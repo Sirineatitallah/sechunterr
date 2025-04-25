@@ -1,0 +1,200 @@
+// widget.component.scss
+@use './../../../../assets/scss/variables' as vars;
+:host {
+  display: block;
+  height: 100%;
+}
+
+.widget {
+  background: var(--widget-bg, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+  
+  .widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+    
+    .widget-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary, #333);
+      margin: 0;
+    }
+    
+    &.has-actions {
+      padding-right: 12px;
+    }
+  }
+  
+  .widget-actions {
+    display: flex;
+    align-items: center;
+    position: relative;
+    
+    .action-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      margin-left: 4px;
+      cursor: pointer;
+      color: var(--text-secondary, #777);
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+        color: var(--text-primary, #333);
+      }
+      
+      &.active {
+        background: var(--primary-light, rgba(25, 118, 210, 0.1));
+        color: var(--primary, #1976d2);
+      }
+    }
+    
+    .widget-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      z-index: 10;
+      background: var(--widget-bg, #fff);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      min-width: 160px;
+      margin-top: 8px;
+      overflow: hidden;
+      
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      li {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        
+        &:hover {
+          background: var(--hover-bg, rgba(0, 0, 0, 0.05));
+        }
+      }
+    }
+  }
+  
+  .widget-content {
+    flex: 1;
+    padding: 16px 20px;
+    position: relative;
+    overflow: auto;
+  }
+  
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-top-color: var(--primary, #1976d2);
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+    }
+  }
+}
+
+// Widget types styling
+.widget-vulnerabilities {
+  --widget-accent: #e53935;
+  border-top: 3px solid var(--widget-accent);
+}
+
+.widget-critical-alerts {
+  --widget-accent: #d32f2f;
+  border-top: 3px solid var(--widget-accent);
+}
+
+.widget-quick-actions {
+  --widget-accent: #1e88e5;
+  border-top: 3px solid var(--widget-accent);
+}
+
+.widget-activity-log {
+  --widget-accent: #43a047;
+  border-top: 3px solid var(--widget-accent);
+}
+
+// Widget sizes
+.widget.small {
+  .widget-header {
+    padding: 12px 16px;
+    
+    .widget-title {
+      font-size: 14px;
+    }
+  }
+  
+  .widget-content {
+    padding: 12px 16px;
+  }
+}
+
+.widget.large {
+  .widget-header {
+    .widget-title {
+      font-size: 18px;
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+  .widget {
+    --widget-bg: #2d3035;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: #e0e0e0;
+    --text-secondary: #aaa;
+    --hover-bg: rgba(255, 255, 255, 0.05);
+    
+    .loading-overlay {
+      background: rgba(45, 48, 53, 0.7);
+    }
+  }
+}

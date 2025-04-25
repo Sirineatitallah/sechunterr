@@ -1,0 +1,62 @@
+// _dark-theme.scss
+@import './variables';
+
+.dark-theme {
+  // Base colors
+  --bg-default: #{$dark-bg-default};
+  --bg-paper: #{$dark-bg-paper};
+  --bg-card: #{$dark-bg-card};
+  --text-primary: #{$dark-text-primary};
+  --text-secondary: #{$dark-text-secondary};
+  --border-color: #{$dark-border-color};
+  
+  // Keep brand colors mostly the same but slightly adjust
+  --primary: #{$primary};
+  --primary-light: #{adjust-color($primary-light, $lightness: -10%)};
+  --accent: #{adjust-color($accent, $lightness: -5%)};
+  
+  // Status colors with better contrast for dark mode
+  --error: #{adjust-color($error, $lightness: 5%)};
+  --warning: #{adjust-color($warning, $lightness: 5%)};
+  --info: #{adjust-color($info, $lightness: 5%)};
+  --success: #{adjust-color($success, $lightness: 5%)};
+  
+  // Module colors
+  --vi-color: #{adjust-color($vi-color, $lightness: 5%)};
+  --asm-color: #{adjust-color($asm-color, $lightness: 5%)};
+  --cti-color: #{adjust-color($cti-color, $lightness: 5%)};
+  --soar-color: #{adjust-color($soar-color, $lightness: 5%)};
+  
+  // Component-specific overrides
+  --card-bg: #{$dark-bg-card};
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --widget-bg: #{$dark-bg-card};
+  
+  // Chart and visualization colors
+  --chart-grid: #{rgba(255, 255, 255, 0.1)};
+  --chart-tooltip-bg: #{rgba(30, 30, 30, 0.9)};
+  
+  // Custom elements
+  .widget {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dashboard-container {
+    background-color: var(--bg-default);
+  }
+  
+  // Chart and data visualization adjustments
+  .apexcharts-text {
+    fill: var(--text-secondary) !important;
+  }
+  
+  .apexcharts-grid line {
+    stroke: var(--chart-grid) !important;
+  }
+  
+  .apexcharts-tooltip {
+    background: var(--chart-tooltip-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+  }
+}

@@ -1,0 +1,93 @@
+// _variables.scss
+@use "sass:math";
+// Colors
+$primary: #1976d2;
+$primary-light: #42a5f5;
+$primary-dark: #0d47a1;
+$secondary: #26a69a;
+$accent: #ff4081;
+$error: #f44336;
+$warning: #ff9800;
+$info: #2196f3;
+$success: #4caf50;
+
+// Text
+$text-primary: #333333;
+$text-secondary: #757575;
+$text-hint: #9e9e9e;
+$text-disabled: rgba(0, 0, 0, 0.38);
+
+// Background
+$bg-default: #f5f7fa;
+$bg-paper: #ffffff;
+$bg-card: #ffffff;
+
+// Borders
+$border-radius-sm: 4px;
+$border-radius: 8px;
+$border-radius-lg: 12px;
+$border-color: rgba(0, 0, 0, 0.12);
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+$shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+// Spacing
+$spacing-unit: 8px;
+$spacing-sm: $spacing-unit;     // 8px
+$spacing-md: $spacing-unit * 2; // 16px
+$spacing-lg: $spacing-unit * 3; // 24px
+$spacing-xl: $spacing-unit * 4; // 32px
+
+// Typography
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+$font-family-heading: $font-family-base;
+$font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+$font-size-xs: 0.75rem;   // 12px
+$font-size-sm: 0.875rem;  // 14px
+$font-size-base: 1rem;    // 16px
+$font-size-lg: 1.125rem;  // 18px
+$font-size-xl: 1.25rem;   // 20px
+$font-size-2xl: 1.5rem;   // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem;  // 36px
+
+// Breakpoints
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-2xl: 1400px;
+
+// Z-index layers
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// Dark theme
+$dark-bg-default: #121212;
+$dark-bg-paper: #1e1e1e;
+$dark-bg-card: #2d3035;
+$dark-text-primary: #e0e0e0;
+$dark-text-secondary: #a0a0a0;
+$dark-border-color: rgba(255, 255, 255, 0.1);
+
+// Module-specific colors
+$vi-color: #7c4dff;
+$asm-color: #ff5722;
+$cti-color: #2196f3;
+$soar-color: #00c853;
+
+// Transition
+$transition-base: all 0.2s ease-in-out;
+$transition-fast: all 0.1s ease-in-out;
+$transition-slow: all 0.3s ease-in-out;
+
+$spacing-unit: 8px;
+$spacing-xs: math.div($spacing-unit, 2); 

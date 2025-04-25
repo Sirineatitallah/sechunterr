@@ -1,0 +1,27 @@
+// Nous utiliserons uniquement le thème précompilé pour l'instant
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+// Styles globaux de base
+html, body {
+  height: 100%;
+}
+
+// Styles pour les conteneurs
+.container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Styles pour les cartes de dashboard
+.dashboard-card {
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
