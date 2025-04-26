@@ -1,7 +1,9 @@
-// Update vi.component.ts
+//vi.component.ts
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { WidgetComponent } from '../../../../shared/components/widget/widget.component';
+import { WidgetComponent } from './../../../../shared/components/widget/widget.component';
+import { WidgetPosition } from './../../../../core/models/widget-position.model';
+
 
 @Component({
   standalone: true,
@@ -10,8 +12,15 @@ import { WidgetComponent } from '../../../../shared/components/widget/widget.com
   styleUrls: ['./vi.component.scss']
 })
 export class ViComponent {
-  widgetConfig = { 
-    type: 'vi-dashboard',
-    refreshInterval: 300000 // 5 minutes
+  widgetConfig: WidgetPosition = {
+    id: 'vi-widget-1',
+    type: 'vulnerability',
+    x: 0,
+    y: 0,
+    cols: 4,
+    rows: 2,
+    config: {
+      refreshInterval: 3000
+    }
   };
 }

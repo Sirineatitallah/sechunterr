@@ -1,23 +1,32 @@
-// _variables.scss
 @use "sass:math";
-// Colors
+
+// Color System
 $primary: #1976d2;
+$primary-50: #e3f2fd;
+$primary-100: #bbdefb;
+$primary-300: #64b5f6;
 $primary-light: #42a5f5;
 $primary-dark: #0d47a1;
-$secondary: #26a69a;
-$accent: #ff4081;
-$error: #f44336;
-$warning: #ff9800;
-$info: #2196f3;
-$success: #4caf50;
 
-// Text
+$secondary: #26a69a;
+$secondary-100: #80cbc4;
+$secondary-300: #26a69a;
+
+$accent: #ff4081;
+
+// Status Colors
+$error: #ff4444;
+$warning: #ffbb33;
+$success: #00C851;
+$info: #2196f3;
+
+// Text Colors
 $text-primary: #333333;
 $text-secondary: #757575;
 $text-hint: #9e9e9e;
 $text-disabled: rgba(0, 0, 0, 0.38);
 
-// Background
+// Backgrounds
 $bg-default: #f5f7fa;
 $bg-paper: #ffffff;
 $bg-card: #ffffff;
@@ -26,19 +35,23 @@ $bg-card: #ffffff;
 $border-radius-sm: 4px;
 $border-radius: 8px;
 $border-radius-lg: 12px;
+$border-radius-2xl: 24px;
 $border-color: rgba(0, 0, 0, 0.12);
 
 // Shadows
 $shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
 $shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+$shadow-3d: 0 15px 30px rgba(0, 0, 0, 0.12);
 
-// Spacing
+// Spacing System
 $spacing-unit: 8px;
-$spacing-sm: $spacing-unit;     // 8px
-$spacing-md: $spacing-unit * 2; // 16px
-$spacing-lg: $spacing-unit * 3; // 24px
-$spacing-xl: $spacing-unit * 4; // 32px
+$spacing-xs: math.div($spacing-unit, 2);  // 4px
+$spacing-sm: $spacing-unit;              // 8px
+$spacing-md: $spacing-unit * 2;          // 16px
+$spacing-lg: $spacing-unit * 3;          // 24px
+$spacing-xl: $spacing-unit * 4;          // 32px
+$spacing-2xl: $spacing-unit * 6;         // 48px
 
 // Typography
 $font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
@@ -61,7 +74,7 @@ $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
 $breakpoint-2xl: 1400px;
 
-// Z-index layers
+// Z-index
 $z-index-dropdown: 1000;
 $z-index-sticky: 1020;
 $z-index-fixed: 1030;
@@ -70,7 +83,7 @@ $z-index-modal: 1050;
 $z-index-popover: 1060;
 $z-index-tooltip: 1070;
 
-// Dark theme
+// Dark Theme
 $dark-bg-default: #121212;
 $dark-bg-paper: #1e1e1e;
 $dark-bg-card: #2d3035;
@@ -78,16 +91,14 @@ $dark-text-primary: #e0e0e0;
 $dark-text-secondary: #a0a0a0;
 $dark-border-color: rgba(255, 255, 255, 0.1);
 
-// Module-specific colors
+// Module Colors
 $vi-color: #7c4dff;
 $asm-color: #ff5722;
 $cti-color: #2196f3;
 $soar-color: #00c853;
 
-// Transition
-$transition-base: all 0.2s ease-in-out;
-$transition-fast: all 0.1s ease-in-out;
-$transition-slow: all 0.3s ease-in-out;
-
-$spacing-unit: 8px;
-$spacing-xs: math.div($spacing-unit, 2); 
+// Transition System
+$transition-duration: 0.2s;
+$transition-duration-fast: 0.1s;
+$transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: all $transition-duration $transition-easing;

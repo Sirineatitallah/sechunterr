@@ -1,4 +1,13 @@
-// Nous utiliserons uniquement le thème précompilé pour l'instant
+// Local font imports
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/fonts/roboto-latin-400-normal.woff2') format('woff2');
+  font-display: swap;
+}
+
+// Base styles
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -6,19 +15,17 @@ body {
   color: #333;
 }
 
-// Styles globaux de base
 html, body {
   height: 100%;
 }
 
-// Styles pour les conteneurs
+// Layout components
 .container {
   padding: 16px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-// Styles pour les cartes de dashboard
 .dashboard-card {
   padding: 16px;
   border-radius: 8px;

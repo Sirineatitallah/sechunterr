@@ -1,78 +1,115 @@
 <div class="auth-container">
     <div class="auth-card">
+      <div class="auth-glass"></div>
+      
       <div class="auth-header">
-        <h1 class="auth-title">SecHunter</h1>
-        <p class="auth-subtitle">Security Dashboard Login</p>
+        <img src="assets/icons/logo-sechunter.svg" alt="SecHunter" class="brand-logo">
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Secure Access to VOC Ecosystem</p>
       </div>
   
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-        <div class="form-group">
-          <label for="email">Email</label>
+        <!-- Email Input -->
+        <div class="form-group floating-group">
           <div class="input-container">
-            <i class="material-icons">email</i>
+            <i class="icon icon-email"></i>
             <input 
               type="email" 
               id="email" 
               formControlName="email" 
-              placeholder="Enter your email"
               autocomplete="email"
+              [class.valid]="email.valid && email.touched"
+              placeholder=" "
             >
+            <label for="email">Enterprise Email</label>
+            <div class="input-border"></div>
           </div>
-          <div class="error-message" *ngIf="email.invalid && (email.dirty || email.touched)">
-            <span *ngIf="email.errors?.['required']">Email is required</span>
-            <span *ngIf="email.errors?.['email']">Please enter a valid email address</span>
+          <div class="error-message" @fadeIn *ngIf="email.invalid && (email.dirty || email.touched)">
+            <i class="icon icon-warning"></i>
+            <span>{{ getEmailErrorMessage() }}</span>
           </div>
         </div>
   
-        <div class="form-group">
-          <label for="password">Password</label>
+        <!-- Password Input -->
+        <div class="form-group floating-group">
           <div class="input-container">
-            <i class="material-icons">lock</i>
+            <i class="icon icon-lock"></i>
             <input 
               [type]="showPassword ? 'text' : 'password'" 
               id="password" 
               formControlName="password" 
-              placeholder="Enter your password"
               autocomplete="current-password"
+              [class.valid]="password.valid && password.touched"
+              placeholder=" "
             >
+            <label for="password">Access Code</label>
+            <div class="input-border"></div>
             <button 
               type="button" 
               class="password-toggle" 
               (click)="togglePasswordVisibility()"
-              aria-label="Toggle password visibility">
-              <i class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</i>
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <i class="icon" [class.icon-visibility]="!showPassword" [class.icon-visibility-off]="showPassword"></i>
             </button>
           </div>
-          <div class="error-message" *ngIf="password.invalid && (password.dirty || password.touched)">
-            <span *ngIf="password.errors?.['required']">Password is required</span>
-            <span *ngIf="password.errors?.['minlength']">Password must be at least 6 characters</span>
+          <div class="password-strength" [class.visible]="password.dirty">
+            <div class="strength-bar" [class]="getPasswordStrength()"></div>
+            <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+          </div>
+          <div class="error-message" @fadeIn *ngIf="password.invalid && (password.dirty || password.touched)">
+            <i class="icon icon-warning"></i>
+            <span>{{ getPasswordErrorMessage() }}</span>
           </div>
         </div>
   
         <div class="form-options">
-          <div class="remember-me">
-            <input type="checkbox" id="remember" formControlName="rememberMe">
-            <label for="remember">Remember me</label>
-          </div>
-          <a href="#" class="forgot-password">Forgot password?</a>
+          <label class="remember-me">
+            <input type="checkbox" formControlName="rememberMe">
+            <span class="checkmark"></span>
+            Persistent Session
+          </label>
+          <a href="#" class="forgot-password">
+            <i class="icon icon-key"></i>
+            Recovery Access
+          </a>
         </div>
   
         <button 
           type="submit" 
           class="login-btn" 
-          [disabled]="loginForm.invalid || isLoading">
-          <span *ngIf="!isLoading">Log In</span>
-          <div class="spinner" *ngIf="isLoading"></div>
+          [disabled]="loginForm.invalid || isLoading"
+          [class.loading]="isLoading"
+        >
+          <span class="btn-content">
+            <i class="icon icon-fingerprint"></i>
+            <span>Authenticate</span>
+          </span>
+          <div class="loader"></div>
         </button>
   
-        <div class="alert error" *ngIf="error">
-          <i class="material-icons">error</i>
-          <span>{{ error }}</span>
+        <div class="auth-social">
+          <p class="social-divider">Or continue with</p>
+          <div class="social-buttons">
+            <button type="button" class="social-btn google">
+              <i class="icon icon-google"></i>
+            </button>
+            <button type="button" class="social-btn microsoft">
+              <i class="icon icon-microsoft"></i>
+            </button>
+            <button type="button" class="social-btn github">
+              <i class="icon icon-github"></i>
+            </button>
+          </div>
         </div>
       </form>
   
       <div class="auth-footer">
-        <p>Secure Login © SecHunter {{ currentYear }}</p>
+        <p class="security-info">
+          <i class="icon icon-shield"></i>
+          E2E Encrypted Session • ISO 27001 Certified
+        </p>
+        <p class="copyright">Secure Access © SecHunter {{ currentYear }}</p>
       </div>
     </div>
   </div>

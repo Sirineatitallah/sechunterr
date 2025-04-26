@@ -1,0 +1,10 @@
+<div class="dashboard-grid" cdkDropListGroup>
+    @for (widget of widgets; track widget.id) {
+      <div 
+        cdkDrag
+        class="grid-item"
+        [style.gridArea]="getGridArea(widget)">
+        <app-widget [config]="widget"></app-widget>
+      </div>
+    }
+  </div>
