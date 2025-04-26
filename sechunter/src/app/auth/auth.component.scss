@@ -1,0 +1,242 @@
+@use 'sass:color';
+@use '../../assets/scss/variables' as vars;
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, vars.$bg-default 0%, color.adjust(vars.$bg-default, $lightness: -10%) 100%);  padding: vars.$spacing-md;
+  
+  @media (max-width: vars.$breakpoint-md) {
+    padding: vars.$spacing-sm;
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  background-color: vars.$bg-paper;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-lg;
+  overflow: hidden;
+}
+
+.auth-header {
+  padding: vars.$spacing-xl;
+  text-align: center;
+  background-color: vars.$primary-dark;
+  color: white;
+  border-top-left-radius: vars.$border-radius;
+  border-top-right-radius: vars.$border-radius;
+}
+
+.auth-title {
+  margin: 0;
+  font-size: vars.$font-size-2xl;
+  font-weight: 600;
+}
+
+.auth-subtitle {
+  margin: vars.$spacing-sm 0 0;
+  font-size: vars.$font-size-sm;
+  opacity: 0.8;
+}
+
+.auth-form {
+  padding: vars.$spacing-xl;
+}
+
+.form-group {
+  margin-bottom: vars.$spacing-lg;
+}
+
+label {
+  display: block;
+  margin-bottom: vars.$spacing-xs;
+  font-size: vars.$font-size-sm;
+  font-weight: 500;
+  color: vars.$text-secondary;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  i {
+    position: absolute;
+    left: vars.$spacing-md;
+    color: vars.$text-secondary;
+    font-size: 20px;
+  }
+  
+  input {
+    width: 100%;
+    padding: vars.$spacing-md vars.$spacing-md vars.$spacing-md calc(vars.$spacing-xl * 1.5);
+    border: 1px solid vars.$border-color;
+    border-radius: vars.$border-radius;
+    font-size: vars.$font-size-base;
+    color: vars.$text-primary;
+    background-color: transparent;
+    transition: vars.$transition-base;
+    
+    &:focus {
+      outline: none;
+      border-color: vars.$primary;
+      box-shadow: 0 0 0 2px rgba(vars.$primary, 0.2);
+    }
+    
+    &::placeholder {
+      color: vars.$text-hint;
+    }
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: vars.$spacing-md;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: vars.$text-secondary;
+  
+  &:hover {
+    color: vars.$primary;
+  }
+  
+  i {
+    position: static;
+  }
+}
+
+.error-message {
+  color: vars.$error;
+  font-size: vars.$font-size-xs;
+  margin-top: vars.$spacing-xs;
+  min-height: 20px;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-lg;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  
+  input[type="checkbox"] {
+    margin-right: vars.$spacing-xs;
+    cursor: pointer;
+  }
+  
+  label {
+    margin-bottom: 0;
+    font-size: vars.$font-size-sm;
+    cursor: pointer;
+  }
+}
+
+.forgot-password {
+  font-size: vars.$font-size-sm;
+  color: vars.$primary;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.login-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: vars.$spacing-md;
+  background-color: vars.$primary;
+  color: white;
+  border: none;
+  border-radius: vars.$border-radius;
+  font-size: vars.$font-size-base;
+  font-weight: 500;
+  cursor: pointer;
+  transition: vars.$transition-base;
+  height: 48px;
+  
+  &:hover:not(:disabled) {
+    background-color: color.adjust(vars.$primary, $lightness: -5%);
+  }
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  padding: vars.$spacing-md;
+  border-radius: vars.$border-radius;
+  margin-top: vars.$spacing-lg;
+  font-size: vars.$font-size-sm;
+  
+  i {
+    margin-right: vars.$spacing-sm;
+    font-size: 20px;
+  }
+  
+  &.error {
+    background-color: rgba(vars.$error, 0.1);
+    color: vars.$error;
+  }
+}
+
+.auth-footer {
+  padding: vars.$spacing-md;
+  text-align: center;
+  background-color: vars.$bg-card;
+  border-top: 1px solid vars.$border-color;
+  
+  p {
+    margin: 0;
+    font-size: vars.$font-size-xs;
+    color: vars.$text-secondary;
+  }
+}
+
+// Dark mode styles
+:host-context(.dark-theme) {
+  .auth-container {
+    background: linear-gradient(135deg, vars.$dark-bg-default 0%, color.adjust(vars.$dark-bg-default, $lightness: -5%) 100%);  }
+  
+  .auth-card {
+    background-color: vars.$dark-bg-paper;
+  }
+  
+  input {
+    background-color: rgba(255, 255, 255, 0.05);
+    
+    &:focus {
+        box-shadow: 0 0 0 2px rgba(color.adjust(vars.$primary, $lightness: 10%), 0.2);
+    }
+  }
+}
