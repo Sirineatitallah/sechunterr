@@ -1,0 +1,9 @@
+<div class="action-history-widget">
+  <h3>Historique des Actions</h3>
+  <ul>
+    <li *ngFor="let action of actionHistory">
+      <span class="action-desc">{{ action.description }}</span>
+      <span class="action-time">{{ formatTimestamp(action.timestamp) }}</span>
+    </li>
+  </ul>
+</div>

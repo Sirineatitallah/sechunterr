@@ -1,0 +1,11 @@
+<div class="ai-copilot-container" [class.open]="isOpen">
+  <button class="toggle-button" (click)="toggleOpen()">
+    <span *ngIf="!isOpen">💬</span>
+    <span *ngIf="isOpen">✖</span>
+  </button>
+  <div class="chatbot-messages" *ngIf="isOpen">
+    <ul>
+      <li *ngFor="let message of messages">{{ message }}</li>
+    </ul>
+  </div>
+</div>

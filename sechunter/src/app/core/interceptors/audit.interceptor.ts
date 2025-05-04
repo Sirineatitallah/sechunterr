@@ -1,42 +1,45 @@
-import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuditService } from '../services/audit.service';
+import { AuthService } from '../services/auth.service';
+import { tap } from 'rxjs';
+import { User } from '../models/user.model';
 
-// Create an interface for audit entries
-interface AuditEntry {
-  timestamp: string;
-  endpoint: string;
-  method: string;
-  user: string;
-}
+export const auditInterceptor: HttpInterceptorFn = (req, next) => {
+  const auditService = inject(AuditService);
+  const authService = inject(AuthService);
+  const user = authService.getDecodedToken();
 
-// Create a simple AuditService since it's missing
-@Injectable({ providedIn: 'root' })
-export class AuditService {
-  log(entry: AuditEntry): void {
-    // Implementation of logging logic
-    console.log('Audit log:', entry);
-  }
-}
+  const baseEntry = {
+    timestamp: new Date().toISOString(),
+    endpoint: req.url,
+    method: req.method,
+    status: 'success' as const,
+    user: user ? { id: user.id, email: user.email } : undefined,
+    metadata: {
+      ipAddress: '', // À remplacer par la vraie IP
+      userAgent: navigator.userAgent
+    }
+  };
 
-@Injectable()
-export class AuditInterceptor implements HttpInterceptor {
-  constructor(private audit: AuditService) {}
-
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const auditEntry = {
-      timestamp: new Date().toISOString(),
-      endpoint: request.url,
-      method: request.method,
-      user: 'currentUser' // Replace with actual user context
-    };
-    
-    this.audit.log(auditEntry);
-    return next.handle(request);
-  }
-}
+  return next(req).pipe(
+    tap({
+      next: () => {
+        auditService.log({ 
+          ...baseEntry,
+          status: 'success'
+        });
+      },
+      error: (err) => {
+        auditService.log({ 
+          ...baseEntry,
+          status: 'error',
+          metadata: {
+            ...baseEntry.metadata,
+            error: err.message
+          }
+        });
+      }
+    })
+  );
+};

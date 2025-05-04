@@ -1,1 +1,68 @@
-<p>header works!</p>
+<header class="dashboard-header glassmorphism">
+  <div class="branding">
+    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgcng9IjMyIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgogICAgPHJlY3Qgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiIGZpbGw9InVybCgjZ3JhZGllbnQpIiBmaWx0ZXI9InVybCgjZmxvb2QpIi8+CiAgICA8cGF0aCBkPSJNMTI4IDY0QzEyOCA5OS4yMTMgMTAwLjIxMyAxMjggNjQgMTI4QzI3Ljc4NyAxMjggMCA5OS4yMTMgMCA2NEMwIDI3Ljc4NyAyNy43ODcgMCA2NCAwQzEwMC4yMTMgMCAxMjggMjcuNzg3IDEyOCA2NFoiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+Cjwvc3ZnPgo=" alt="VOC Logo" class="logo neon-glow">
+    <h1 class="app-name">Security Operations</h1>
+  </div>
+
+  <div class="instance-selector">
+    <mat-form-field appearance="fill" class="instance-dropdown">
+      <mat-label>Instance Client</mat-label>
+      <mat-select [(value)]="selectedInstance">
+        <mat-option *ngFor="let instance of instances" [value]="instance.id">
+          <mat-icon>dns</mat-icon> {{instance.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Rechercher des vulnérabilités CVE-2024-..." [(ngModel)]="searchQuery" (input)="onSearchInput()" />
+    <div class="search-filters">
+      <mat-checkbox [(ngModel)]="filters.asm">ASM</mat-checkbox>
+      <mat-checkbox [(ngModel)]="filters.vi">VI</mat-checkbox>
+      <mat-checkbox [(ngModel)]="filters.cti">CTI</mat-checkbox>
+      <mat-checkbox [(ngModel)]="filters.soar">SOAR</mat-checkbox>
+    </div>
+    <ul class="search-predictions" *ngIf="searchPredictions.length > 0">
+      <li *ngFor="let prediction of searchPredictions" (click)="selectPrediction(prediction)">{{prediction}}</li>
+    </ul>
+  </div>
+
+  <div class="quick-actions">
+    <button mat-raised-button color="primary" class="new-report-btn" (mouseenter)="hoverNewReport=true" (mouseleave)="hoverNewReport=false">
+      Nouveau Rapport
+    </button>
+    <button mat-icon-button class="alerts-btn" (click)="openAlerts()">
+      <mat-icon class="rotating-icon">notifications_active</mat-icon>
+      <span class="badge" *ngIf="alertCount > 0">{{alertCount}}</span>
+    </button>
+  </div>
+
+  <div class="header-controls">
+    <div class="global-status">
+      <mat-icon class="shield-icon animated-shield">shield</mat-icon>
+      <span>Sécurité : Niveau Optimal</span>
+      <mat-progress-bar mode="determinate" [value]="systemStatus"></mat-progress-bar>
+    </div>
+
+    <div class="profile-menu">
+      <button mat-icon-button [matMenuTriggerFor]="profileMenu">
+        <img [src]="userAvatar" alt="Profile" class="profile-avatar">
+      </button>
+      <mat-menu #profileMenu="matMenu">
+        <button mat-menu-item (click)="toggleDarkMode()">
+          <mat-icon>brightness_6</mat-icon>
+          {{darkMode ? 'Light Mode' : 'Dark Mode'}}
+        </button>
+        <button mat-menu-item (click)="openSettings()">
+          <mat-icon>settings</mat-icon>
+          Paramètres
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          Déconnexion
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</header>

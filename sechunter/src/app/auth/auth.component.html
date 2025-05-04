@@ -1,115 +1,114 @@
+<!-- auth.component.html -->
 <div class="auth-container">
-    <div class="auth-card">
-      <div class="auth-glass"></div>
-      
-      <div class="auth-header">
-        <img src="assets/icons/logo-sechunter.svg" alt="SecHunter" class="brand-logo">
-        <h1 class="auth-title">Welcome Back</h1>
-        <p class="auth-subtitle">Secure Access to VOC Ecosystem</p>
-      </div>
-  
+  <div class="auth-card">
+    <div class="cyber-gradient"></div>
+    <div class="neon-grid"></div>
+    
+    <div class="auth-content">
+      <header class="auth-header">
+        <h1 class="auth-title glitch" data-text="Welcome Back">Welcome Back</h1>
+        <p class="auth-subtitle">Secure Gateway to VOC Ecosystem</p>
+      </header>
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-        <!-- Email Input -->
-        <div class="form-group floating-group">
-          <div class="input-container">
-            <i class="icon icon-email"></i>
-            <input 
-              type="email" 
-              id="email" 
-              formControlName="email" 
-              autocomplete="email"
-              [class.valid]="email.valid && email.touched"
-              placeholder=" "
-            >
-            <label for="email">Enterprise Email</label>
-            <div class="input-border"></div>
-          </div>
-          <div class="error-message" @fadeIn *ngIf="email.invalid && (email.dirty || email.touched)">
-            <i class="icon icon-warning"></i>
-            <span>{{ getEmailErrorMessage() }}</span>
+        <div class="input-field cyber-input">
+          <label for="id" class="hologram-label">Enterprise ID</label>
+          <input 
+            type="text" 
+            id="id" 
+            formControlName="id"
+            autocomplete="off" 
+            required
+          >
+          <div class="cyber-border"></div>
+          <i class="icon icon-beam"></i>
+        </div>
+
+        <div class="input-field cyber-input">
+          <label for="password" class="hologram-label">Access Code</label>
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password"
+            autocomplete="off" 
+            required
+            (input)="updatePasswordStrength()"
+          >
+          <div class="cyber-border"></div>
+          <button 
+            type="button" 
+            class="password-toggle cyber-button"
+            (click)="togglePasswordVisibility()"
+            title="Toggle password visibility"
+            aria-label="Toggle password visibility"
+          >
+            <i class="icon" [class.icon-eye]="!showPassword" [class.icon-eye-blocked]="showPassword"></i>
+          </button>
+          
+          <div class="password-strength-indicator">
+            <div class="strength-bar" [style.width.%]="strengthPercentage" 
+                 [class]="'strength-' + passwordStrength"></div>
+            <div class="strength-labels">
+              <span *ngFor="let level of strengthLevels" [class.active]="level <= strengthLevel">
+                {{ level }}
+              </span>
+            </div>
           </div>
         </div>
-  
-        <!-- Password Input -->
-        <div class="form-group floating-group">
-          <div class="input-container">
-            <i class="icon icon-lock"></i>
-            <input 
-              [type]="showPassword ? 'text' : 'password'" 
-              id="password" 
-              formControlName="password" 
-              autocomplete="current-password"
-              [class.valid]="password.valid && password.touched"
-              placeholder=" "
-            >
-            <label for="password">Access Code</label>
-            <div class="input-border"></div>
-            <button 
-              type="button" 
-              class="password-toggle" 
-              (click)="togglePasswordVisibility()"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-            >
-              <i class="icon" [class.icon-visibility]="!showPassword" [class.icon-visibility-off]="showPassword"></i>
-            </button>
+
+        <div class="security-criteria">
+          <div class="criteria-item" [class.valid]="hasMinLength">
+            <i class="icon icon-check"></i>
+            <span>8+ Characters</span>
           </div>
-          <div class="password-strength" [class.visible]="password.dirty">
-            <div class="strength-bar" [class]="getPasswordStrength()"></div>
-            <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+          <div class="criteria-item" [class.valid]="hasUppercase">
+            <i class="icon icon-check"></i>
+            <span>Uppercase Letter</span>
           </div>
-          <div class="error-message" @fadeIn *ngIf="password.invalid && (password.dirty || password.touched)">
-            <i class="icon icon-warning"></i>
-            <span>{{ getPasswordErrorMessage() }}</span>
+          <div class="criteria-item" [class.valid]="hasNumber">
+            <i class="icon icon-check"></i>
+            <span>Numeric Character</span>
+          </div>
+          <div class="criteria-item" [class.valid]="hasSpecialChar">
+            <i class="icon icon-check"></i>
+            <span>Special Symbol</span>
           </div>
         </div>
-  
-        <div class="form-options">
-          <label class="remember-me">
-            <input type="checkbox" formControlName="rememberMe">
-            <span class="checkmark"></span>
-            Persistent Session
-          </label>
-          <a href="#" class="forgot-password">
-            <i class="icon icon-key"></i>
-            Recovery Access
-          </a>
-        </div>
-  
+
+        <!-- Sign In Button -->
         <button 
           type="submit" 
-          class="login-btn" 
+          class="auth-button cyber-button"
           [disabled]="loginForm.invalid || isLoading"
-          [class.loading]="isLoading"
         >
-          <span class="btn-content">
-            <i class="icon icon-fingerprint"></i>
-            <span>Authenticate</span>
-          </span>
-          <div class="loader"></div>
+          <span *ngIf="!isLoading">SIGN IN</span>
+          <span *ngIf="isLoading" class="cyber-loader"></span>
         </button>
-  
-        <div class="auth-social">
-          <p class="social-divider">Or continue with</p>
-          <div class="social-buttons">
-            <button type="button" class="social-btn google">
-              <i class="icon icon-google"></i>
-            </button>
-            <button type="button" class="social-btn microsoft">
-              <i class="icon icon-microsoft"></i>
-            </button>
-            <button type="button" class="social-btn github">
-              <i class="icon icon-github"></i>
-            </button>
+      </form>
+
+      <footer class="auth-footer">
+        <div class="security-badges">
+          <div class="badge-item">
+            <i class="icon icon-lock-orb"></i>
+            <span>256-bit Encryption</span>
+          </div>
+          <div class="badge-item">
+            <i class="icon icon-shield-check"></i>
+            <span>Zero Trust Architecture</span>
           </div>
         </div>
-      </form>
-  
-      <div class="auth-footer">
-        <p class="security-info">
-          <i class="icon icon-shield"></i>
-          E2E Encrypted Session • ISO 27001 Certified
+        <div class="security-badges">
+        </div>
+        
+        <p class="auth-switch">
+          don't have an account ? 
+          <a routerLink="/signup" 
+          class="neon-link"
+          queryParamsHandling="preserve">
+          Create an account
+          </a>
         </p>
-        <p class="copyright">Secure Access © SecHunter {{ currentYear }}</p>
-      </div>
+      </footer>
     </div>
   </div>
+</div>

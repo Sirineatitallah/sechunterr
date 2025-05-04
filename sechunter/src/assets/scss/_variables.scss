@@ -102,3 +102,23 @@ $transition-duration: 0.2s;
 $transition-duration-fast: 0.1s;
 $transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 $transition-base: all $transition-duration $transition-easing;
+
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #4f46e5;
+    --success-color: #22c55e;
+    --danger-color: #ef4444;
+    --header-bg: #ffffff;
+    --sidebar-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  }
+  
+  .dark-mode {
+    --header-bg: #1e293b;
+    --sidebar-bg: #0f172a;
+    --card-bg: #1e293b;
+    --text-primary: #f8fafc;
+  }

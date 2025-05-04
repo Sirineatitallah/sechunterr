@@ -1,0 +1,42 @@
+.dashboard-grid {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    min-height: 500px;
+  }
+  
+  .grid-item {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  
+    &.resizing {
+      opacity: 0.8;
+    }
+  }
+  
+  .grid-resize-handle {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    cursor: move;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      margin-bottom: 1rem;
+    }
+  }

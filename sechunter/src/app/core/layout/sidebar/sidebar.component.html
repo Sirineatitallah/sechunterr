@@ -1,1 +1,87 @@
-<p>sidebar works!</p>
+<nav class="sidebar" (mouseleave)="focusModeActive = false" (mouseenter)="focusModeActive = true">
+  <div class="sidebar-header">
+    <div class="branding">
+      <img src="assets/icons/shield-3d.svg" alt="Shield Icon" class="shield-icon" />
+      <h3>VOC Ecosystem</h3>
+    </div>
+    <ng-container *ngIf="currentUser">
+      <div class="user-info">
+        <mat-icon>account_circle</mat-icon>
+        <span>{{ currentUser.name }}</span>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Main Menu -->
+  <ul class="nav flex-column main-menu">
+    <li *ngFor="let item of menuItems" class="nav-item" >
+      <ng-container *ngIf="showMenuItem(item)">
+        <a class="nav-link" 
+           [routerLink]="item.path" 
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }"
+           (mouseenter)="hoveredMenu = item"
+           (mouseleave)="hoveredMenu = null">
+          <img [src]="item.icon" alt="{{ item.title }} Icon" class="nav-icon-3d" />
+          <span class="nav-text">{{ item.title }}</span>
+          <span *ngIf="item.notificationCount && item.notificationCount > 0" class="badge">{{ item.notificationCount }}</span>
+        </a>
+        <!-- Submenus -->
+        <ul *ngIf="item.submenus && item.submenus.length > 0 && hoveredMenu === item" class="submenu">
+          <li *ngFor="let submenu of item.submenus" >
+            <ng-container *ngIf="showMenuItem(submenu)">
+              <a [routerLink]="submenu.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <mat-icon class="submenu-icon">{{ submenu.icon }}</mat-icon>
+                <span>{{ submenu.title }}</span>
+              </a>
+            </ng-container>
+          </li>
+        </ul>
+      </ng-container>
+    </li>
+  </ul>
+
+  <!-- Instance Manager -->
+  <div class="instance-manager">
+    <h4>Instance Manager</h4>
+    <ul class="instance-list">
+      <li *ngFor="let instance of environmentInstances">
+        <span class="status-indicator" [ngClass]="instance.status"></span>
+        <span class="instance-name">{{ instance.name }}</span>
+      </li>
+    </ul>
+    <button class="btn-add-instance" (click)="addInstance()">
+      <img src="assets/icons/holographic-plus.svg" alt="Add Instance" />
+      Ajouter une Instance
+    </button>
+  </div>
+
+  <!-- Favorites / Quick Widgets -->
+  <div class="favorites-widgets">
+    <h4>Favoris / Widgets Rapides</h4>
+    <div class="widget-dropzone">
+      <div *ngFor="let widget of widgets" class="widget" [class.pinned]="widget.pinned" (click)="toggleWidgetPin(widget)">
+        {{ widget.title }}
+        <mat-icon *ngIf="widget.pinned">push_pin</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action History -->
+  <div class="action-history">
+    <h4>Historique des Actions</h4>
+    <ul class="history-timeline">
+      <li *ngFor="let action of actionHistory">
+        <span class="action-desc">{{ action.description }}</span>
+        <span class="action-time">{{ formatTimestamp(action.timestamp) }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="btn-logout" (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+      Secure Sign Out
+    </button>
+  </div>
+</nav>

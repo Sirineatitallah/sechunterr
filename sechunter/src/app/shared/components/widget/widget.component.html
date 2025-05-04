@@ -1,1 +1,39 @@
-<p>widget works!</p>
+<div class="widget" [ngClass]="getWidgetClass()">
+    <div class="widget-header">
+      <div class="widget-title">
+        @if (config?.data?.icon) {
+          <mat-icon class="title-icon">{{ config?.data?.icon }}</mat-icon>
+        }
+        <h3>{{ title || config?.title || 'Unnamed Widget' }}</h3>
+      </div>
+      
+      <div class="widget-controls">
+        @if (hasActions) {
+          <button mat-icon-button (click)="toggleMenu()">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        }
+        
+        <div class="widget-menu" [class.show]="showMenu">
+          <button mat-menu-item (click)="onRefresh()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+          </button>
+          <button mat-menu-item (click)="onExpand()">
+            <mat-icon>open_in_full</mat-icon>
+            Expand
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="widget-content">
+      <ng-content></ng-content>
+      
+      @if (loading) {
+        <div class="loading-overlay">
+          <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+        </div>
+      }
+    </div>
+  </div>

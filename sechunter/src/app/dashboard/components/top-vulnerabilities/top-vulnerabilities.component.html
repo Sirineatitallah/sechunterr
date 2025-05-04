@@ -1,0 +1,10 @@
+<div class="top-vulnerabilities-widget">
+  <h3>Top 5 Vulnerabilities</h3>
+  <ul>
+    <li *ngFor="let vuln of topVulnerabilities">
+      <span class="vuln-name">{{ vuln.name }}</span>
+      <span class="vuln-severity" [ngClass]="vuln.severity.toLowerCase()">{{ vuln.severity }}</span>
+      <span class="vuln-count">{{ vuln.count }}</span>
+    </li>
+  </ul>
+</div>

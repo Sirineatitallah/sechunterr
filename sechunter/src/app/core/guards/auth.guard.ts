@@ -1,19 +1,16 @@
-// src/app/core/guards/auth.guard.ts
 import { inject } from '@angular/core';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { CanActivateFn, Router } from '@angular/router';
-import { isPlatformServer } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
 
-export const authGuard: CanActivateFn = () => {
-  const auth = inject(AuthService);
+export const authGuard: CanActivateFn = (route, state): boolean | UrlTree => {
+  const authService = inject(AuthService);
   const router = inject(Router);
-  const platformId = inject(PLATFORM_ID);
-  
-  // Permettre l'accès sur le serveur pour éviter les blocages en SSR
-  if (isPlatformServer(platformId)) {
+
+  if (authService.isAuthenticated()) {
     return true;
   }
-  
-  return auth.isAuthenticated() || router.parseUrl('/auth');
+
+  // Store attempted URL for redirect after login
+  authService.redirectUrl = state.url;
+  return router.parseUrl('/auth');
 };

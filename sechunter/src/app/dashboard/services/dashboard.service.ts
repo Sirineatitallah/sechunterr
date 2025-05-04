@@ -1,69 +1,73 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, tap } from 'rxjs';
 import { WidgetPosition } from '../../core/models/widget-position.model';
 import { UserInteraction } from '../../core/models/user-interaction.model';
-import { MicroserviceConnectorService, MicroserviceType, ServicePreferences } from '../../core/services/microservice-connector.service';
+import { MicroserviceConnectorService, MicroserviceType } from '../../core/services/microservice-connector.service';
+import { of } from 'rxjs'; 
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class DashboardService {
   private layoutSubject = new BehaviorSubject<WidgetPosition[]>([]);
+
+  public layout$ = this.layoutSubject.asObservable();
   private userBehaviorSubject = new BehaviorSubject<UserInteraction[]>([]);
+  private widgetCache = new Map<string, any>();
 
   constructor(private microserviceConnector: MicroserviceConnectorService) {
-    // Initialize with default or stored data
+    this.initializeDashboard();
+  }
+
+  private initializeDashboard(): void {
+    this.microserviceConnector.getAvailableServices().subscribe(services => {
+      const initialLayout = services.map(service => ({
+        id: `${service}-widget`,
+        type: service,
+        cols: 4,
+        rows: 3,
+        x: 0,
+        y: 0
+      }));
+      this.layoutSubject.next(initialLayout);
+    });
   }
 
   saveLayout(layout: WidgetPosition[]): void {
-    this.layoutSubject.next(layout);
-    
-    // Create service preferences object to match the expected type
-    const servicePreferences: Record<MicroserviceType, ServicePreferences> = {
-      [MicroserviceType.THREAT_INTEL]: { refreshRate: 60, notificationEnabled: true },
-      [MicroserviceType.VULNERABILITY_SCANNER]: { refreshRate: 300, notificationEnabled: false },
-      [MicroserviceType.INCIDENT_RESPONSE]: { refreshRate: 30, notificationEnabled: true },
-      [MicroserviceType.NETWORK_SECURITY]: { refreshRate: 120, notificationEnabled: false }
-    };
-    
-    this.microserviceConnector.saveUserPreferences({ 
+    const config = {
       layout,
-      servicePreferences
-    });
+      servicePreferences: {} 
+    };
+  
+    this.microserviceConnector.saveUserPreferences(config)
+      .pipe(
+        tap(() => console.log('Layout saved successfully')),
+        catchError(error => {
+          console.error('Failed to save layout:', error);
+          return [];
+        })
+      )
+      .subscribe();
+  }
+  saveWidgetPositions(positions: WidgetPosition[]): void {
+    localStorage.setItem('dashboardLayout', JSON.stringify(positions));
   }
 
   trackUserInteraction(interaction: UserInteraction): void {
     const currentInteractions = this.userBehaviorSubject.value;
-    this.userBehaviorSubject.next([...currentInteractions, interaction]);
-    
-    // You might send this data to an analytics service
+    this.userBehaviorSubject.next([...currentInteractions.slice(-99), interaction]);
   }
 
-  getLayout(): Observable<WidgetPosition[]> {
-    return this.layoutSubject.asObservable();
+  getWidgetData(widgetType: string, forceRefresh = false): Observable<any> {
+    if (!forceRefresh && this.widgetCache.has(widgetType)) {
+      return of(this.widgetCache.get(widgetType));
+    }
+
+    return this.microserviceConnector.getServiceData(widgetType as MicroserviceType).pipe(
+      tap(data => this.widgetCache.set(widgetType, data))
+    );
   }
 
-  getUserBehavior(): Observable<UserInteraction[]> {
-    return this.userBehaviorSubject.asObservable();
-  }
-
-  // Other methods to load widget-specific data
-  loadVulnerabilityData() {
-    // Simulate for now, replace with real API call
-    return [
-      { date: '2025-01', critical: 42, high: 78, medium: 123, low: 96 },
-      { date: '2025-02', critical: 36, high: 82, medium: 114, low: 89 },
-      { date: '2025-03', critical: 28, high: 74, medium: 108, low: 92 },
-      { date: '2025-04', critical: 24, high: 68, medium: 102, low: 85 }
-    ];
-  }
-
-  loadSecurityMetrics() {
-    return [
-      { label: 'Critical Vulnerabilities', value: 24, trend: 'down', trendValue: '12%' },
-      { label: 'Attack Surface Score', value: 72, trend: 'up', trendValue: '3%' },
-      { label: 'Threat Intelligence', value: 158, trend: 'up', trendValue: '15%' },
-      { label: 'Open Incidents', value: 7, trend: 'down', trendValue: '5%' }
-    ];
+  // Additional methods
+  resetToDefaultLayout(): void {
+    this.initializeDashboard();
   }
 }

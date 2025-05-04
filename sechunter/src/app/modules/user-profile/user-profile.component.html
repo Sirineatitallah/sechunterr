@@ -1,0 +1,19 @@
+<div class="security-settings-container">
+    <h2>Account Security</h2>
+    
+    <div class="mfa-section">
+      <mat-slide-toggle 
+        [checked]="user?.mfaEnabled" 
+        [disabled]="loading"
+        (change)="toggleMFA()">
+        Enable Two-Factor Authentication
+      </mat-slide-toggle>
+      
+      @if (user?.mfaEnabled) {
+        <div class="mfa-help-text">
+          <mat-icon>verified_user</mat-icon>
+          <span>2FA is currently active for your account</span>
+        </div>
+      }
+    </div>
+  </div>

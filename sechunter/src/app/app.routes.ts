@@ -1,60 +1,63 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
 
-// app.routes.ts
 export const routes: Routes = [
-    // Authentication
-    { 
-      path: 'auth',
-      loadComponent: () => import('./auth/auth.component').then(m => m.AuthComponent),
-      title: 'Security Authentication'
-    },
-  
-    // Main Dashboard
-    { 
-      path: 'dashboard',
-      loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
-      canActivate: [authGuard],
-      data: { animation: 'dashboardFade' }
-    },
-  
-    // Vulnerability Intelligence (VI)
-    { 
-      path: 'vi',
-      loadComponent: () => import('./modules/vi/components/vi-page/vi.component').then(m => m.ViComponent),
-      canActivate: [authGuard],
-      data: { animation: 'cyberSlide' },
-      title: 'Threat Intelligence'
-    },
-  
-    // Attack Surface Management (ASM)
-    { 
-      path: 'asm',
-      loadComponent: () => import('./modules/asm/components/asm-page/asm.component').then(m => m.AsmComponent),
-      canActivate: [authGuard],
-      data: { animation: 'cyberSlide' },
-      title: 'Attack Surface Analysis'
-    },
-  
-    // Cyber Threat Intelligence (CTI)
-    { 
-      path: 'cti',
-      loadComponent: () => import('./modules/cti/components/cti-page/cti.component').then(m => m.CtiComponent),
-      canActivate: [authGuard],
-      data: { animation: 'cyberSlide' },
-      title: 'Threat Intelligence'
-    },
-  
-    // Security Orchestration (SOAR)
-    { 
-      path: 'soar',
-      loadComponent: () => import('./modules/soar/components/soar-page/soar.component').then(m => m.SoarComponent),
-      canActivate: [authGuard],
-      data: { animation: 'cyberSlide' },
-      title: 'Incident Response'
-    },
-  
-    // Redirects
-    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-    { path: '**', redirectTo: 'dashboard' }
-  ];
+  { 
+    path: 'auth',
+    loadComponent: () => import('./auth/auth.component').then(m => m.AuthComponent),
+    title: 'Security Authentication'
+  },
+  { 
+    path: 'signup',
+    loadComponent: () => import('./signup/signup.component').then(m => m.SignupComponent),
+    title: 'Security Registration'
+  },
+  { 
+    path: 'dashboard',
+    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard],
+    data: { animation: 'dashboardFade' },
+    children: [
+      { path: '', redirectTo: 'asm', pathMatch: 'full' },
+      { 
+        path: 'vi',
+        loadComponent: () => import('./modules/vi/components/vi-page/vi.component').then(m => m.ViComponent),
+        title: 'Threat Intelligence'
+      },
+      { 
+        path: 'asm',
+        loadComponent: () => import('./modules/asm/components/asm-page/asm.component').then(m => m.AsmComponent),
+        title: 'Attack Surface Analysis'
+      },
+      { 
+        path: 'cti',
+        loadComponent: () => import('./modules/cti/components/cti-page/cti.component').then(m => m.CtiComponent),
+        title: 'Threat Intelligence'
+      },
+      { 
+        path: 'soar',
+        loadComponent: () => import('./modules/soar/components/soar-page/soar.component').then(m => m.SoarComponent),
+        title: 'Incident Response'
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./modules/user-profile/user-profile.component').then(m => m.UserProfileComponent),
+        data: { animation: 'profileSlide' },
+        title: 'User Security Settings'
+      },
+      {
+        path: 'admin',
+        loadComponent: () => import('./modules/admin/admin.component').then(m => m.AdminComponent),
+        canActivate: [roleGuard],
+        data: { 
+          requiredRole: 'admin',
+          animation: 'adminSlide' 
+        },
+        title: 'Administration Panel'
+      }
+    ]
+  },
+  { path: '', redirectTo: 'auth', pathMatch: 'full' },
+  { path: '**', redirectTo: 'auth' }
+];

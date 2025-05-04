@@ -1,31 +1,169 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GridsterModule, GridsterConfig, GridsterItem, GridType } from 'angular-gridster2';
-import { WidgetComponent } from './../shared/components/widget/widget.component';
+import { GridsterModule, GridsterConfig, GridsterItem, GridType, GridsterItemComponent } from 'angular-gridster2';
+// Removed unused import WidgetComponent
+import { WidgetPosition } from '../core/models/widget-position.model';
+import { MicroserviceConnectorService, MicroserviceType } from '../core/services/microservice-connector.service';
+import { DashboardService } from './services/dashboard.service';
+import { Subscription, debounceTime } from 'rxjs';
+import { FavoritesQuickWidgetsComponent } from "./components/favorites-quick-widgets/favorites-quick-widgets.component";
+import { InstanceManagerComponent } from "./components/instance-manager/instance-manager.component";
+import { RecentMemosComponent } from "./components/recent-memos/recent-memos.component";
 
-// Étendre l'interface GridsterItem pour inclure la propriété 'type'
-interface DashboardItem extends GridsterItem {
-  type: string;
+interface DashboardItem extends GridsterItem, WidgetPosition {
+  componentType: string;
+  data?: {
+    icon: string;
+    [key: string]: any;
+  };
+  config?: Record<string, unknown>;
 }
 
 @Component({
   standalone: true,
-  imports: [CommonModule, GridsterModule, WidgetComponent],
+  imports: [CommonModule, GridsterModule, FavoritesQuickWidgetsComponent, InstanceManagerComponent, RecentMemosComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit, OnDestroy {
+  private readonly LAYOUT_SAVE_DEBOUNCE = 1000;
+  private readonly DEFAULT_WIDGET_SIZE = { cols: 2, rows: 2 };
+  
   gridsterOptions: GridsterConfig = {
     gridType: GridType.Fit,
-    margin: 10,
+    margin: 12,
     outerMargin: true,
-    draggable: { enabled: true },
-    resizable: { enabled: true },
-    mobileBreakpoint: 768
+    draggable: { 
+      enabled: true,
+      ignoreContent: true,
+      dragHandleClass: 'drag-handle'
+    },
+    resizable: { 
+      enabled: true,
+      handles: {
+        s: true,
+        e: true,
+        n: true,
+        w: true,
+        se: true,
+        ne: true,
+        sw: true,
+        nw: true
+      }
+    },
+    mobileBreakpoint: 768,
+    minCols: 6,
+    maxCols: 12,
+    minRows: 4,
+    pushItems: true,
+    swap: false,
+    disableWindowResize: false,
+    enableSmoothTransition: true,
+    itemChangeCallback: () => this.queueLayoutSave(),
+    itemResizeCallback: () => this.queueLayoutSave(),
   };
-  
-  dashboardWidgets: Array<DashboardItem> = [
-    { cols: 2, rows: 1, x: 0, y: 0, type: 'vulnerability-chart' },
-    { cols: 1, rows: 1, x: 2, y: 0, type: 'threat-feed' }
-  ];
+
+  dashboardWidgets: DashboardItem[] = [];
+  private layoutSaveQueue: Subscription | null = null;
+  private subscriptions: Subscription[] = [];
+
+  constructor(
+    private readonly microserviceConnector: MicroserviceConnectorService,
+    private readonly dashboardService: DashboardService
+  ) {}
+
+  ngOnInit() {
+    this.initLayoutSubscription();
+    this.initDataSubscriptions();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.layoutSaveQueue?.unsubscribe();
+  }
+
+  trackByWidgetId(index: number, widget: DashboardItem): string {
+    return widget.id;
+  }
+
+  private initLayoutSubscription(): void {
+    const layoutSub = this.dashboardService.layout$
+      .subscribe(layout => {
+        this.dashboardWidgets = layout?.length 
+          ? this.normalizeWidgetPositions(layout)
+          : this.getDefaultLayout();
+      });
+    
+    this.subscriptions.push(layoutSub);
+  }
+
+  private initDataSubscriptions(): void {
+    this.subscriptions.push(
+      this.microserviceConnector.getRealTimeServiceData(MicroserviceType.VULNERABILITY_SCANNER)
+        .subscribe(data => this.updateWidgetData('vulnerability-chart', data)),
+
+      this.microserviceConnector.getRealTimeServiceData(MicroserviceType.THREAT_INTEL)
+        .subscribe(data => this.updateWidgetData('threat-feed', data))
+    );
+  }
+
+  private normalizeWidgetPositions(layout: WidgetPosition[]): DashboardItem[] {
+    return layout.map((widget, index) => ({
+      ...this.DEFAULT_WIDGET_SIZE,
+      componentType: 'generic',
+      ...widget,
+      config: widget.config || {},
+      data: undefined
+    }));
+  }
+
+  private getDefaultLayout(): DashboardItem[] {
+    return [
+      this.createWidget('vulnerability-chart', 0, 0, { cols: 2, rows: 1 }, 'chart1', { title: 'Vulnerability Trends' }),
+      this.createWidget('threat-feed', 2, 0, { cols: 1, rows: 1 }, 'feed1', { dataSource: 'threat-api' }),
+      this.createWidget('asm-heatmap', 0, 1, { cols: 2, rows: 2 }, 'asm1', { title: 'ASM Heatmap' }),
+      this.createWidget('vi-radar', 2, 1, { cols: 2, rows: 2 }, 'vi1', { title: 'Vulnerability Radar' }),
+      this.createWidget('cti-world-map', 0, 3, { cols: 3, rows: 2 }, 'cti1', { title: 'CTI World Threat Map' }),
+      this.createWidget('soar-gantt', 3, 3, { cols: 3, rows: 2 }, 'soar1', { title: 'SOAR Workflow' })
+    ];
+  }
+
+  private createWidget(
+    type: string,
+    x: number,
+    y: number,
+    size: { cols: number; rows: number },
+    id: string,
+    config?: Record<string, unknown>
+  ): DashboardItem {
+    return {
+      id,
+      type,
+      x,
+      y,
+      cols: size.cols,
+      rows: size.rows,
+      componentType: type,
+      config: config || {},
+      data: undefined
+    };
+  }
+
+  private updateWidgetData(widgetType: string, data: unknown): void {
+    const widget = this.dashboardWidgets.find(w => w.componentType === widgetType);
+    if (widget) {
+      // Type guard to ensure data has 'icon' property, else assign default icon
+      if (data && typeof data === 'object' && 'icon' in data) {
+        widget.data = data as { icon: string; [key: string]: any };
+      } else {
+        widget.data = { icon: 'default-icon' };
+      }
+    }
+  }
+
+  private queueLayoutSave(): void {
+    this.layoutSaveQueue?.unsubscribe();
+    // Call saveLayout directly as it returns void
+    this.dashboardService.saveLayout(this.dashboardWidgets);
+  }
 }

@@ -1,10 +1,14 @@
-<div class="dashboard-grid" cdkDropListGroup>
-    @for (widget of widgets; track widget.id) {
-      <div 
-        cdkDrag
-        class="grid-item"
-        [style.gridArea]="getGridArea(widget)">
-        <app-widget [config]="widget"></app-widget>
-      </div>
-    }
+<div cdkDropList class="grid" (cdkDropListDropped)="onDrop($event)">
+  <div 
+    *ngFor="let widget of widgets; trackBy: trackByWidgetId"
+    cdkDrag
+    class="grid-item"
+    [style.grid-column]="'span ' + widget.cols"
+    [style.grid-row]="'span ' + widget.rows"
+  >
+    <app-widget 
+      [config]="widget"
+      (action)="handleWidgetAction($event)"
+    ></app-widget>
   </div>
+</div>

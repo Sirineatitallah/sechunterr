@@ -1,0 +1,10 @@
+<div class="recent-memos p-2 border rounded bg-white shadow">
+  <h2 class="text-lg font-bold mb-4">Recent Memos</h2>
+  <ul>
+    <li *ngFor="let memo of memos" class="mb-3 p-2 border-b border-gray-200">
+      <h3 class="font-semibold">{{ memo.title }}</h3>
+      <p class="text-sm text-gray-600">{{ memo.date }}</p>
+      <p>{{ memo.content }}</p>
+    </li>
+  </ul>
+</div>

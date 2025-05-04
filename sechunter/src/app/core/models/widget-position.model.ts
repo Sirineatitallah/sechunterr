@@ -1,3 +1,4 @@
+// src/app/core/models/widget-position.model.ts
 export interface WidgetPosition {
     id: string;
     type: string;
@@ -5,10 +6,15 @@ export interface WidgetPosition {
     y: number;
     cols: number;
     rows: number;
+    title?: string;
+    isResizing?: boolean;  // Already correct
     config?: {
-        refreshInterval?: number;
-        title?: string;
-        dataSource?: string;
-        refreshRate?: number; 
+      refreshInterval?: number;
+      title?: string;
+      dataSource?: string;
+    };
+    data?: { 
+      icon: string;
+      [key: string]: any;
     };
   }

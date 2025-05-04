@@ -1,1 +1,20 @@
-<p>asm-dashboard works!</p>
+<div>
+  <div *ngIf="loading" class="loading-container">
+    <img src="/assets/icons/shield-3d.svg" alt="Loading Shield" class="loading-shield" />
+    <p>Loading ASM data...</p>
+  </div>
+  <apx-chart
+    *ngIf="!loading"
+    [series]="heatmapChartOptions.series"
+    [chart]="heatmapChartOptions.chart"
+    [dataLabels]="heatmapChartOptions.dataLabels"
+    [title]="heatmapChartOptions.title"
+    [fill]="heatmapChartOptions.fill"
+    [tooltip]="heatmapChartOptions.tooltip"
+    [grid]="heatmapChartOptions.grid"
+    [xaxis]="heatmapChartOptions.xaxis"
+    [yaxis]="heatmapChartOptions.yaxis"
+    [legend]="heatmapChartOptions.legend"
+    [plotOptions]="heatmapChartOptions.plotOptions"
+  ></apx-chart>
+</div>

@@ -1,16 +1,21 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WidgetPosition } from '../../../core/models/widget-position.model';
+import { WidgetPosition } from './../../../core/models/widget-position.model';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-widget',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule,MatProgressSpinnerModule],
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.scss']
 })
+
 export class WidgetComponent {
-  @Input() config!: WidgetPosition;
+  @Input() config?: WidgetPosition;
   @Input() type!: string;
   @Input() title?: string;
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
@@ -19,7 +24,7 @@ export class WidgetComponent {
 
   @Output() refresh = new EventEmitter<void>();
   @Output() expand = new EventEmitter<void>();
-  @Output() action = new EventEmitter<string>();
+  @Output() action = new EventEmitter<{ action: string }>();
 
   showMenu = false;
 
@@ -36,14 +41,18 @@ export class WidgetComponent {
   }
 
   onAction(actionType: string) {
-    this.action.emit(actionType);
+    this.action.emit({ action: actionType });
     this.showMenu = false;
   }
 
   getWidgetClass() {
     return {
       [`widget-${this.type}`]: true,
-      [this.size]: true
+      [this.size]: true,
+      'resizing': this.config?.isResizing ?? false
     };
   }
+  
+  constructor(private cdr: ChangeDetectorRef) {}
+
 }

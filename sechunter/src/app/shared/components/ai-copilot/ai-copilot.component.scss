@@ -1,0 +1,46 @@
+.ai-copilot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  background-color: #fff;
+  color: #333;
+  &.open {
+    height: 300px;
+  }
+  .toggle-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 10px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    &:focus {
+      outline: none;
+    }
+  }
+  .chatbot-messages {
+    margin-top: 10px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+    ul {
+      list-style: none;
+      padding: 0;
+      li {
+        background-color: #f1f1f1;
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+    }
+  }
+}

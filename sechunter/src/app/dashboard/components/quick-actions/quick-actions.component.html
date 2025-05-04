@@ -1,1 +1,27 @@
-<p>quick-actions works!</p>
+<!-- src/app/dashboard/components/quick-actions/quick-actions.component.html -->
+<div class="quick-actions-container" [class.vertical]="layout === 'vertical'">
+    @for (action of actions; track action.id; let i = $index) {
+      <button mat-raised-button
+              class="action-button"
+              [color]="action.color || 'default'"
+              [matTooltip]="action.tooltip || ''"
+              [disabled]="action.disabled"
+              (click)="onActionClick(action)"
+              [attr.aria-label]="action.label"
+              [attr.data-testid]="'action-' + action.id">
+        
+        <!-- Icon avec espacement dynamique -->
+        @if (action.icon) {
+          <mat-icon class="action-icon">{{ action.icon }}</mat-icon>
+        }
+  
+        <!-- Label -->
+        <span class="action-label">{{ action.label }}</span>
+  
+        <!-- Badge de notification -->
+        @if (action.badgeCount && action.badgeCount > 0) {
+          <span class="action-badge">{{ action.badgeCount }}</span>
+        }
+      </button>
+    }
+  </div>

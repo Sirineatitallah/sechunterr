@@ -12,20 +12,27 @@ import { WidgetComponent } from './../../../shared/components/widget/widget.comp
   standalone: true,
   imports: [CommonModule, DragDropModule, WidgetComponent],
   templateUrl: './dashboard-grid.component.html',
-  styleUrls: ['./dashboard-grid.component.scss']
+  styleUrls: ['./dashboard-grid.component.scss'],
+  host: {
+    class: 'grid-container',
+    '[style.grid-template-columns]': "'repeat(auto-fill, minmax(300px, 1fr))'"
+  }
 })
 export class DashboardGridComponent {
+handleWidgetAction($event: { action: string; }) {
+throw new Error('Method not implemented.');
+}
   @Input() widgets: WidgetPosition[] = [];
 
   constructor(private store: Store) {}
 
   onDrop(event: CdkDragDrop<WidgetPosition[]>) {
-    // Using moveItemInArray instead of moveItemInGrid which doesn't exist
-    moveItemInArray(this.widgets, event.previousIndex, event.currentIndex);
-    this.store.dispatch(new UpdateLayout(this.widgets));
+    const updatedWidgets = [...this.widgets];
+    moveItemInArray(updatedWidgets, event.previousIndex, event.currentIndex);
+    this.store.dispatch(new UpdateLayout(updatedWidgets));
   }
 
-  getGridArea(widget: WidgetPosition): string {
-    return `${widget.y} / ${widget.x} / ${widget.y + widget.rows} / ${widget.x + widget.cols}`;
+  trackByWidgetId(index: number, widget: WidgetPosition): string {
+    return widget.id;
   }
 }

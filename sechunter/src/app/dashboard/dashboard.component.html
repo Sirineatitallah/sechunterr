@@ -1,7 +1,13 @@
-<div class="dashboard-container">
-  <gridster [options]="gridsterOptions">
-    <gridster-item *ngFor="let widget of dashboardWidgets" [item]="widget">
-      <app-widget [type]="widget['type']"></app-widget>
-    </gridster-item>
-  </gridster>
+<div class="dashboard-container grid grid-cols-4 gap-4 min-h-screen p-6 bg-gray-100">
+  <div class="col-span-1 bg-white rounded shadow p-4">
+    <app-instance-manager></app-instance-manager>
+  </div>
+  <div class="col-span-3 grid grid-rows-2 gap-4">
+    <div class="bg-white rounded shadow p-4">
+      <app-favorites-quick-widgets></app-favorites-quick-widgets>
+    </div>
+    <div class="bg-white rounded shadow p-4">
+      <app-recent-memos></app-recent-memos>
+    </div>
+  </div>
 </div>

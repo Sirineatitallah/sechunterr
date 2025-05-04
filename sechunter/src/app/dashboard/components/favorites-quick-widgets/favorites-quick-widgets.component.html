@@ -1,0 +1,9 @@
+<div class="favorites-quick-widgets p-2 border rounded bg-white shadow">
+  <h2 class="text-lg font-bold mb-4">Favorites / Quick Widgets</h2>
+  <div class="grid grid-cols-3 gap-4">
+    <button *ngFor="let widget of quickWidgets" (click)="onWidgetClick(widget)" class="flex flex-col items-center p-2 bg-gray-100 rounded hover:bg-gray-200">
+      <span class="text-2xl">{{ widget.icon }}</span>
+      <span class="mt-1">{{ widget.name }}</span>
+    </button>
+  </div>
+</div>

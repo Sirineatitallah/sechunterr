@@ -1,4 +1,6 @@
 // Local font imports
+@use '@fontsource/roboto';
+@use '@fontsource/material-icons';
 @font-face {
   font-family: 'Roboto';
   font-style: normal;
@@ -12,7 +14,7 @@ body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: #f5f5f5;
-  color: #333;
+  color: rgb(168, 163, 163);
 }
 
 html, body {
@@ -32,3 +34,5 @@ html, body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: white;
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

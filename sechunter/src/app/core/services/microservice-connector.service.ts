@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, Subject, timer } from 'rxjs';
+import { switchMap, retryWhen, delayWhen } from 'rxjs/operators';
 import { WidgetPosition } from '../models/widget-position.model';
 
-// Define MicroserviceType enum
 export enum MicroserviceType {
   THREAT_INTEL = 'threat-intel',
   VULNERABILITY_SCANNER = 'vuln-scanner',
@@ -11,38 +11,49 @@ export enum MicroserviceType {
   NETWORK_SECURITY = 'network-security'
 }
 
-// Define Record type for servicePreferences
 export interface ServicePreferences {
-  dataRetention?: number;
-  refreshRate?: number;
-  notificationEnabled?: boolean;
+  dataRetention: number;
+  refreshRate: number;
+  notificationEnabled: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class MicroserviceConnectorService {
+  private http = inject(HttpClient);
   private apiUrl = '/api/services';
-  
-  constructor(private http: HttpClient) {}
 
-  // Method to save user preferences
-  saveUserPreferences(data: { layout: WidgetPosition[], servicePreferences?: Record<MicroserviceType, any> }): Observable<any> {
-    // In a real app, this would be an HTTP POST
-    console.log('Saving user preferences:', data);
-    return of({ success: true });
+  private dataUpdateSubjects: Record<string, Subject<any>> = {};
+
+  saveUserPreferences(config: {
+    layout: WidgetPosition[];
+    servicePreferences: Partial<Record<MicroserviceType, ServicePreferences>>;
+  }): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.apiUrl}/preferences`, config);
   }
 
-  // Method to fetch data from a specific microservice
-  getServiceData(serviceType: MicroserviceType): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${serviceType}/data`);
+  getServiceData<T = unknown>(serviceType: MicroserviceType): Observable<T> {
+    return this.http.get<T>(`${this.apiUrl}/${serviceType}/data`);
   }
 
-  // Method to get service configuration
-  getServiceConfig(serviceType: MicroserviceType): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${serviceType}/config`);
+  getServiceConfig<T = unknown>(serviceType: MicroserviceType): Observable<T> {
+    return this.http.get<T>(`${this.apiUrl}/${serviceType}/config`);
   }
 
-  // Simulated method to get available services
   getAvailableServices(): Observable<MicroserviceType[]> {
-    return of(Object.values(MicroserviceType));
+    return this.http.get<MicroserviceType[]>(`${this.apiUrl}/available`);
+  }
+
+  // New method to get real-time updates using polling with retry
+  getRealTimeServiceData<T = unknown>(serviceType: MicroserviceType, intervalMs: number = 5000): Observable<T> {
+    if (!this.dataUpdateSubjects[serviceType]) {
+      this.dataUpdateSubjects[serviceType] = new Subject<T>();
+      timer(0, intervalMs).pipe(
+        switchMap(() => this.getServiceData<T>(serviceType)),
+        retryWhen(errors => errors.pipe(delayWhen(() => timer(3000))))
+      ).subscribe(data => {
+        this.dataUpdateSubjects[serviceType].next(data);
+      });
+    }
+    return this.dataUpdateSubjects[serviceType].asObservable();
   }
 }
