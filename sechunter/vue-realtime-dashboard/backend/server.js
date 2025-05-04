@@ -32,6 +32,39 @@ app.post('/api/login', (req, res) => {
   res.json({ token });
 });
 
+// New API endpoints added here
+
+// Example: GET /api/userinfo returns user info based on token
+app.get('/api/userinfo', (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Authorization header missing' });
+  }
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    const user = users.find(u => u.id === decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ id: user.id, username: user.username, role: user.role });
+  });
+});
+
+// Example: GET /api/dashboard-data returns some dashboard data
+app.get('/api/dashboard-data', (req, res) => {
+  res.json({
+    message: 'Dashboard data',
+    stats: {
+      users: 100,
+      activeSessions: 25,
+      alerts: 5
+    }
+  });
+});
+
 function generateRandomVulnerabilityData() {
   return {
     vulnerabilityScore: Math.floor(Math.random() * 100),
