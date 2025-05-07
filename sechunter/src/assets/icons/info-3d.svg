@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Info 3D Icon</title>
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="infoGradient">
+            <stop stop-color="#00f3ff" offset="0%"></stop>
+            <stop stop-color="#bc13fe" offset="100%"></stop>
+        </linearGradient>
+        <filter id="infoShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"></feGaussianBlur>
+            <feOffset in="blur" dx="1" dy="1" result="offsetBlur"></feOffset>
+            <feFlood flood-color="#00f3ff" flood-opacity="0.5" result="glowColor"></feFlood>
+            <feComposite in="glowColor" in2="offsetBlur" operator="in" result="coloredShadow"></feComposite>
+            <feComposite in="SourceGraphic" in2="coloredShadow" operator="over"></feComposite>
+        </filter>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle fill="url(#infoGradient)" filter="url(#infoShadow)" cx="12" cy="12" r="10"></circle>
+        <path d="M12,7 C12.5522847,7 13,7.44771525 13,8 C13,8.55228475 12.5522847,9 12,9 C11.4477153,9 11,8.55228475 11,8 C11,7.44771525 11.4477153,7 12,7 Z M13,11 L13,17 L11,17 L11,11 L13,11 Z" fill="#FFFFFF"></path>
+    </g>
+</svg>

@@ -1,14 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, isDevMode } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GridsterModule, GridsterConfig, GridsterItem, GridType, GridsterItemComponent } from 'angular-gridster2';
+import { Router, RouterModule } from '@angular/router';
 // Removed unused import WidgetComponent
 import { WidgetPosition } from '../core/models/widget-position.model';
 import { MicroserviceConnectorService, MicroserviceType } from '../core/services/microservice-connector.service';
 import { DashboardService } from './services/dashboard.service';
+import { AuthService } from '../core/services/auth.service';
 import { Subscription, debounceTime } from 'rxjs';
-import { FavoritesQuickWidgetsComponent } from "./components/favorites-quick-widgets/favorites-quick-widgets.component";
-import { InstanceManagerComponent } from "./components/instance-manager/instance-manager.component";
-import { RecentMemosComponent } from "./components/recent-memos/recent-memos.component";
+// These components are no longer used directly in the template
+// import { FavoritesQuickWidgetsComponent } from "./components/favorites-quick-widgets/favorites-quick-widgets.component";
+// import { InstanceManagerComponent } from "./components/instance-manager/instance-manager.component";
+// import { RecentMemosComponent } from "./components/recent-memos/recent-memos.component";
+// import { UserRole } from '../core/models/user.model'; // Not used
+// import { DashboardWidget, WidgetType } from '../core/models/dashboard-widget.model'; // Not used
 
 interface DashboardItem extends GridsterItem, WidgetPosition {
   componentType: string;
@@ -21,24 +26,32 @@ interface DashboardItem extends GridsterItem, WidgetPosition {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, GridsterModule, FavoritesQuickWidgetsComponent, InstanceManagerComponent, RecentMemosComponent],
+  imports: [
+    CommonModule,
+    GridsterModule,
+    RouterModule
+    // These components are no longer used directly in the template
+    // FavoritesQuickWidgetsComponent,
+    // InstanceManagerComponent,
+    // RecentMemosComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  private readonly LAYOUT_SAVE_DEBOUNCE = 1000;
+  // private readonly LAYOUT_SAVE_DEBOUNCE = 1000; // Not used
   private readonly DEFAULT_WIDGET_SIZE = { cols: 2, rows: 2 };
-  
+
   gridsterOptions: GridsterConfig = {
     gridType: GridType.Fit,
     margin: 12,
     outerMargin: true,
-    draggable: { 
+    draggable: {
       enabled: true,
       ignoreContent: true,
       dragHandleClass: 'drag-handle'
     },
-    resizable: { 
+    resizable: {
       enabled: true,
       handles: {
         s: true,
@@ -82,33 +95,63 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.layoutSaveQueue?.unsubscribe();
   }
 
-  trackByWidgetId(index: number, widget: DashboardItem): string {
+  trackByWidgetId(_index: number, widget: DashboardItem): string {
     return widget.id;
   }
 
   private initLayoutSubscription(): void {
     const layoutSub = this.dashboardService.layout$
       .subscribe(layout => {
-        this.dashboardWidgets = layout?.length 
+        this.dashboardWidgets = layout?.length
           ? this.normalizeWidgetPositions(layout)
           : this.getDefaultLayout();
       });
-    
+
     this.subscriptions.push(layoutSub);
   }
 
   private initDataSubscriptions(): void {
-    this.subscriptions.push(
-      this.microserviceConnector.getRealTimeServiceData(MicroserviceType.VULNERABILITY_SCANNER)
-        .subscribe(data => this.updateWidgetData('vulnerability-chart', data)),
+    // In development mode, use mock data instead of making API calls
+    if (isDevMode()) {
+      console.log('Running in development mode - using mock data for dashboard widgets');
 
-      this.microserviceConnector.getRealTimeServiceData(MicroserviceType.THREAT_INTEL)
-        .subscribe(data => this.updateWidgetData('threat-feed', data))
-    );
+      // Mock data for vulnerability scanner
+      const mockVulnData = {
+        icon: 'security',
+        criticalCount: 12,
+        highCount: 28,
+        mediumCount: 45,
+        lowCount: 67,
+        trend: 'decreasing'
+      };
+
+      // Mock data for threat intel
+      const mockThreatData = {
+        icon: 'warning',
+        alerts: [
+          { severity: 'high', source: 'darkweb', description: 'Credentials leaked' },
+          { severity: 'medium', source: 'osint', description: 'New vulnerability disclosed' }
+        ],
+        lastUpdated: new Date().toISOString()
+      };
+
+      // Update widgets with mock data
+      this.updateWidgetData('vulnerability-chart', mockVulnData);
+      this.updateWidgetData('threat-feed', mockThreatData);
+    } else {
+      // In production mode, make the actual API calls
+      this.subscriptions.push(
+        this.microserviceConnector.getRealTimeServiceData(MicroserviceType.VULNERABILITY_SCANNER)
+          .subscribe(data => this.updateWidgetData('vulnerability-chart', data)),
+
+        this.microserviceConnector.getRealTimeServiceData(MicroserviceType.THREAT_INTEL)
+          .subscribe(data => this.updateWidgetData('threat-feed', data))
+      );
+    }
   }
 
   private normalizeWidgetPositions(layout: WidgetPosition[]): DashboardItem[] {
-    return layout.map((widget, index) => ({
+    return layout.map((widget) => ({
       ...this.DEFAULT_WIDGET_SIZE,
       componentType: 'generic',
       ...widget,

@@ -1,0 +1,126 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Playbooks Actifs</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="filter-bar">
+      <button 
+        [class.active]="activeFilter === 'all'"
+        (click)="applyFilter('all')">
+        Tous ({{ playbooks.length }})
+      </button>
+      <button 
+        class="active-filter"
+        [class.active]="activeFilter === 'active'"
+        (click)="applyFilter('active')">
+        Actifs ({{ getCountByStatus('active') }})
+      </button>
+      <button 
+        class="inactive-filter"
+        [class.active]="activeFilter === 'inactive'"
+        (click)="applyFilter('inactive')">
+        Inactifs ({{ getCountByStatus('inactive') }})
+      </button>
+    </div>
+    <div class="table-container">
+      <table mat-table [dataSource]="filteredPlaybooks" matSort (matSortChange)="sortData($event)" class="playbooks-table">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+          <td mat-cell *matCellDef="let playbook">
+            <div class="playbook-name">
+              <span>{{ playbook.name }}</span>
+              <span class="playbook-id">{{ playbook.id }}</span>
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let playbook">{{ playbook.type }}</td>
+        </ng-container>
+        
+        <!-- Executions Column -->
+        <ng-container matColumnDef="executions">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Exécutions</th>
+          <td mat-cell *matCellDef="let playbook">{{ playbook.executions }}</td>
+        </ng-container>
+        
+        <!-- Success Rate Column -->
+        <ng-container matColumnDef="successRate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Taux de Succès</th>
+          <td mat-cell *matCellDef="let playbook">
+            <div class="success-rate" [ngClass]="getSuccessRateClass(playbook.successRate)">
+              {{ playbook.successRate }}%
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Average Duration Column -->
+        <ng-container matColumnDef="avgDuration">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Durée Moyenne</th>
+          <td mat-cell *matCellDef="let playbook">{{ playbook.avgDuration }}</td>
+        </ng-container>
+        
+        <!-- Last Run Column -->
+        <ng-container matColumnDef="lastRun">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Dernière Exécution</th>
+          <td mat-cell *matCellDef="let playbook">{{ formatDate(playbook.lastRun) }}</td>
+        </ng-container>
+        
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+          <td mat-cell *matCellDef="let playbook">
+            <div class="status-badge" [ngClass]="playbook.status">
+              {{ playbook.status === 'active' ? 'Actif' : 'Inactif' }}
+            </div>
+          </td>
+        </ng-container>
+        
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let playbook">
+            <div class="action-buttons">
+              <button mat-icon-button color="primary" (click)="launchPlaybook(playbook)" matTooltip="Lancer" [disabled]="playbook.status === 'inactive'">
+                <mat-icon>play_arrow</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" (click)="editPlaybook(playbook)" matTooltip="Éditer">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="playbook-stats">
+      <div class="stat-item">
+        <div class="stat-value">{{ getTotalExecutions() }}</div>
+        <div class="stat-label">Exécutions Totales</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ getAverageSuccessRate() }}%</div>
+        <div class="stat-label">Taux de Succès Moyen</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ playbooks.length }}</div>
+        <div class="stat-label">Playbooks Configurés</div>
+      </div>
+    </div>
+  </div>
+</div>

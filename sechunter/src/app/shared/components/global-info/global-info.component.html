@@ -1,0 +1,156 @@
+<div class="global-info-container">
+  <div class="info-header">
+    <h1>SecHunter Information & Contact</h1>
+    <p class="subtitle">Your trusted partner in cybersecurity</p>
+  </div>
+
+  <mat-tab-group animationDuration="300ms" class="info-tabs">
+    <!-- About Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>info</mat-icon>
+        <span>About</span>
+      </ng-template>
+      <div class="tab-content">
+        <div class="about-section">
+          <div class="company-info">
+            <h2>{{ companyInfo.name }}</h2>
+            <p class="company-description">{{ companyInfo.description }}</p>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Founded</div>
+                <div class="info-value">{{ companyInfo.founded }}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Headquarters</div>
+                <div class="info-value">{{ companyInfo.headquarters }}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Website</div>
+                <div class="info-value">
+                  <a [href]="companyInfo.website" target="_blank" class="website-link">{{ companyInfo.website }}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="services-section">
+            <h3>Our Services</h3>
+            <div class="services-grid">
+              <mat-card class="service-card" *ngFor="let service of services">
+                <mat-card-header>
+                  <mat-icon mat-card-avatar>{{ service.icon }}</mat-icon>
+                  <mat-card-title>{{ service.name }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <p>{{ service.description }}</p>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Contact Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>contact_support</mat-icon>
+        <span>Contact</span>
+      </ng-template>
+      <div class="tab-content">
+        <div class="contact-section">
+          <div class="contact-cards">
+            <mat-card class="contact-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>support_agent</mat-icon>
+                <mat-card-title>General Support</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="contact-methods">
+                  <div class="contact-method">
+                    <mat-icon>email</mat-icon>
+                    <span>{{ contactInfo.email }}</span>
+                  </div>
+                  <div class="contact-method">
+                    <mat-icon>phone</mat-icon>
+                    <span>{{ contactInfo.phone }}</span>
+                  </div>
+                  <div class="contact-method">
+                    <mat-icon>schedule</mat-icon>
+                    <span>{{ contactInfo.supportHours }}</span>
+                  </div>
+                  <div class="contact-method">
+                    <mat-icon>location_on</mat-icon>
+                    <span>{{ contactInfo.address }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-raised-button color="primary" (click)="contactSupport()">
+                  <mat-icon>message</mat-icon> Contact Support
+                </button>
+              </mat-card-actions>
+            </mat-card>
+
+            <mat-card class="contact-card emergency-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>warning</mat-icon>
+                <mat-card-title>Emergency Response</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <p>If you are experiencing a security incident or breach, please contact our emergency response team immediately.</p>
+                <div class="emergency-contact">
+                  <mat-icon>phone</mat-icon>
+                  <span>{{ contactInfo.emergencyPhone }}</span>
+                </div>
+                <p class="emergency-note">Available 24/7/365</p>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-raised-button color="warn" (click)="contactEmergencySupport()">
+                  <mat-icon>emergency</mat-icon> Emergency Contact
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+
+          <div class="social-media-section">
+            <h3>Connect With Us</h3>
+            <div class="social-links">
+              <a *ngFor="let social of socialMedia" [href]="social.url" target="_blank" class="social-link">
+                <mat-icon>{{ social.icon }}</mat-icon>
+                <span>{{ social.name }}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- FAQ Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>help</mat-icon>
+        <span>FAQ</span>
+      </ng-template>
+      <div class="tab-content">
+        <div class="faq-section">
+          <h3>Frequently Asked Questions</h3>
+          <div class="faq-list">
+            <mat-card class="faq-item" *ngFor="let faq of faqItems; let i = index">
+              <mat-card-header>
+                <mat-card-title>{{ faq.question }}</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{ faq.answer }}</p>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

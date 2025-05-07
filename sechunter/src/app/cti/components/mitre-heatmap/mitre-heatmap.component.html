@@ -1,0 +1,74 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Heatmap MITRE ATT&CK</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="heatmap-container" #heatmapContainer></div>
+    <div *ngIf="selectedTechnique" class="technique-details">
+      <div class="details-header">
+        <h4>{{ selectedTechnique.name }} ({{ selectedTechnique.id }})</h4>
+        <button mat-icon-button (click)="clearSelection()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="details-content">
+        <div class="detail-item">
+          <div class="detail-label">Alertes</div>
+          <div class="detail-value">{{ selectedTechnique.count }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Dernière Détection</div>
+          <div class="detail-value">{{ '2023-05-15' | date:'dd/MM/yyyy' }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Tendance</div>
+          <div class="detail-value trend-up">
+            <mat-icon>trending_up</mat-icon>
+            <span>+15%</span>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button mat-button color="accent">
+            <mat-icon>search</mat-icon>
+            Analyser
+          </button>
+          <button mat-button color="warn">
+            <mat-icon>shield</mat-icon>
+            Bloquer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="legend">
+      <div class="legend-title">Nombre d'Alertes</div>
+      <div class="legend-scale">
+        <div class="scale-item" style="background: #000004;"></div>
+        <div class="scale-item" style="background: #1b0c41;"></div>
+        <div class="scale-item" style="background: #4a0c6b;"></div>
+        <div class="scale-item" style="background: #781c6d;"></div>
+        <div class="scale-item" style="background: #a52c60;"></div>
+        <div class="scale-item" style="background: #cf4446;"></div>
+        <div class="scale-item" style="background: #ed6925;"></div>
+        <div class="scale-item" style="background: #fb9b06;"></div>
+        <div class="scale-item" style="background: #f7d13d;"></div>
+      </div>
+      <div class="scale-labels">
+        <span>0</span>
+        <span>120</span>
+      </div>
+    </div>
+    <div class="chart-info">
+      <span>Cliquez sur une cellule pour plus de détails</span>
+    </div>
+  </div>
+</div>

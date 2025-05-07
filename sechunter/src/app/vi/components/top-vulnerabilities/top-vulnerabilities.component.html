@@ -1,0 +1,62 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Top 5 Vulnérabilités</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <ngx-charts-bar-horizontal
+      [view]="view"
+      [scheme]="colorScheme"
+      [results]="chartData"
+      [gradient]="gradient"
+      [xAxis]="showXAxis"
+      [yAxis]="showYAxis"
+      [legend]="showLegend"
+      [showXAxisLabel]="showXAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      [xAxisLabel]="xAxisLabel"
+      [yAxisLabel]="yAxisLabel"
+      [customColors]="[
+        { name: 'CVE-2021-44228', value: '#ff4757' },
+        { name: 'CVE-2021-26855', value: '#ff4757' },
+        { name: 'CVE-2021-34527', value: '#ffa502' },
+        { name: 'CVE-2021-26084', value: '#ffa502' },
+        { name: 'CVE-2021-21985', value: '#ffa502' }
+      ]"
+      (select)="onSelect($event)">
+      <ng-template #tooltipTemplate let-model="model">
+        <div class="custom-tooltip" [innerHTML]="formatTooltip(model)"></div>
+      </ng-template>
+    </ngx-charts-bar-horizontal>
+  </div>
+  <div class="chart-footer">
+    <div class="severity-legend">
+      <div class="legend-item">
+        <div class="legend-color critical"></div>
+        <div class="legend-label">Critique</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color high"></div>
+        <div class="legend-label">Haute</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color medium"></div>
+        <div class="legend-label">Moyenne</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color low"></div>
+        <div class="legend-label">Faible</div>
+      </div>
+    </div>
+    <div class="chart-info">
+      <span>Cliquez sur une barre pour plus de détails</span>
+    </div>
+  </div>
+</div>

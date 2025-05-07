@@ -1,0 +1,55 @@
+{
+  "title": "Top Vulnérabilités",
+  "data": [
+    {
+      "id": "CVE-2023-1234",
+      "name": "Apache Log4j Remote Code Execution",
+      "severity": "Critical",
+      "cvss": 9.8,
+      "affected": 42,
+      "remediated": 28,
+      "description": "Vulnerability in Apache Log4j allows attackers to execute arbitrary code on the target system.",
+      "discoveryDate": "2023-06-15"
+    },
+    {
+      "id": "CVE-2023-5678",
+      "name": "Windows Print Spooler Privilege Escalation",
+      "severity": "High",
+      "cvss": 8.5,
+      "affected": 36,
+      "remediated": 20,
+      "description": "A vulnerability in Windows Print Spooler service allows local users to gain elevated privileges.",
+      "discoveryDate": "2023-07-22"
+    },
+    {
+      "id": "CVE-2023-9012",
+      "name": "OpenSSL Buffer Overflow",
+      "severity": "High",
+      "cvss": 8.2,
+      "affected": 29,
+      "remediated": 15,
+      "description": "Buffer overflow vulnerability in OpenSSL allows remote attackers to cause a denial of service.",
+      "discoveryDate": "2023-08-05"
+    },
+    {
+      "id": "CVE-2023-3456",
+      "name": "Kubernetes API Server Authentication Bypass",
+      "severity": "Critical",
+      "cvss": 9.1,
+      "affected": 18,
+      "remediated": 12,
+      "description": "Authentication bypass vulnerability in Kubernetes API Server allows unauthorized access.",
+      "discoveryDate": "2023-09-10"
+    },
+    {
+      "id": "CVE-2023-7890",
+      "name": "SQL Injection in WordPress Plugin",
+      "severity": "Medium",
+      "cvss": 6.5,
+      "affected": 24,
+      "remediated": 18,
+      "description": "SQL injection vulnerability in popular WordPress plugin allows attackers to access sensitive data.",
+      "discoveryDate": "2023-10-03"
+    }
+  ]
+}

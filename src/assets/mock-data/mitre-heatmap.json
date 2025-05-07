@@ -1,0 +1,115 @@
+{
+  "title": "Heatmap MITRE ATT&CK",
+  "data": {
+    "tactics": [
+      "Initial Access",
+      "Execution",
+      "Persistence",
+      "Privilege Escalation",
+      "Defense Evasion",
+      "Credential Access",
+      "Discovery",
+      "Lateral Movement",
+      "Collection",
+      "Command and Control",
+      "Exfiltration",
+      "Impact"
+    ],
+    "groups": [
+      "APT28",
+      "APT29",
+      "APT41",
+      "Lazarus Group",
+      "FIN7",
+      "Carbanak",
+      "Sandworm",
+      "Turla"
+    ],
+    "heatmap": [
+      [5, 3, 4, 2, 5, 4, 3, 2, 1, 3, 2, 1],
+      [4, 5, 5, 4, 5, 3, 4, 3, 2, 4, 3, 2],
+      [3, 4, 5, 5, 4, 3, 5, 4, 3, 5, 4, 3],
+      [5, 4, 3, 4, 5, 5, 4, 3, 4, 5, 5, 4],
+      [2, 3, 4, 3, 5, 4, 3, 2, 3, 4, 3, 5],
+      [3, 4, 5, 4, 3, 5, 4, 3, 2, 3, 2, 3],
+      [5, 4, 3, 5, 5, 4, 3, 5, 4, 3, 2, 4],
+      [4, 3, 5, 4, 5, 3, 4, 3, 2, 3, 2, 1]
+    ],
+    "techniques": {
+      "Initial Access": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "count": 156,
+          "groups": ["APT28", "APT29", "FIN7", "Lazarus Group"]
+        },
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "count": 87,
+          "groups": ["APT41", "Sandworm"]
+        }
+      ],
+      "Execution": [
+        {
+          "id": "T1059",
+          "name": "Command and Scripting Interpreter",
+          "count": 203,
+          "groups": ["APT28", "APT29", "APT41", "Lazarus Group", "Turla"]
+        },
+        {
+          "id": "T1204",
+          "name": "User Execution",
+          "count": 178,
+          "groups": ["FIN7", "Carbanak"]
+        }
+      ],
+      "Persistence": [
+        {
+          "id": "T1547",
+          "name": "Boot or Logon Autostart Execution",
+          "count": 145,
+          "groups": ["APT29", "APT41", "Turla"]
+        },
+        {
+          "id": "T1136",
+          "name": "Create Account",
+          "count": 92,
+          "groups": ["APT28", "Sandworm"]
+        }
+      ]
+    },
+    "topTechniques": [
+      {
+        "id": "T1059",
+        "name": "Command and Scripting Interpreter",
+        "count": 203,
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1204",
+        "name": "User Execution",
+        "count": 178,
+        "tactic": "Execution"
+      },
+      {
+        "id": "T1566",
+        "name": "Phishing",
+        "count": 156,
+        "tactic": "Initial Access"
+      },
+      {
+        "id": "T1547",
+        "name": "Boot or Logon Autostart Execution",
+        "count": 145,
+        "tactic": "Persistence"
+      },
+      {
+        "id": "T1027",
+        "name": "Obfuscated Files or Information",
+        "count": 132,
+        "tactic": "Defense Evasion"
+      }
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 import { ApplicationConfig, inject } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -11,8 +11,8 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
-    provideClientHydration(),
+    provideRouter(routes, withComponentInputBinding()),
+    // provideClientHydration() is now in app.config.server.ts to avoid duplication
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     {
@@ -20,8 +20,8 @@ export const appConfig: ApplicationConfig = {
       useValue: {
         tokenGetter: () => {
           const platformId = inject(PLATFORM_ID);
-          return isPlatformBrowser(platformId) 
-            ? localStorage.getItem('access_token') 
+          return isPlatformBrowser(platformId)
+            ? localStorage.getItem('access_token')
             : null;
         },
         allowedDomains: ['localhost:4200']

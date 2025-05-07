@@ -1,0 +1,134 @@
+<div class="asset-dialog">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2>{{ asset.name }}</h2>
+      <div class="header-badges">
+        <div class="badge asset-id">{{ asset.id }}</div>
+        <div class="badge asset-type">{{ asset.type }}</div>
+        <div class="badge exposure-score" [ngClass]="getRiskClass()">
+          Score: {{ asset.exposureScore }}
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button class="close-button" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  
+  <mat-divider></mat-divider>
+  
+  <div class="dialog-content">
+    <div class="content-section">
+      <h3>Informations Générales</h3>
+      <div class="info-grid">
+        <div class="info-item" *ngIf="asset.ip">
+          <div class="info-label">Adresse IP</div>
+          <div class="info-value">{{ asset.ip }}</div>
+        </div>
+        <div class="info-item" *ngIf="asset.domain">
+          <div class="info-label">Domaine</div>
+          <div class="info-value">{{ asset.domain }}</div>
+        </div>
+        <div class="info-item" *ngIf="asset.os">
+          <div class="info-label">Système d'Exploitation</div>
+          <div class="info-value">{{ asset.os }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Vulnérabilités</div>
+          <div class="info-value">{{ asset.vulnerabilities || 0 }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="content-section" *ngIf="asset.services && asset.services.length > 0">
+      <h3>Services Exposés</h3>
+      <table mat-table [dataSource]="asset.services" class="services-table">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Service</th>
+          <td mat-cell *matCellDef="let service">{{ service.name }}</td>
+        </ng-container>
+        
+        <!-- Port Column -->
+        <ng-container matColumnDef="port">
+          <th mat-header-cell *matHeaderCellDef>Port</th>
+          <td mat-cell *matCellDef="let service">{{ service.port }}</td>
+        </ng-container>
+        
+        <!-- Protocol Column -->
+        <ng-container matColumnDef="protocol">
+          <th mat-header-cell *matHeaderCellDef>Protocole</th>
+          <td mat-cell *matCellDef="let service">{{ service.protocol }}</td>
+        </ng-container>
+        
+        <!-- Version Column -->
+        <ng-container matColumnDef="version">
+          <th mat-header-cell *matHeaderCellDef>Version</th>
+          <td mat-cell *matCellDef="let service">{{ service.version || 'N/A' }}</td>
+        </ng-container>
+        
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Statut</th>
+          <td mat-cell *matCellDef="let service">
+            <span class="status-badge" [ngClass]="getStatusClass(service.status)">
+              {{ service.status }}
+            </span>
+          </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="serviceColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: serviceColumns;"></tr>
+      </table>
+    </div>
+    
+    <div class="content-section">
+      <h3>Recommandations</h3>
+      <div class="recommendations">
+        <div class="recommendation-item">
+          <div class="recommendation-icon">
+            <mat-icon>security</mat-icon>
+          </div>
+          <div class="recommendation-content">
+            <div class="recommendation-title">Limiter l'exposition des services</div>
+            <div class="recommendation-description">
+              Restreindre l'accès aux services non essentiels et mettre en place un pare-feu pour limiter l'exposition.
+            </div>
+          </div>
+        </div>
+        <div class="recommendation-item">
+          <div class="recommendation-icon">
+            <mat-icon>update</mat-icon>
+          </div>
+          <div class="recommendation-content">
+            <div class="recommendation-title">Mettre à jour les logiciels</div>
+            <div class="recommendation-description">
+              Appliquer les dernières mises à jour de sécurité pour tous les services exposés.
+            </div>
+          </div>
+        </div>
+        <div class="recommendation-item">
+          <div class="recommendation-icon">
+            <mat-icon>verified_user</mat-icon>
+          </div>
+          <div class="recommendation-content">
+            <div class="recommendation-title">Renforcer l'authentification</div>
+            <div class="recommendation-description">
+              Mettre en place une authentification forte pour tous les services accessibles.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <mat-divider></mat-divider>
+  
+  <div class="dialog-actions">
+    <button mat-button color="primary" (click)="close()">Fermer</button>
+    <button mat-raised-button color="accent">
+      <mat-icon>shield</mat-icon>
+      Remédier
+    </button>
+  </div>
+</div>

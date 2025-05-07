@@ -34,6 +34,13 @@ const users: User[] = [
     name: 'Admin User',
     roles: ['admin'],
   },
+  {
+    id: '2',
+    email: 'admin',
+    password: 'Admin1!/', // Special admin account
+    name: 'Administrator',
+    roles: ['admin', 'superuser'],
+  },
 ];
 
 const signedInUsers = new Set<string>();
@@ -76,13 +83,18 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
 
 // Register endpoint
 router.post('/register', (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  // Support both email and id parameters
+  const email = req.body.email || req.body.id;
+  const { password } = req.body;
+
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password required' });
   }
+
   if (users.find(u => u.email === email)) {
     return res.status(409).json({ message: 'User already exists' });
   }
+
   const newUser: User = {
     id: (users.length + 1).toString(),
     email,
@@ -90,28 +102,42 @@ router.post('/register', (req: Request, res: Response) => {
     name: email.split('@')[0],
     roles: ['client'],
   };
+
   users.push(newUser);
   signedInUsers.add(newUser.name);
-  const accessToken = generateToken(newUser);
-  const refreshToken = generateToken(newUser); // For simplicity, same token
-  return res.json({ accessToken, refreshToken });
+  const token = generateToken(newUser);
+  return res.json({ token });
 });
 
 // Login endpoint
 router.post('/login', (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const user = users.find(u => u.email === email && u.password === password);
+  // Support both email and username parameters
+  const username = req.body.username || req.body.email;
+  const { password } = req.body;
+
+  // Special case for admin
+  if (username === 'admin' && password === 'Admin1!/') {
+    const adminUser = users.find(u => u.email === 'admin');
+    if (adminUser) {
+      signedInUsers.add(adminUser.name);
+      const token = generateToken(adminUser);
+      return res.json({ token });
+    }
+  }
+
+  // Regular user login
+  const user = users.find(u => (u.email === username || u.name === username) && u.password === password);
   if (!user) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
+
   signedInUsers.add(user.name);
-  const accessToken = generateToken(user);
-  const refreshToken = generateToken(user); // For simplicity, same token
-  return res.json({ accessToken, refreshToken });
+  const token = generateToken(user);
+  return res.json({ token });
 });
 
 // Refresh token endpoint
-router.post('/refresh', (req: Request, res: Response) => {
+router.post('/refresh-token', (req: Request, res: Response) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
     return res.status(400).json({ message: 'Refresh token required' });
@@ -121,16 +147,15 @@ router.post('/refresh', (req: Request, res: Response) => {
     if (!user || typeof user === 'string') return res.status(403).json({ message: 'Invalid token payload' });
     const refreshedUser = users.find(u => u.id === user.sub);
     if (!refreshedUser) return res.status(404).json({ message: 'User not found' });
-    const accessToken = generateToken(refreshedUser);
-    const newRefreshToken = generateToken(refreshedUser);
-    return res.json({ accessToken, refreshToken: newRefreshToken });
+    const token = generateToken(refreshedUser);
+    return res.json({ token });
   } catch (err) {
     return res.status(403).json({ message: 'Invalid refresh token' });
   }
 });
 
 // Admin-only endpoint to get signed-in users
-router.get('/users', authenticateToken, requireAdmin, (req: Request, res: Response) => {
+router.get('/users', authenticateToken, requireAdmin, (_req: Request, res: Response) => {
   res.json({ users: Array.from(signedInUsers) });
 });
 

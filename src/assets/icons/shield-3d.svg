@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512px" height="512px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>Shield 3D</title>
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#4A6CF7" offset="0%"></stop>
+            <stop stop-color="#3A56D4" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-2">
+            <stop stop-color="#6B89FF" offset="0%"></stop>
+            <stop stop-color="#4A6CF7" offset="100%"></stop>
+        </linearGradient>
+        <filter x="-25.0%" y="-25.0%" width="150.0%" height="150.0%" filterUnits="objectBoundingBox" id="filter-3">
+            <feGaussianBlur stdDeviation="20" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="Shield-3D" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle id="Glow" fill="#4A6CF7" filter="url(#filter-3)" cx="256" cy="256" r="160"></circle>
+        <path d="M256,80 C256,80 352,112 416,128 C416,240 400,320 256,432 C112,320 96,240 96,128 C160,112 256,80 256,80 Z" id="Shield-Shadow" fill="#3A56D4"></path>
+        <path d="M256,64 C256,64 352,96 416,112 C416,224 400,304 256,416 C112,304 96,224 96,112 C160,96 256,64 256,64 Z" id="Shield-Base" fill="url(#linearGradient-1)"></path>
+        <path d="M256,64 C256,64 160,96 96,112 C96,224 112,304 256,416 L256,64 Z" id="Shield-Highlight" fill="url(#linearGradient-2)"></path>
+        <path d="M256,128 C256,128 304,144 336,152 C336,216 328,264 256,328 C184,264 176,216 176,152 C208,144 256,128 256,128 Z" id="Inner-Shield" fill="#FFFFFF" opacity="0.2"></path>
+    </g>
+</svg>

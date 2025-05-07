@@ -1,11 +1,10 @@
-<ng-container *ngIf="authService.isAuthenticated()">
-    <app-header></app-header>
-    <div class="main-container">
-      <app-sidebar></app-sidebar>
-      <div class="content-container">
-        <router-outlet></router-outlet>
-      </div>
+<div class="app-container">
+  <app-header *ngIf="authService.isAuthenticated()"></app-header>
+  <div class="main-container" [class.blurred]="!authService.isAuthenticated()">
+    <div class="content-container">
+      <router-outlet></router-outlet>
     </div>
-  </ng-container>
-  
+  </div>
+
+  <div class="auth-overlay" *ngIf="!authService.isAuthenticated()"></div>
   <router-outlet *ngIf="!authService.isAuthenticated()"></router-outlet>

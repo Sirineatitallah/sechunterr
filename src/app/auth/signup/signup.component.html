@@ -1,0 +1,138 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <img src="assets/icons/shield-3d.svg" alt="SecHunter Logo" class="logo-icon">
+        <h1 class="logo-text">SecHunter <span class="accent">VOC</span></h1>
+      </div>
+      <h2 class="auth-title">Create Account</h2>
+      <p class="auth-subtitle">Join SecHunter VOC to manage your security operations</p>
+    </div>
+    
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <div class="input-container">
+          <i class="material-icons input-icon">person</i>
+          <input 
+            type="text" 
+            id="fullName" 
+            formControlName="fullName" 
+            placeholder="Enter your full name"
+            [class.is-invalid]="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched"
+          >
+        </div>
+        <div class="error-message" *ngIf="signupForm.get('fullName')?.invalid && signupForm.get('fullName')?.touched">
+          Full name is required
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <div class="input-container">
+          <i class="material-icons input-icon">email</i>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="Enter your email"
+            [class.is-invalid]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          >
+        </div>
+        <div class="error-message" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+          <span *ngIf="signupForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="signupForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-container">
+          <i class="material-icons input-icon">account_circle</i>
+          <input 
+            type="text" 
+            id="username" 
+            formControlName="username" 
+            placeholder="Choose a username"
+            [class.is-invalid]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
+          >
+        </div>
+        <div class="error-message" *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched">
+          Username is required
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-container">
+          <i class="material-icons input-icon">lock</i>
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password" 
+            placeholder="Create a password"
+            [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          >
+          <button 
+            type="button" 
+            class="password-toggle" 
+            (click)="togglePasswordVisibility()"
+          >
+            <i class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</i>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+          <span *ngIf="signupForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="input-container">
+          <i class="material-icons input-icon">lock</i>
+          <input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            id="confirmPassword" 
+            formControlName="confirmPassword" 
+            placeholder="Confirm your password"
+            [class.is-invalid]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
+          >
+          <button 
+            type="button" 
+            class="password-toggle" 
+            (click)="toggleConfirmPasswordVisibility()"
+          >
+            <i class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</i>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched">
+          <span *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+          <span *ngIf="signupForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+        </div>
+      </div>
+      
+      <div class="terms-agreement">
+        <input type="checkbox" id="terms">
+        <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+      </div>
+      
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      
+      <button 
+        type="submit" 
+        class="signup-btn" 
+        [disabled]="signupForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Create Account</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+    
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/auth">Sign In</a></p>
+    </div>
+  </div>
+</div>

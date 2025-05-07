@@ -1,0 +1,210 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h2>Security Operations Center</h2>
+      <div class="security-badge info">
+        <i class="material-icons">shield</i>
+        <span>SecHunter Pro</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="time-selector">
+        <i class="material-icons">date_range</i>
+        <span>Last 7 days</span>
+        <button class="refresh-button" (click)="refreshData()" tabindex="0" aria-label="Refresh dashboard">
+          <i class="material-icons">refresh</i>
+        </button>
+      </div>
+      <div class="security-status">
+        <div class="status-indicator" [ngClass]="{'secure': true}">
+          <i class="material-icons">security</i>
+          <span>System Secure</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="security-spinner">
+      <div class="spinner-ring"></div>
+      <div class="spinner-core"></div>
+    </div>
+    <p>Scanning security metrics...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container security-card critical" *ngIf="error && !isLoading">
+    <i class="material-icons error-icon">error</i>
+    <h3>Security Scan Failed</h3>
+    <p>{{ error }}</p>
+    <button class="retry-button" (click)="refreshData()" tabindex="0">
+      <i class="material-icons">refresh</i>
+      Retry Security Scan
+    </button>
+  </div>
+
+  <!-- Security Summary -->
+  <div class="security-summary" *ngIf="!isLoading && !error">
+    <div class="summary-card">
+      <div class="summary-icon secure">
+        <i class="material-icons">verified_user</i>
+      </div>
+      <div class="summary-content">
+        <h4>Security Score</h4>
+        <div class="summary-value">94<span class="summary-unit">%</span></div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon warning">
+        <i class="material-icons">gpp_maybe</i>
+      </div>
+      <div class="summary-content">
+        <h4>Active Threats</h4>
+        <div class="summary-value">3</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon info">
+        <i class="material-icons">admin_panel_settings</i>
+      </div>
+      <div class="summary-content">
+        <h4>Monitored Assets</h4>
+        <div class="summary-value">128</div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon success">
+        <i class="material-icons">security_update_good</i>
+      </div>
+      <div class="summary-content">
+        <h4>Resolved Issues</h4>
+        <div class="summary-value">27</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid" *ngIf="!isLoading && !error">
+    <div class="chart-item chart-item-medium security-card" (click)="onChartClick('revenue')" tabindex="0" role="button" aria-label="Revenue Analysis Chart">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>Vulnerability Trends</h3>
+            <div class="security-badge warning">Critical</div>
+          </div>
+          <span class="chart-subtitle">Monthly vulnerability distribution</span>
+        </div>
+        <app-revenue-bar-chart></app-revenue-bar-chart>
+      </div>
+    </div>
+
+    <div class="chart-item chart-item-medium security-card" (click)="onChartClick('satisfaction')" tabindex="0" role="button" aria-label="Satisfaction Trends Chart">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>Security Posture</h3>
+            <div class="security-badge success">Stable</div>
+          </div>
+          <span class="chart-subtitle">Security rating over time</span>
+        </div>
+        <app-satisfaction-line-chart></app-satisfaction-line-chart>
+      </div>
+    </div>
+
+    <div class="chart-item chart-item-medium security-card" (click)="onChartClick('target')" tabindex="0" role="button" aria-label="Target vs Reality Chart">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>Compliance Status</h3>
+            <div class="security-badge info">Monitoring</div>
+          </div>
+          <span class="chart-subtitle">Compliance targets vs. current state</span>
+        </div>
+        <app-target-reality-chart></app-target-reality-chart>
+      </div>
+    </div>
+
+    <div class="chart-item chart-item-medium security-card" (click)="onChartClick('volume')" tabindex="0" role="button" aria-label="Service Volume Chart">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>Incident Distribution</h3>
+            <div class="security-badge info">Active</div>
+          </div>
+          <span class="chart-subtitle">Security incidents by category</span>
+        </div>
+        <app-volume-service-chart></app-volume-service-chart>
+      </div>
+    </div>
+
+    <div class="chart-item chart-item-large security-card" (click)="onChartClick('geography')" tabindex="0" role="button" aria-label="Geographic Distribution Map">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>Threat Intelligence Map</h3>
+            <div class="security-badge critical">Active Threats</div>
+          </div>
+          <span class="chart-subtitle">Global threat activity in real-time</span>
+        </div>
+        <app-country-map></app-country-map>
+      </div>
+    </div>
+
+    <div class="chart-item chart-item-large security-card" (click)="onChartClick('products')" tabindex="0" role="button" aria-label="Top Products Chart">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <h3>Critical Vulnerabilities</h3>
+            <div class="security-badge warning">High Priority</div>
+          </div>
+          <span class="chart-subtitle">Top vulnerabilities by risk score</span>
+        </div>
+        <app-top-products-chart></app-top-products-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Detail Modal -->
+  <div class="chart-modal" *ngIf="selectedChart" (click)="closeModal()">
+    <div class="modal-content security-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h2>{{ getChartTitle() }}</h2>
+          <div class="security-badge" [ngClass]="getChartSeverity()">{{ getChartStatus() }}</div>
+        </div>
+        <button class="close-button" (click)="closeModal()" tabindex="0" aria-label="Close modal">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div [ngSwitch]="selectedChart">
+          <app-revenue-bar-chart *ngSwitchCase="'revenue'" [fullSize]="true"></app-revenue-bar-chart>
+          <app-satisfaction-line-chart *ngSwitchCase="'satisfaction'" [fullSize]="true"></app-satisfaction-line-chart>
+          <app-target-reality-chart *ngSwitchCase="'target'" [fullSize]="true"></app-target-reality-chart>
+          <app-volume-service-chart *ngSwitchCase="'volume'" [fullSize]="true"></app-volume-service-chart>
+          <app-country-map *ngSwitchCase="'geography'" [fullSize]="true"></app-country-map>
+          <app-top-products-chart *ngSwitchCase="'products'" [fullSize]="true"></app-top-products-chart>
+        </div>
+
+        <div class="modal-actions">
+          <button class="action-button">
+            <i class="material-icons">download</i>
+            Export Data
+          </button>
+          <button class="action-button">
+            <i class="material-icons">share</i>
+            Share Report
+          </button>
+          <button class="action-button primary">
+            <i class="material-icons">security</i>
+            Run Security Scan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

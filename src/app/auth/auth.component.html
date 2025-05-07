@@ -1,0 +1,107 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="cyber-gradient"></div>
+    <div class="neon-grid"></div>
+
+    <div class="auth-content">
+      <header class="auth-header">
+        <h1 class="auth-title glitch" data-text="Welcome Back">Welcome Back</h1>
+        <p class="auth-subtitle">Secure Gateway to VOC Ecosystem</p>
+      </header>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <!-- Enterprise ID Field -->
+        <div class="input-field cyber-input">
+          <label for="username" class="hologram-label">Enterprise ID</label>
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            autocomplete="off"
+            required
+          >
+          <div class="cyber-border"></div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="input-field cyber-input">
+          <label for="password" class="hologram-label">Access Code</label>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            autocomplete="off"
+            required
+          >
+          <div class="cyber-border"></div>
+          <button
+            type="button"
+            class="password-toggle cyber-button"
+            (click)="togglePasswordVisibility()"
+          >
+            <i class="icon" [class.icon-eye]="!showPassword" [class.icon-eye-blocked]="showPassword"></i>
+          </button>
+        </div>
+
+        <!-- Security Criteria -->
+        <div class="security-criteria">
+          <div class="criteria-item">
+            <i class="icon icon-check"></i>
+            <span>8+ Characters</span>
+          </div>
+          <div class="criteria-item">
+            <i class="icon icon-check"></i>
+            <span>Uppercase Letter</span>
+          </div>
+          <div class="criteria-item">
+            <i class="icon icon-check"></i>
+            <span>Numeric Character</span>
+          </div>
+          <div class="criteria-item">
+            <i class="icon icon-check"></i>
+            <span>Special Symbol</span>
+          </div>
+        </div>
+
+        <!-- Error Messages -->
+        <div *ngIf="errorMessage" class="error-message">
+          <i class="icon icon-warning"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Success Messages -->
+        <div *ngIf="successMessage" class="success-message">
+          <i class="icon icon-checkmark"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="auth-button cyber-button"
+          [disabled]="loginForm.invalid || isLoading"
+          (click)="onSubmit()"
+        >
+          <span *ngIf="!isLoading">SIGN IN</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+      </form>
+
+      <footer class="auth-footer">
+        <div class="security-badges">
+          <div class="badge-item">
+            <i class="icon icon-lock-orb"></i>
+            <span>256-bit Encryption</span>
+          </div>
+          <div class="badge-item">
+            <i class="icon icon-shield-check"></i>
+            <span>Zero Trust Architecture</span>
+          </div>
+        </div>
+        <div class="auth-switch">
+          don't have an account ? <a routerLink="/signup" class="neon-link">Create an account</a>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>

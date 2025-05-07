@@ -1,0 +1,52 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Global Threat Intelligence</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Refresh data">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Expand">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="chart-wrapper">
+      <canvas #chartCanvas></canvas>
+    </div>
+    <div class="threat-alerts">
+      <h4>Recent Threat Alerts</h4>
+      <div class="alert-list">
+        <div *ngFor="let threat of recentThreats" class="alert-item" [ngClass]="getSeverityClass(threat.severity)">
+          <div class="alert-icon">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">{{ threat.type }}</div>
+            <div class="alert-details">
+              <span class="alert-region">{{ threat.region }}</span>
+              <span class="alert-time">{{ threat.time }}</span>
+            </div>
+            <div class="alert-source">Source: {{ threat.source }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="global-stats">
+      <div class="stat-item">
+        <span class="stat-value">358</span>
+        <span class="stat-label">Total Threats</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">42</span>
+        <span class="stat-label">Critical</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">+12%</span>
+        <span class="stat-label">Increase</span>
+      </div>
+    </div>
+  </div>
+</div>

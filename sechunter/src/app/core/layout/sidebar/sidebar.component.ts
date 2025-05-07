@@ -55,10 +55,10 @@ export class SidebarComponent {
   private focusModeTimeoutId: any = null;
 
   menuItems: MenuItem[] = [
-    { 
-      path: 'asm', 
-      title: 'Attack Surface', 
-      icon: 'assets/icons/asm-3d.svg', 
+    {
+      path: 'asm',
+      title: 'Attack Surface',
+      icon: 'assets/icons/asm-3d.svg',
       roles: ['admin'],
       submenus: [
         { path: 'asm/scan', title: 'Scan de Vulnérabilités', icon: 'scan', roles: ['admin'] },
@@ -66,27 +66,35 @@ export class SidebarComponent {
       ],
       notificationCount: 0
     },
-    { 
-      path: 'vi', 
-      title: 'Vulnerability Intel', 
-      icon: 'assets/icons/vi-3d.svg', 
+    {
+      path: 'vi',
+      title: 'Vulnerability Intel',
+      icon: 'assets/icons/vi-3d.svg',
       roles: ['analyst', 'admin'],
       submenus: [],
       notificationCount: 0
     },
-    { 
-      path: 'cti', 
-      title: 'Threat Intelligence', 
-      icon: 'assets/icons/cti-3d.svg', 
+    {
+      path: 'cti',
+      title: 'Threat Intelligence',
+      icon: 'assets/icons/cti-3d.svg',
       roles: ['admin'],
       submenus: [],
       notificationCount: 5 // example badge count
     },
-    { 
-      path: 'soar', 
-      title: 'Incident Response', 
-      icon: 'assets/icons/soar-3d.svg', 
+    {
+      path: 'soar',
+      title: 'Incident Response',
+      icon: 'assets/icons/soar-3d.svg',
       roles: ['admin'],
+      submenus: [],
+      notificationCount: 0
+    },
+    {
+      path: 'info',
+      title: 'Information & Contact',
+      icon: 'assets/icons/info-3d.svg',
+      roles: ['admin', 'analyst', 'client'],
       submenus: [],
       notificationCount: 0
     }
@@ -113,8 +121,10 @@ export class SidebarComponent {
   }
 
   showMenuItem(item: MenuItem): boolean {
-    return this.authService.isLoggedIn() && 
-           item.roles.some(role => this.currentUser?.roles?.includes(role));
+    if (!this.authService.isLoggedIn() || !this.currentUser || !this.currentUser.roles) {
+      return false;
+    }
+    return item.roles.some(role => this.currentUser.roles.includes(role));
   }
 
   logout() {

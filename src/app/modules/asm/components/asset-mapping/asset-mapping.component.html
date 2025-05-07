@@ -1,0 +1,284 @@
+<div class="asset-mapping-container">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Header -->
+  <div class="mapping-header">
+    <div class="header-title">
+      <h2>Attack Surface Mapping</h2>
+      <p class="subtitle">Unified view of internal (IASM) and external (EASM) assets</p>
+    </div>
+    <div class="view-controls">
+      <mat-button-toggle-group [(ngModel)]="currentView" (change)="setView(currentView)">
+        <mat-button-toggle value="map" matTooltip="Network Map View">
+          <mat-icon>share</mat-icon>
+          <span>Map</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="list" matTooltip="List View">
+          <mat-icon>view_list</mat-icon>
+          <span>List</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="tree" matTooltip="Tree View">
+          <mat-icon>account_tree</mat-icon>
+          <span>Tree</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-section">
+      <div class="filter-group">
+        <label>Category</label>
+        <div class="toggle-buttons">
+          <button 
+            *ngFor="let type of ['internal', 'external']" 
+            class="toggle-button" 
+            [class.active]="type === 'internal' ? showInternal : showExternal"
+            (click)="toggleCategory(type)"
+            [matTooltip]="type === 'internal' ? 'Internal Assets (IASM)' : 'External Assets (EASM)'"
+          >
+            <mat-icon>{{ type === 'internal' ? 'home' : 'public' }}</mat-icon>
+            <span>{{ type === 'internal' ? 'Internal' : 'External' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Asset Types</label>
+        <div class="toggle-buttons">
+          <button 
+            *ngFor="let type of ['server', 'endpoint', 'network', 'cloud', 'application', 'database', 'iot', 'container']" 
+            class="toggle-button small" 
+            [class.active]="selectedTypes.includes(type)"
+            (click)="toggleNodeType(type)"
+            [matTooltip]="type.charAt(0).toUpperCase() + type.slice(1) + ' Assets'"
+          >
+            <span>{{ type.charAt(0).toUpperCase() }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Min Risk Score: {{ minRiskScore }}</label>
+        <mat-slider
+          min="0"
+          max="100"
+          step="5"
+          [value]="minRiskScore"
+          (change)="setMinRiskScore($event.value)"
+          color="primary"
+        >
+        </mat-slider>
+      </div>
+    </div>
+
+    <div class="search-section">
+      <mat-form-field appearance="outline">
+        <mat-label>Search Assets</mat-label>
+        <input matInput placeholder="Enter asset name, IP, domain...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button color="primary">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <!-- Map View -->
+    <div class="map-view" *ngIf="currentView === 'map'">
+      <div class="graph-container" #graphContainer></div>
+    </div>
+
+    <!-- List View -->
+    <div class="list-view" *ngIf="currentView === 'list'">
+      <table mat-table [dataSource]="assetMapData.nodes" class="asset-table">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let asset">
+            <div class="asset-name-cell">
+              <div class="asset-icon" [ngClass]="asset.type + '-icon'">{{ getNodeIcon(asset.type) }}</div>
+              <span>{{ asset.name }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let asset">{{ asset.type }}</td>
+        </ng-container>
+
+        <!-- Category Column -->
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef>Category</th>
+          <td mat-cell *matCellDef="let asset">
+            <span class="category-badge" [ngClass]="asset.category + '-badge'">
+              {{ asset.category }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Risk Score Column -->
+        <ng-container matColumnDef="riskScore">
+          <th mat-header-cell *matHeaderCellDef>Risk Score</th>
+          <td mat-cell *matCellDef="let asset">
+            <div class="risk-score-cell">
+              <div class="risk-meter" [style.width.%]="asset.riskScore"></div>
+              <span>{{ asset.riskScore }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Vulnerabilities Column -->
+        <ng-container matColumnDef="vulnerabilities">
+          <th mat-header-cell *matHeaderCellDef>Vulnerabilities</th>
+          <td mat-cell *matCellDef="let asset">
+            <span class="vuln-count" [ngClass]="getVulnClass(asset.vulnerabilities)">
+              {{ asset.vulnerabilities }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let asset">
+            <button mat-icon-button color="primary" matTooltip="View Details" (click)="selectNode(asset)">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button color="accent" matTooltip="Scan Asset">
+              <mat-icon>security</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['name', 'type', 'category', 'riskScore', 'vulnerabilities', 'actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['name', 'type', 'category', 'riskScore', 'vulnerabilities', 'actions'];"
+            (click)="selectNode(row)"></tr>
+      </table>
+    </div>
+
+    <!-- Tree View -->
+    <div class="tree-view" *ngIf="currentView === 'tree'">
+      <div class="tree-placeholder">
+        <mat-icon>account_tree</mat-icon>
+        <p>Tree view will be implemented in the next release</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details panel -->
+  <div class="details-panel" *ngIf="selectedNode">
+    <div class="panel-header">
+      <div class="node-icon" [ngClass]="selectedNode.type + '-icon'">
+        {{ getNodeIcon(selectedNode.type) }}
+      </div>
+      <div class="node-title">
+        <h3>{{ selectedNode.name }}</h3>
+        <span class="node-type">{{ selectedNode.type }} ({{ selectedNode.category }})</span>
+      </div>
+      <button mat-icon-button (click)="clearSelection()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="panel-content">
+      <div class="metrics-section">
+        <div class="metric-card">
+          <div class="metric-value" [ngClass]="getRiskClass(selectedNode.riskScore)">{{ selectedNode.riskScore }}</div>
+          <div class="metric-label">Risk Score</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" [ngClass]="getExposureClass(selectedNode.exposureLevel)">{{ selectedNode.exposureLevel }}</div>
+          <div class="metric-label">Exposure Level</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" [ngClass]="getVulnClass(selectedNode.vulnerabilities)">{{ selectedNode.vulnerabilities }}</div>
+          <div class="metric-label">Vulnerabilities</div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="details-section">
+        <h4>Asset Details</h4>
+        
+        <div class="detail-row">
+          <div class="detail-label">Services</div>
+          <div class="detail-value">
+            <mat-chip-list>
+              <mat-chip *ngFor="let service of selectedNode.services">{{ service }}</mat-chip>
+            </mat-chip-list>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label">IP Addresses</div>
+          <div class="detail-value">
+            <div class="ip-list">
+              <div class="ip-item" *ngFor="let ip of selectedNode.ips">{{ ip }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-row" *ngIf="selectedNode.domains && selectedNode.domains.length > 0">
+          <div class="detail-label">Domains</div>
+          <div class="detail-value">
+            <div class="domain-list">
+              <div class="domain-item" *ngFor="let domain of selectedNode.domains">{{ domain }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-row" *ngIf="selectedNode.lastScan">
+          <div class="detail-label">Last Scan</div>
+          <div class="detail-value">{{ selectedNode.lastScan | date:'medium' }}</div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="connections-section">
+        <h4>Connections</h4>
+        <div class="connection-list">
+          <div class="connection-item" *ngFor="let link of getNodeConnections(selectedNode.id)">
+            <div class="connection-icon" [ngClass]="getConnectedNode(link, selectedNode.id).type + '-icon'">
+              {{ getNodeIcon(getConnectedNode(link, selectedNode.id).type) }}
+            </div>
+            <div class="connection-details">
+              <div class="connection-name">{{ getConnectedNode(link, selectedNode.id).name }}</div>
+              <div class="connection-type">
+                <span class="connection-badge" [ngClass]="link.type + '-badge'">{{ link.type }}</span>
+                <span class="encryption-badge" *ngIf="link.encrypted">
+                  <mat-icon>lock</mat-icon> Encrypted
+                </span>
+                <span class="encryption-badge unencrypted" *ngIf="!link.encrypted">
+                  <mat-icon>lock_open</mat-icon> Unencrypted
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button mat-raised-button color="primary">
+          <mat-icon>security_update</mat-icon>
+          Scan Asset
+        </button>
+        <button mat-stroked-button color="primary">
+          <mat-icon>assessment</mat-icon>
+          Generate Report
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

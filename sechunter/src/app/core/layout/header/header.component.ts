@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
@@ -22,7 +23,8 @@ import { ThemeService } from '../../services/theme.service';
     MatSelectModule,
     MatCheckboxModule,
     MatProgressBarModule,
-    FormsModule
+    FormsModule,
+    RouterModule
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']

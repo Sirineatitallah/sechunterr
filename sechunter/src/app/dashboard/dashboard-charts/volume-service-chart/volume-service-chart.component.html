@@ -1,0 +1,33 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Volume vs Service</h3>
+  </div>
+  <div class="chart-content">
+    <ngx-charts-bar-vertical-2d
+      [view]="view"
+      [scheme]="colorScheme"
+      [results]="multi"
+      [gradient]="gradient"
+      [xAxis]="showXAxis"
+      [yAxis]="showYAxis"
+      [legend]="showLegend"
+      [showXAxisLabel]="showXAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      [xAxisLabel]="xAxisLabel"
+      [yAxisLabel]="yAxisLabel"
+      (select)="onSelect($event)"
+      (activate)="onActivate($event)"
+      (deactivate)="onDeactivate($event)">
+    </ngx-charts-bar-vertical-2d>
+  </div>
+  <div class="chart-summary">
+    <div class="summary-item">
+      <div class="summary-label">Volume Total</div>
+      <div class="summary-value volume">{{ volumeTotal | number }}</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-label">Service Total</div>
+      <div class="summary-value service">{{ serviceTotal | number }}</div>
+    </div>
+  </div>
+</div>

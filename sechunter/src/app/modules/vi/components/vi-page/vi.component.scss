@@ -1,0 +1,814 @@
+@use '../../../../../assets/scss/variables' as vars;
+@use '../../../../../assets/scss/mixins' as mixins;
+
+.vi-dashboard {
+  padding: 24px;
+
+  // Dashboard Header
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background: rgba(var(--primary-rgb), 0.1);
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(var(--primary-rgb), 0.2);
+      }
+
+      mat-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+      }
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .dashboard-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .time-range-selector {
+        display: flex;
+        align-items: center;
+
+        .control-label {
+          margin-right: 8px;
+          font-size: 14px;
+          color: var(--text-secondary);
+        }
+
+        .time-range-buttons {
+          display: flex;
+          gap: 4px;
+
+          button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-paper);
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(var(--primary-rgb), 0.05);
+            }
+
+            &.active {
+              background: rgba(var(--primary-rgb), 0.1);
+              color: var(--primary);
+              border-color: var(--primary);
+            }
+          }
+        }
+      }
+
+      .refresh-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--primary-dark);
+        }
+
+        mat-icon {
+          font-size: 18px;
+          height: 18px;
+          width: 18px;
+        }
+      }
+    }
+  }
+
+  // Vulnerability Summary Section
+  .vulnerability-summary-section {
+    margin-bottom: 24px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 16px;
+      color: var(--text-primary);
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+
+      .summary-card {
+        background: var(--bg-paper);
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        padding: 16px;
+        display: flex;
+        align-items: center;
+
+        .card-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 8px;
+          background: rgba(var(--primary-rgb), 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 16px;
+
+          mat-icon {
+            color: var(--primary);
+            font-size: 24px;
+            height: 24px;
+            width: 24px;
+          }
+
+          &.critical {
+            background: rgba(var(--error-rgb), 0.1);
+
+            mat-icon {
+              color: var(--error);
+            }
+          }
+
+          &.warning {
+            background: rgba(var(--warning-rgb), 0.1);
+
+            mat-icon {
+              color: var(--warning);
+            }
+          }
+
+          &.success {
+            background: rgba(var(--success-rgb), 0.1);
+
+            mat-icon {
+              color: var(--success);
+            }
+          }
+        }
+
+        .card-content {
+          flex: 1;
+
+          .card-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+          }
+
+          .card-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+          }
+        }
+
+        .card-trend {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          font-weight: 500;
+
+          mat-icon {
+            font-size: 16px;
+            height: 16px;
+            width: 16px;
+            margin-right: 4px;
+          }
+
+          &.positive {
+            color: var(--success);
+          }
+
+          &.negative {
+            color: var(--error);
+          }
+        }
+
+        .card-percentage {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-secondary);
+        }
+      }
+    }
+  }
+
+  // Top Vulnerabilities Section
+  .top-vulnerabilities-section {
+    background: var(--bg-paper);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
+    margin-bottom: 24px;
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-primary);
+      }
+
+      .view-all-button {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: none;
+        border: none;
+        color: var(--primary);
+        font-size: 14px;
+        cursor: pointer;
+
+        mat-icon {
+          font-size: 18px;
+          height: 18px;
+          width: 18px;
+        }
+      }
+    }
+
+    .vulnerabilities-table {
+      width: 100%;
+
+      .table-header {
+        display: flex;
+        padding: 12px 16px;
+        background: var(--bg-default);
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .table-body {
+        .table-row {
+          display: flex;
+          padding: 16px;
+          border-bottom: 1px solid var(--border-color);
+
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+      }
+
+      .header-cell, .cell {
+        padding: 0 8px;
+      }
+
+      .cve-cell {
+        width: 120px;
+      }
+
+      .title-cell {
+        flex: 1;
+      }
+
+      .severity-cell, .status-cell {
+        width: 100px;
+      }
+
+      .cvss-cell {
+        width: 80px;
+      }
+
+      .affected-cell {
+        width: 120px;
+      }
+
+      .actions-cell {
+        width: 100px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .severity-badge, .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      .severity-critical {
+        background: rgba(var(--error-rgb), 0.1);
+        color: var(--error);
+      }
+
+      .severity-high {
+        background: rgba(var(--warning-rgb), 0.1);
+        color: var(--warning);
+      }
+
+      .severity-medium {
+        background: rgba(var(--info-rgb), 0.1);
+        color: var(--info);
+      }
+
+      .severity-low {
+        background: rgba(var(--success-rgb), 0.1);
+        color: var(--success);
+      }
+
+      .status-open {
+        background: rgba(var(--error-rgb), 0.1);
+        color: var(--error);
+      }
+
+      .status-in-progress {
+        background: rgba(var(--warning-rgb), 0.1);
+        color: var(--warning);
+      }
+
+      .status-fixed {
+        background: rgba(var(--success-rgb), 0.1);
+        color: var(--success);
+      }
+
+      .cvss-score {
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        color: white;
+
+        &.critical {
+          background: var(--error);
+        }
+
+        &.high {
+          background: var(--warning);
+        }
+
+        &.medium {
+          background: var(--info);
+        }
+
+        &.low {
+          background: var(--success);
+        }
+      }
+    }
+  }
+
+  // Visualizations Grid
+  .visualizations-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+
+    .grid-item {
+      background: var(--bg-paper);
+      border-radius: 8px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      min-height: 300px;
+    }
+  }
+
+  // Vulnerability Categories Section
+  .vulnerability-categories-section {
+    background: var(--bg-paper);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
+    margin-bottom: 24px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 16px;
+      color: var(--text-primary);
+    }
+
+    .categories-chart {
+      display: flex;
+
+      .chart-legend {
+        flex: 1;
+        padding-right: 24px;
+
+        .legend-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 12px;
+
+          .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 12px;
+          }
+
+          .legend-label {
+            flex: 1;
+            font-size: 14px;
+          }
+
+          .legend-value {
+            font-weight: 600;
+            margin-right: 8px;
+          }
+
+          .legend-percentage {
+            font-size: 12px;
+            color: var(--text-secondary);
+            width: 50px;
+            text-align: right;
+          }
+        }
+      }
+
+      .chart-visual {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .donut-chart {
+          position: relative;
+          width: 200px;
+          height: 200px;
+
+          .donut-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+
+            .donut-segment {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              transform-origin: center;
+            }
+
+            .donut-center {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 120px;
+              height: 120px;
+              background: var(--bg-paper);
+              border-radius: 50%;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+              .center-value {
+                font-size: 24px;
+                font-weight: 600;
+                color: var(--text-primary);
+              }
+
+              .center-label {
+                font-size: 14px;
+                color: var(--text-secondary);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Remediation Section
+  .remediation-section {
+    margin-bottom: 24px;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 16px;
+      color: var(--text-primary);
+    }
+
+    .remediation-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+
+      .remediation-card {
+        background: var(--bg-paper);
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        padding: 16px;
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+
+          h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-primary);
+          }
+
+          .time-trend {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 500;
+
+            mat-icon {
+              font-size: 14px;
+              height: 14px;
+              width: 14px;
+              margin-right: 2px;
+            }
+
+            &.positive {
+              color: var(--success);
+            }
+
+            &.negative {
+              color: var(--error);
+            }
+          }
+        }
+
+        .card-value {
+          font-size: 28px;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 16px;
+        }
+
+        .card-chart {
+          height: 120px;
+
+          .progress-chart {
+            height: 8px;
+            background: var(--bg-default);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 56px;
+
+            .progress-bar {
+              height: 100%;
+              background: var(--primary);
+              border-radius: 4px;
+            }
+          }
+
+          .line-chart {
+            position: relative;
+            height: 100%;
+            width: 100%;
+
+            .chart-point {
+              position: absolute;
+              width: 2px;
+              height: 2px;
+              background: var(--primary);
+              border-radius: 50%;
+
+              &::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                width: 100%;
+                height: 1px;
+                background: rgba(var(--primary-rgb), 0.2);
+                transform: translateY(-50%);
+              }
+            }
+          }
+
+          .systems-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .system-item {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .system-name {
+                width: 120px;
+                font-size: 14px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .system-bar-container {
+                flex: 1;
+                height: 8px;
+                background: var(--bg-default);
+                border-radius: 4px;
+                overflow: hidden;
+              }
+
+              .system-bar {
+                height: 100%;
+                border-radius: 4px;
+              }
+
+              .system-count {
+                width: 40px;
+                text-align: right;
+                font-size: 14px;
+                font-weight: 500;
+              }
+            }
+          }
+
+          .donut-chart {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+
+            .donut-segments {
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+              position: relative;
+              overflow: hidden;
+
+              .donut-segment {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                transform-origin: center;
+              }
+            }
+
+            .donut-center {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 60px;
+              height: 60px;
+              background: var(--bg-paper);
+              border-radius: 50%;
+            }
+          }
+
+          .donut-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+
+            .legend-item {
+              display: flex;
+              align-items: center;
+              font-size: 12px;
+
+              .legend-color {
+                width: 12px;
+                height: 12px;
+                border-radius: 2px;
+                margin-right: 8px;
+              }
+
+              .legend-label {
+                flex: 1;
+              }
+
+              .legend-value {
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 1200px) {
+    .vulnerability-summary-section {
+      .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .visualizations-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .remediation-section {
+      .remediation-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+
+      .dashboard-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .time-range-selector {
+          width: 100%;
+          flex-direction: column;
+          align-items: flex-start;
+
+          .time-range-buttons {
+            width: 100%;
+            justify-content: space-between;
+          }
+        }
+
+        .refresh-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+
+    .vulnerability-summary-section {
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .top-vulnerabilities-section {
+      .vulnerabilities-table {
+        overflow-x: auto;
+
+        .table-header, .table-row {
+          min-width: 800px;
+        }
+      }
+    }
+
+    .vulnerability-categories-section {
+      .categories-chart {
+        flex-direction: column;
+
+        .chart-legend {
+          padding-right: 0;
+          margin-bottom: 24px;
+        }
+      }
+    }
+  }
+}

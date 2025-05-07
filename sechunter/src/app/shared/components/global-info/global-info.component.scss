@@ -1,0 +1,422 @@
+.global-info-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(16, 18, 27, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+  color: #ffffff;
+}
+
+.info-header {
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(10, 14, 31, 0.9) 0%, rgba(16, 18, 27, 0.8) 100%);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #00f3ff, #bc13fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    color: #a8a3a3;
+  }
+}
+
+.info-tabs {
+  flex: 1;
+
+  ::ng-deep {
+    .mat-mdc-tab-header {
+      background: rgba(10, 14, 31, 0.7);
+      border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+    }
+
+    .mat-mdc-tab {
+      min-width: 120px;
+
+      .mdc-tab__content {
+        flex-direction: row;
+
+        .mdc-tab__text-label {
+          color: #a8a3a3;
+          transition: color 0.3s ease;
+        }
+
+        mat-icon {
+          margin-right: 0.5rem;
+          color: #a8a3a3;
+          transition: color 0.3s ease;
+        }
+      }
+
+      &.mdc-tab--active {
+        .mdc-tab__text-label {
+          color: #00f3ff;
+        }
+
+        mat-icon {
+          color: #00f3ff;
+        }
+      }
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      flex: 1;
+    }
+  }
+}
+
+.tab-content {
+  padding: 2rem;
+  height: calc(100% - 4rem);
+  overflow-y: auto;
+}
+
+// About Tab Styles
+.about-section {
+  .company-info {
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+
+    .company-description {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: #e1e1e6;
+    }
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .info-item {
+      background: rgba(16, 18, 27, 0.5);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 243, 255, 0.1);
+
+      .info-label {
+        font-size: 0.9rem;
+        color: #a8a3a3;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-value {
+        font-size: 1.1rem;
+        color: #ffffff;
+
+        .website-link {
+          color: #00f3ff;
+          text-decoration: none;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #bc13fe;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+
+  mat-divider {
+    margin: 2rem 0;
+    background-color: rgba(0, 243, 255, 0.1);
+  }
+
+  .services-section {
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+
+      .service-card {
+        background: rgba(16, 18, 27, 0.7);
+        border: 1px solid rgba(0, 243, 255, 0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+          border-color: rgba(0, 243, 255, 0.3);
+        }
+
+        ::ng-deep {
+          .mat-mdc-card-header {
+            padding: 1rem 1rem 0.5rem;
+          }
+
+          .mat-mdc-card-avatar {
+            background-color: rgba(0, 243, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00f3ff;
+          }
+
+          .mat-mdc-card-title {
+            color: #ffffff;
+            font-size: 1.2rem;
+          }
+
+          .mat-mdc-card-content {
+            padding: 0 1rem 1rem;
+            color: #e1e1e6;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Contact Tab Styles
+.contact-section {
+  .contact-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    .contact-card {
+      background: rgba(16, 18, 27, 0.7);
+      border: 1px solid rgba(0, 243, 255, 0.1);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border-color: rgba(0, 243, 255, 0.3);
+      }
+
+      &.emergency-card {
+        border-color: rgba(255, 71, 87, 0.3);
+
+        ::ng-deep {
+          .mat-mdc-card-avatar {
+            background-color: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+          }
+        }
+
+        .emergency-contact {
+          display: flex;
+          align-items: center;
+          margin: 1rem 0;
+          padding: 0.75rem;
+          background: rgba(255, 71, 87, 0.1);
+          border-radius: 4px;
+
+          mat-icon {
+            margin-right: 0.75rem;
+            color: #ff4757;
+          }
+
+          span {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #ffffff;
+          }
+        }
+
+        .emergency-note {
+          color: #ff4757;
+          font-size: 0.9rem;
+          text-align: center;
+          margin-top: 0.5rem;
+        }
+      }
+
+      ::ng-deep {
+        .mat-mdc-card-header {
+          padding: 1rem 1rem 0.5rem;
+        }
+
+        .mat-mdc-card-avatar {
+          background-color: rgba(0, 243, 255, 0.1);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #00f3ff;
+        }
+
+        .mat-mdc-card-title {
+          color: #ffffff;
+          font-size: 1.2rem;
+        }
+
+        .mat-mdc-card-content {
+          padding: 0 1rem 1rem;
+          color: #e1e1e6;
+        }
+
+        .mat-mdc-card-actions {
+          padding: 0 1rem 1rem;
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      .contact-methods {
+        margin-top: 1rem;
+
+        .contact-method {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.75rem;
+
+          mat-icon {
+            margin-right: 0.75rem;
+            color: #00f3ff;
+          }
+
+          span {
+            color: #e1e1e6;
+          }
+        }
+      }
+    }
+  }
+
+  .social-media-section {
+    margin-top: 2rem;
+
+    h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #ffffff;
+    }
+
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .social-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background: rgba(16, 18, 27, 0.5);
+        border: 1px solid rgba(0, 243, 255, 0.1);
+        border-radius: 8px;
+        color: #e1e1e6;
+        text-decoration: none;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(0, 243, 255, 0.1);
+          transform: translateY(-3px);
+        }
+
+        mat-icon {
+          margin-right: 0.75rem;
+          color: #00f3ff;
+        }
+      }
+    }
+  }
+}
+
+// FAQ Tab Styles
+.faq-section {
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .faq-item {
+      background: rgba(16, 18, 27, 0.7);
+      border: 1px solid rgba(0, 243, 255, 0.1);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: rgba(0, 243, 255, 0.3);
+      }
+
+      ::ng-deep {
+        .mat-mdc-card-header {
+          padding: 1rem 1rem 0.5rem;
+        }
+
+        .mat-mdc-card-title {
+          color: #ffffff;
+          font-size: 1.2rem;
+        }
+
+        .mat-mdc-card-content {
+          padding: 0 1rem 1rem;
+          color: #e1e1e6;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .info-header {
+    padding: 1.5rem;
+
+    h1 {
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .tab-content {
+    padding: 1rem;
+  }
+
+  .about-section {
+    .services-grid,
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contact-section {
+    .contact-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .social-links {
+      flex-direction: column;
+    }
+  }
+}

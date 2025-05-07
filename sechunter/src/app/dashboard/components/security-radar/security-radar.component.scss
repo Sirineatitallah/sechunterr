@@ -1,0 +1,212 @@
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(26, 27, 38, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 243, 255, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(10, 14, 31, 0.5);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+  
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  .chart-actions {
+    display: flex;
+    gap: 0.5rem;
+    
+    button {
+      color: #e1e1e6;
+      
+      &:hover {
+        color: #00f3ff;
+      }
+    }
+  }
+}
+
+.chart-content {
+  flex: 1;
+  display: flex;
+  min-height: 300px;
+  
+  .chart-wrapper {
+    flex: 1;
+    padding: 1rem;
+    position: relative;
+  }
+  
+  .recommendations {
+    width: 300px;
+    padding: 1rem;
+    border-left: 1px solid rgba(0, 243, 255, 0.1);
+    background: rgba(10, 14, 31, 0.3);
+    overflow-y: auto;
+    
+    h4 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      color: #ffffff;
+    }
+    
+    .recommendation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .recommendation-item {
+      padding: 0.75rem;
+      background: rgba(16, 18, 27, 0.5);
+      border-radius: 8px;
+      border-left: 3px solid;
+      
+      &.impact-high {
+        border-left-color: #ff4757;
+      }
+      
+      &.impact-medium {
+        border-left-color: #ffa502;
+      }
+      
+      &.impact-low {
+        border-left-color: #2ed573;
+      }
+      
+      .recommendation-category {
+        font-size: 0.8rem;
+        color: #a8a3a3;
+        margin-bottom: 0.25rem;
+      }
+      
+      .recommendation-action {
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+      }
+      
+      .recommendation-impact {
+        display: flex;
+        align-items: center;
+        font-size: 0.8rem;
+        
+        .impact-label {
+          color: #a8a3a3;
+          margin-right: 0.5rem;
+        }
+        
+        .impact-value {
+          font-weight: 500;
+          text-transform: uppercase;
+          
+          .impact-high & {
+            color: #ff4757;
+          }
+          
+          .impact-medium & {
+            color: #ffa502;
+          }
+          
+          .impact-low & {
+            color: #2ed573;
+          }
+        }
+      }
+    }
+  }
+}
+
+.chart-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(0, 243, 255, 0.1);
+  display: flex;
+  align-items: center;
+  
+  .overall-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-right: 1.5rem;
+    margin-right: 1.5rem;
+    border-right: 1px solid rgba(0, 243, 255, 0.1);
+    
+    .score-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #00f3ff;
+      line-height: 1;
+    }
+    
+    .score-label {
+      font-size: 0.8rem;
+      color: #a8a3a3;
+      margin-top: 0.25rem;
+    }
+  }
+  
+  .score-comparison {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .comparison-item {
+      display: flex;
+      align-items: center;
+      
+      .comparison-value {
+        font-weight: 600;
+        color: #2ed573;
+        margin-right: 0.5rem;
+      }
+      
+      .comparison-label {
+        font-size: 0.9rem;
+        color: #e1e1e6;
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .chart-content {
+    flex-direction: column;
+    
+    .recommendations {
+      width: auto;
+      border-left: none;
+      border-top: 1px solid rgba(0, 243, 255, 0.1);
+    }
+  }
+  
+  .chart-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .overall-score {
+      padding-right: 0;
+      margin-right: 0;
+      border-right: none;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1rem;
+    }
+  }
+}

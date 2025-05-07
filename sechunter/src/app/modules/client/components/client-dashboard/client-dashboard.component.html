@@ -1,0 +1,422 @@
+<div class="client-dashboard">
+  <!-- Header with stats -->
+  <div class="dashboard-header">
+    <h1>Security Dashboard</h1>
+    <p class="welcome-message">Welcome back, {{ currentUser?.name }}</p>
+
+    <div class="stats-cards">
+      <mat-card class="stat-card security-score">
+        <mat-card-content>
+          <div class="stat-value" [class]="getSecurityScoreClass()">{{ securityScore }}</div>
+          <div class="stat-label">Security Score</div>
+          <div class="stat-description">
+            Your security level is <span [class]="getSecurityScoreClass()">{{ getSecurityScoreLabel() }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card vulnerabilities">
+        <mat-card-content>
+          <div class="stat-value">{{ totalVulnerabilities.critical + totalVulnerabilities.high + totalVulnerabilities.medium + totalVulnerabilities.low }}</div>
+          <div class="stat-label">Total Vulnerabilities</div>
+          <div class="stat-breakdown">
+            <span class="vuln-critical">{{ totalVulnerabilities.critical }} Critical</span> |
+            <span class="vuln-high">{{ totalVulnerabilities.high }} High</span> |
+            <span class="vuln-medium">{{ totalVulnerabilities.medium }} Medium</span> |
+            <span class="vuln-low">{{ totalVulnerabilities.low }} Low</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card asm-report">
+        <mat-card-content>
+          <div class="stat-value">{{ externalRiskPercentage }}%</div>
+          <div class="stat-label">External Risk</div>
+          <div class="stat-description">
+            Percentage of assets exposed to external threats
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card communications">
+        <mat-card-content>
+          <div class="stat-value">{{ getUnreadMessagesCount() }}</div>
+          <div class="stat-label">Unread Messages</div>
+          <div class="stat-breakdown">
+            <span class="priority-critical">{{ getCriticalUnreadMessagesCount() }} Critical</span> |
+            <span class="priority-high">{{ getHighUnreadMessagesCount() }} High</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Main content with tabs -->
+  <mat-tab-group class="dashboard-tabs">
+    <!-- Overview Tab -->
+    <mat-tab label="Overview">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>Security Overview</h2>
+          <button mat-raised-button color="primary" (click)="generateReport()">
+            <mat-icon>download</mat-icon> Generate PDF Report
+          </button>
+        </div>
+
+        <div class="overview-grid">
+          <!-- Top Vulnerabilities -->
+          <mat-card class="overview-card">
+            <mat-card-header>
+              <mat-card-title>Top 5 Vulnerabilities</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <table class="vulnerability-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Vulnerability</th>
+                    <th>Affected</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let vuln of topVulnerabilities">
+                    <td>
+                      <span [class]="getSeverityClass(vuln.severity)">
+                        {{ vuln.severity.charAt(0).toUpperCase() + vuln.severity.slice(1) }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="vuln-name">{{ vuln.name }}</div>
+                      <div class="vuln-id">{{ vuln.id }}</div>
+                    </td>
+                    <td>{{ vuln.affected }}</td>
+                    <td>
+                      <span class="status-badge" [class]="'status-' + vuln.status">
+                        {{ vuln.status.charAt(0).toUpperCase() + vuln.status.slice(1).replace('-', ' ') }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Threat Intel Digest -->
+          <mat-card class="overview-card">
+            <mat-card-header>
+              <mat-card-title>Threat Intel Digest</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="threat-intel-list">
+                <div class="threat-intel-item" *ngFor="let threat of threatIntel">
+                  <div class="threat-header">
+                    <div class="threat-type">{{ threat.type }}</div>
+                    <div class="threat-relevance" [class]="getRelevanceClass(threat.relevance)">
+                      {{ threat.relevance.charAt(0).toUpperCase() + threat.relevance.slice(1) }} Relevance
+                    </div>
+                  </div>
+                  <div class="threat-name">{{ threat.name }}</div>
+                  <div class="threat-sector">Sector: {{ threat.sector }}</div>
+                  <div class="threat-description">{{ threat.description }}</div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- ASM Surface Report -->
+          <mat-card class="overview-card">
+            <mat-card-header>
+              <mat-card-title>Attack Surface Report</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="asm-report-content">
+                <div class="asm-chart">
+                  <!-- Placeholder for chart -->
+                  <div class="placeholder-chart">Attack Surface Visualization</div>
+                </div>
+                <div class="asm-stats">
+                  <div class="asm-stat">
+                    <div class="stat-label">External Risk</div>
+                    <div class="stat-value">{{ externalRiskPercentage }}%</div>
+                    <mat-progress-bar mode="determinate" [value]="externalRiskPercentage" color="warn"></mat-progress-bar>
+                  </div>
+                  <div class="asm-stat">
+                    <div class="stat-label">Exposed Services</div>
+                    <div class="stat-value">8</div>
+                  </div>
+                  <div class="asm-stat">
+                    <div class="stat-label">Domains Monitored</div>
+                    <div class="stat-value">12</div>
+                  </div>
+                  <div class="asm-stat">
+                    <div class="stat-label">Last Scan</div>
+                    <div class="stat-value">{{ instances[0] && instances[0].lastScan ? (instances[0].lastScan | date:'short') : 'Never' }}</div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Instance Status -->
+          <mat-card class="overview-card">
+            <mat-card-header>
+              <mat-card-title>Instance Status</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="instance-list">
+                <div class="instance-item" *ngFor="let instance of instances">
+                  <div class="instance-header">
+                    <div class="instance-name">{{ instance.name }}</div>
+                    <div class="instance-status" [class]="'status-' + instance.status">
+                      {{ instance.status.charAt(0).toUpperCase() + instance.status.slice(1) }}
+                    </div>
+                  </div>
+                  <div class="instance-metrics" *ngIf="instance.metrics">
+                    <div class="metric-row">
+                      <span>CPU: {{ instance.metrics.cpu }}%</span>
+                      <mat-progress-bar mode="determinate" [value]="instance.metrics.cpu"></mat-progress-bar>
+                    </div>
+                    <div class="metric-row">
+                      <span>Memory: {{ instance.metrics.memory }}%</span>
+                      <mat-progress-bar mode="determinate" [value]="instance.metrics.memory"></mat-progress-bar>
+                    </div>
+                  </div>
+                  <div class="instance-actions">
+                    <button mat-stroked-button color="primary" (click)="requestScan(instance.id)">
+                      Request Scan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Communications Tab -->
+    <mat-tab label="Communications">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>SecureUser Communications</h2>
+        </div>
+
+        <table mat-table [dataSource]="communications" class="mat-elevation-z2">
+          <!-- Priority Column -->
+          <ng-container matColumnDef="priority">
+            <th mat-header-cell *matHeaderCellDef>Priority</th>
+            <td mat-cell *matCellDef="let comm">
+              <span [class]="getPriorityClass(comm.priority)">
+                {{ comm.priority.charAt(0).toUpperCase() + comm.priority.slice(1) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Message</th>
+            <td mat-cell *matCellDef="let comm" [class.unread]="!comm.read">
+              <div class="message-title">{{ comm.title }}</div>
+              <div class="message-preview">{{ comm.message.substring(0, 100) }}{{ comm.message.length > 100 ? '...' : '' }}</div>
+              <div class="message-sender">From: {{ comm.sender.name }}</div>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let comm">
+              {{ comm.createdAt | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let comm">
+              <button mat-icon-button color="primary" matTooltip="View message"
+                      routerLink="/dashboard/client/communications/{{ comm.id }}">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" matTooltip="Mark as read"
+                      (click)="markCommunicationAsRead(comm.id)" *ngIf="!comm.read">
+                <mat-icon>mark_email_read</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="communicationColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: communicationColumns;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Reports Tab -->
+    <mat-tab label="Reports">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>Security Reports</h2>
+          <button mat-raised-button color="primary" (click)="generateReport()">
+            <mat-icon>download</mat-icon> Generate PDF Report
+          </button>
+        </div>
+
+        <div class="reports-grid">
+          <mat-card class="report-card">
+            <mat-card-header>
+              <mat-card-title>Vulnerability Assessment</mat-card-title>
+              <mat-card-subtitle>Last updated: June 1, 2024</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="report-preview">
+                <div class="placeholder-chart">Vulnerability Assessment Report</div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">View Report</button>
+              <button mat-button color="accent">Download PDF</button>
+            </mat-card-actions>
+          </mat-card>
+
+          <mat-card class="report-card">
+            <mat-card-header>
+              <mat-card-title>Compliance Status</mat-card-title>
+              <mat-card-subtitle>Last updated: May 28, 2024</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="report-preview">
+                <div class="placeholder-chart">Compliance Status Report</div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">View Report</button>
+              <button mat-button color="accent">Download PDF</button>
+            </mat-card-actions>
+          </mat-card>
+
+          <mat-card class="report-card">
+            <mat-card-header>
+              <mat-card-title>Security Posture</mat-card-title>
+              <mat-card-subtitle>Last updated: May 15, 2024</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="report-preview">
+                <div class="placeholder-chart">Security Posture Report</div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">View Report</button>
+              <button mat-button color="accent">Download PDF</button>
+            </mat-card-actions>
+          </mat-card>
+
+          <mat-card class="report-card">
+            <mat-card-header>
+              <mat-card-title>Threat Intelligence</mat-card-title>
+              <mat-card-subtitle>Last updated: June 2, 2024</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="report-preview">
+                <div class="placeholder-chart">Threat Intelligence Report</div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button color="primary">View Report</button>
+              <button mat-button color="accent">Download PDF</button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Support Tab -->
+    <mat-tab label="Support">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>Support</h2>
+        </div>
+
+        <div class="support-content">
+          <mat-card class="support-card">
+            <mat-card-header>
+              <mat-card-title>Contact Security Operations Center</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Our security operations center is available 24/7 to assist you with any security concerns or questions.</p>
+              <div class="contact-methods">
+                <div class="contact-method">
+                  <mat-icon>email</mat-icon>
+                  <span>soc&#64;sechunter.com</span>
+                </div>
+                <div class="contact-method">
+                  <mat-icon>phone</mat-icon>
+                  <span>+1 (800) 555-1234</span>
+                </div>
+                <div class="contact-method">
+                  <mat-icon>chat</mat-icon>
+                  <span>Live Chat (Business Hours)</span>
+                </div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="primary">
+                <mat-icon>message</mat-icon> Start Chat
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+          <mat-card class="support-card">
+            <mat-card-header>
+              <mat-card-title>Request Emergency Assistance</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>If you believe you are experiencing a security incident, please contact our emergency response team immediately.</p>
+              <div class="emergency-contact">
+                <mat-icon>emergency</mat-icon>
+                <span>Emergency Hotline: +1 (800) 555-9876</span>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="warn">
+                <mat-icon>warning</mat-icon> Report Security Incident
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+          <mat-card class="support-card">
+            <mat-card-header>
+              <mat-card-title>Knowledge Base</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Access our knowledge base for self-service support and security best practices.</p>
+              <div class="kb-articles">
+                <div class="kb-article">
+                  <mat-icon>article</mat-icon>
+                  <span>How to interpret vulnerability reports</span>
+                </div>
+                <div class="kb-article">
+                  <mat-icon>article</mat-icon>
+                  <span>Understanding your security score</span>
+                </div>
+                <div class="kb-article">
+                  <mat-icon>article</mat-icon>
+                  <span>Best practices for secure configuration</span>
+                </div>
+                <div class="kb-article">
+                  <mat-icon>article</mat-icon>
+                  <span>Responding to security incidents</span>
+                </div>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="primary">
+                <mat-icon>menu_book</mat-icon> Browse Knowledge Base
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

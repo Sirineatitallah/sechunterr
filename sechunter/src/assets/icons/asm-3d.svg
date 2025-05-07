@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512px" height="512px" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <title>ASM 3D Icon</title>
+    <defs>
+        <linearGradient x1="0%" y1="0%" x2="100%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#00F3FF" offset="0%"></stop>
+            <stop stop-color="#BC13FE" offset="100%"></stop>
+        </linearGradient>
+        <filter x="-25%" y="-25%" width="150%" height="150%" filterUnits="objectBoundingBox" id="filter-2">
+            <feGaussianBlur stdDeviation="20" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="ASM-Icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M256,64 C323.3,64 384.6,90.7 430.9,137.1 C477.2,183.5 504,244.8 504,312 L504,312 L504,312 C504,379.2 477.2,440.5 430.9,486.9 C384.6,533.3 323.3,560 256,560 C188.7,560 127.4,533.3 81.1,486.9 C34.8,440.5 8,379.2 8,312 L8,312 L8,312 C8,244.8 34.8,183.5 81.1,137.1 C127.4,90.7 188.7,64 256,64 Z" id="Glow" fill="#00F3FF" filter="url(#filter-2)" transform="translate(256.000000, 312.000000) scale(1, -1) translate(-256.000000, -312.000000) "></path>
+        <path d="M256,96 C362.5,96 448,181.5 448,288 C448,394.5 362.5,480 256,480 C149.5,480 64,394.5 64,288 C64,181.5 149.5,96 256,96 Z" id="Circle-Base" fill="url(#linearGradient-1)"></path>
+        <path d="M256,128 C345.6,128 416,198.4 416,288 C416,377.6 345.6,448 256,448 C166.4,448 96,377.6 96,288 C96,198.4 166.4,128 256,128 Z" id="Circle-Inner" fill="#0A0E1F"></path>
+        <path d="M256,160 C328.8,160 384,215.2 384,288 C384,360.8 328.8,416 256,416 C183.2,416 128,360.8 128,288 C128,215.2 183.2,160 256,160 Z" id="Circle-Center" fill="url(#linearGradient-1)" opacity="0.5"></path>
+        <path d="M256,192 C311.2,192 352,232.8 352,288 C352,343.2 311.2,384 256,384 C200.8,384 160,343.2 160,288 C160,232.8 200.8,192 256,192 Z" id="Circle-Inner-2" fill="#0A0E1F"></path>
+        <path d="M256,224 C293.6,224 320,250.4 320,288 C320,325.6 293.6,352 256,352 C218.4,352 192,325.6 192,288 C192,250.4 218.4,224 256,224 Z" id="Circle-Center-2" fill="url(#linearGradient-1)" opacity="0.75"></path>
+        <path d="M256,256 C274.8,256 288,269.2 288,288 C288,306.8 274.8,320 256,320 C237.2,320 224,306.8 224,288 C224,269.2 237.2,256 256,256 Z" id="Circle-Inner-3" fill="#0A0E1F"></path>
+        <path d="M256,272 C265.9,272 272,278.1 272,288 C272,297.9 265.9,304 256,304 C246.1,304 240,297.9 240,288 C240,278.1 246.1,272 256,272 Z" id="Circle-Center-3" fill="url(#linearGradient-1)"></path>
+        <path d="M160,160 L352,416" id="Line-1" stroke="url(#linearGradient-1)" stroke-width="8" stroke-linecap="round"></path>
+        <path d="M160,416 L352,160" id="Line-2" stroke="url(#linearGradient-1)" stroke-width="8" stroke-linecap="round"></path>
+    </g>
+</svg>

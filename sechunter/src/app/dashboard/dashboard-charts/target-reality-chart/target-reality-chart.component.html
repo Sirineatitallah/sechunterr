@@ -1,0 +1,33 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Target vs Reality</h3>
+  </div>
+  <div class="chart-content">
+    <ngx-charts-bar-vertical-2d
+      [view]="view"
+      [scheme]="colorScheme"
+      [results]="multi"
+      [gradient]="gradient"
+      [xAxis]="showXAxis"
+      [yAxis]="showYAxis"
+      [legend]="showLegend"
+      [showXAxisLabel]="showXAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      [xAxisLabel]="xAxisLabel"
+      [yAxisLabel]="yAxisLabel"
+      (select)="onSelect($event)"
+      (activate)="onActivate($event)"
+      (deactivate)="onDeactivate($event)">
+    </ngx-charts-bar-vertical-2d>
+  </div>
+  <div class="chart-summary">
+    <div class="summary-item">
+      <span class="summary-label">Target Total:</span>
+      <span class="summary-value">{{ targetSum | number }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Reality Total:</span>
+      <span class="summary-value">{{ realitySum | number }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Origine des Menaces</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="map-container" #mapContainer></div>
+    <div class="threat-sources">
+      <h4>Top Sources de Menaces</h4>
+      <div class="source-list">
+        <div *ngFor="let source of threatSources" class="source-item" [style.border-left-color]="source.color">
+          <div class="source-info">
+            <div class="source-country">{{ source.country }}</div>
+            <div class="source-count">{{ source.count }} menaces</div>
+          </div>
+          <div class="source-percentage">{{ source.percentage }}%</div>
+          <button mat-icon-button class="source-toggle" (click)="toggleCountry(source)" matTooltip="Afficher/Masquer">
+            <mat-icon>{{ source.visible === false ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="total-threats">
+      <div class="total-value">{{ totalThreats }}</div>
+      <div class="total-label">Menaces Totales</div>
+    </div>
+    <div class="map-controls">
+      <div class="control-hint">
+        <mat-icon>zoom_in</mat-icon>
+        <span>Zoom pour plus de détails</span>
+      </div>
+    </div>
+  </div>
+</div>

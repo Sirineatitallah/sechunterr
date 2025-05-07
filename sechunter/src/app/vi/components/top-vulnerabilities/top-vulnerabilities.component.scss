@@ -1,0 +1,185 @@
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(26, 27, 38, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 243, 255, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(10, 14, 31, 0.5);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+  
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  .chart-actions {
+    display: flex;
+    gap: 0.5rem;
+    
+    button {
+      color: #e1e1e6;
+      
+      &:hover {
+        color: #00f3ff;
+      }
+    }
+  }
+}
+
+.chart-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  
+  ::ng-deep {
+    .ngx-charts {
+      text {
+        fill: #e1e1e6 !important;
+      }
+      
+      .grid-panel.odd {
+        fill: rgba(255, 255, 255, 0.02);
+      }
+      
+      .tick text {
+        font-size: 12px;
+      }
+      
+      .bar {
+        cursor: pointer;
+        transition: opacity 0.2s;
+        
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+}
+
+.chart-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid rgba(0, 243, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .severity-legend {
+    display: flex;
+    gap: 1rem;
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        
+        &.critical {
+          background-color: #ff4757;
+        }
+        
+        &.high {
+          background-color: #ffa502;
+        }
+        
+        &.medium {
+          background-color: #ffdb58;
+        }
+        
+        &.low {
+          background-color: #2ed573;
+        }
+      }
+      
+      .legend-label {
+        font-size: 0.8rem;
+        color: #a8a3a3;
+      }
+    }
+  }
+  
+  .chart-info {
+    font-size: 0.8rem;
+    color: #a8a3a3;
+    font-style: italic;
+  }
+}
+
+// Custom tooltip styles
+::ng-deep {
+  .custom-tooltip {
+    background: rgba(16, 18, 27, 0.9) !important;
+    border: 1px solid rgba(0, 243, 255, 0.3) !important;
+    border-radius: 4px !important;
+    padding: 0.75rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    
+    .tooltip-container {
+      .tooltip-title {
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.25rem;
+      }
+      
+      .tooltip-cve {
+        font-family: monospace;
+        color: #00f3ff;
+        margin-bottom: 0.5rem;
+      }
+      
+      .tooltip-severity {
+        display: inline-block;
+        padding: 0.15rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        
+        &.critical {
+          background: rgba(255, 71, 87, 0.2);
+          color: #ff4757;
+          border: 1px solid rgba(255, 71, 87, 0.5);
+        }
+        
+        &.high {
+          background: rgba(255, 165, 2, 0.2);
+          color: #ffa502;
+          border: 1px solid rgba(255, 165, 2, 0.5);
+        }
+        
+        &.medium {
+          background: rgba(255, 219, 88, 0.2);
+          color: #ffdb58;
+          border: 1px solid rgba(255, 219, 88, 0.5);
+        }
+        
+        &.low {
+          background: rgba(46, 213, 115, 0.2);
+          color: #2ed573;
+          border: 1px solid rgba(46, 213, 115, 0.5);
+        }
+      }
+      
+      .tooltip-score {
+        color: #e1e1e6;
+      }
+    }
+  }
+}

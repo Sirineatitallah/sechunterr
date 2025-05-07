@@ -1,0 +1,82 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>SOAR Workflows</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="toggleEditMode()" [matTooltip]="editMode ? 'Mode Lecture' : 'Mode Édition'">
+        <mat-icon>{{ editMode ? 'visibility' : 'edit' }}</mat-icon>
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="workflowMenu" matTooltip="Sélectionner un workflow">
+        <mat-icon>list</mat-icon>
+      </button>
+      <mat-menu #workflowMenu="matMenu" class="workflow-menu">
+        <button mat-menu-item *ngFor="let workflow of workflows" (click)="selectWorkflow(workflow)">
+          <div class="workflow-menu-item">
+            <span class="workflow-name">{{ workflow.name }}</span>
+            <span class="workflow-status" [ngClass]="getStatusClass(workflow.status)">{{ workflow.status }}</span>
+          </div>
+        </button>
+      </mat-menu>
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="workflow-info" *ngIf="selectedWorkflow">
+    <div class="workflow-header">
+      <div class="workflow-title">
+        <h4>{{ selectedWorkflow.name }}</h4>
+        <span class="workflow-status" [ngClass]="getStatusClass(selectedWorkflow.status)">{{ selectedWorkflow.status }}</span>
+      </div>
+      <div class="workflow-meta">
+        <span class="workflow-date">Mis à jour: {{ formatDate(selectedWorkflow.updatedAt) }}</span>
+      </div>
+    </div>
+    <p class="workflow-description">{{ selectedWorkflow.description }}</p>
+  </div>
+
+  <div class="chart-content">
+    <div *ngIf="loading" class="loading-container">
+      <mat-icon class="loading-icon">autorenew</mat-icon>
+      <p>Chargement du workflow...</p>
+    </div>
+    <div #graphContainer class="graph-container" [hidden]="loading"></div>
+  </div>
+
+  <div class="chart-footer">
+    <div class="workflow-legend">
+      <div class="legend-section">
+        <h5>Types de Nœuds</h5>
+        <div class="legend-items">
+          <div class="legend-item trigger">
+            <div class="legend-color"></div>
+            <div class="legend-label">Déclencheur</div>
+          </div>
+          <div class="legend-item condition">
+            <div class="legend-color"></div>
+            <div class="legend-label">Condition</div>
+          </div>
+          <div class="legend-item action">
+            <div class="legend-color"></div>
+            <div class="legend-label">Action</div>
+          </div>
+          <div class="legend-item enrichment">
+            <div class="legend-color"></div>
+            <div class="legend-label">Enrichissement</div>
+          </div>
+          <div class="legend-item notification">
+            <div class="legend-color"></div>
+            <div class="legend-label">Notification</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-info">
+      <span *ngIf="!editMode">Cliquez sur un nœud pour plus de détails</span>
+      <span *ngIf="editMode">Mode édition actif</span>
+    </div>
+  </div>
+</div>

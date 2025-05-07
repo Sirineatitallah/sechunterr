@@ -1,0 +1,124 @@
+{
+  "title": "Risques Externes",
+  "data": {
+    "darkweb": {
+      "mentions": 87,
+      "credentials": 45,
+      "source_code": 12,
+      "data_leaks": 8,
+      "trends": [12, 18, 22, 28, 35, 42, 38, 45, 52, 60, 72, 87],
+      "details": [
+        {
+          "type": "Credentials",
+          "count": 45,
+          "severity": "high",
+          "source": "Dark Web Forums",
+          "date": "2023-10-15"
+        },
+        {
+          "type": "Source Code",
+          "count": 12,
+          "severity": "critical",
+          "source": "Telegram Channels",
+          "date": "2023-09-22"
+        },
+        {
+          "type": "Data Leak",
+          "count": 8,
+          "severity": "critical",
+          "source": "Leak Marketplace",
+          "date": "2023-11-05"
+        }
+      ]
+    },
+    "social_media": {
+      "mentions": 156,
+      "negative_sentiment": 68,
+      "impersonation": 15,
+      "trends": [45, 52, 60, 72, 85, 92, 105, 118, 132, 145, 150, 156],
+      "details": [
+        {
+          "platform": "Twitter",
+          "mentions": 78,
+          "negative": 35,
+          "topics": ["Security Breach", "Service Outage", "Customer Complaints"]
+        },
+        {
+          "platform": "LinkedIn",
+          "mentions": 45,
+          "negative": 18,
+          "topics": ["Employee Poaching", "Company Criticism", "Industry Rumors"]
+        },
+        {
+          "platform": "Reddit",
+          "mentions": 33,
+          "negative": 15,
+          "topics": ["Product Issues", "Support Complaints", "Competitor Comparison"]
+        }
+      ]
+    },
+    "supply_chain": {
+      "vendors": 87,
+      "high_risk": 28,
+      "critical_risk": 12,
+      "incidents": 5,
+      "details": [
+        {
+          "vendor_type": "Software Providers",
+          "count": 35,
+          "high_risk": 12,
+          "critical_risk": 5
+        },
+        {
+          "vendor_type": "Cloud Services",
+          "count": 22,
+          "high_risk": 8,
+          "critical_risk": 3
+        },
+        {
+          "vendor_type": "Hardware Suppliers",
+          "count": 18,
+          "high_risk": 5,
+          "critical_risk": 2
+        },
+        {
+          "vendor_type": "Consultants",
+          "count": 12,
+          "high_risk": 3,
+          "critical_risk": 2
+        }
+      ]
+    },
+    "brand_protection": {
+      "domain_squatting": 32,
+      "phishing_sites": 28,
+      "fake_apps": 15,
+      "fake_social": 22,
+      "details": [
+        {
+          "type": "Domain Squatting",
+          "count": 32,
+          "examples": ["company-secure.com", "company-login.net", "companyhelp.org"]
+        },
+        {
+          "type": "Phishing Sites",
+          "count": 28,
+          "examples": ["company-support.com", "company-account.com", "secure-company-login.com"]
+        },
+        {
+          "type": "Fake Apps",
+          "count": 15,
+          "platforms": ["Google Play", "Apple App Store", "Third-party stores"]
+        }
+      ]
+    },
+    "summary": {
+      "total_risks": 342,
+      "critical": 45,
+      "high": 124,
+      "medium": 173,
+      "trend": "+15%",
+      "top_concern": "Credential Leaks"
+    }
+  }
+}

@@ -1,0 +1,165 @@
+<div class="visualization-dashboard">
+  <div class="dashboard-header">
+    <h2>Tableau de Bord de Sécurité</h2>
+    <div class="dashboard-controls">
+      <div class="time-range-selector">
+        <span class="control-label">Période:</span>
+        <div class="time-range-buttons">
+          <button
+            *ngFor="let range of timeRanges"
+            [class.active]="selectedTimeRange === range.id"
+            (click)="setTimeRange(range.id)">
+            {{ range.label }}
+          </button>
+        </div>
+      </div>
+      <button class="refresh-button" (click)="refreshAll()">
+        <mat-icon>refresh</mat-icon>
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- Images 5 and 6 centered in the full image (4) -->
+  <div class="centered-images">
+    <img src="assets/logo.svg" alt="Image 5" class="image-5" />
+    <img src="assets/logo.svg" alt="Image 6" class="image-6" />
+  </div>
+
+  <mat-tab-group animationDuration="300ms" class="dashboard-tabs" [selectedIndex]="getSelectedTabIndex()">
+    <!-- Vulnerability Intelligence Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>security</mat-icon>
+        <span>Vulnérabilités</span>
+      </ng-template>
+      <div class="tab-content">
+        <!-- Filter Component -->
+        <div class="filter-container">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label>Sévérité:</label>
+              <div class="severity-buttons">
+                <button
+                  *ngFor="let severity of ['Critical', 'High', 'Medium', 'Low']"
+                  [class.active]="isSeveritySelected(severity)"
+                  (click)="toggleSeverity(severity)">
+                  {{ severity }}
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label>Recherche:</label>
+              <input
+                type="text"
+                placeholder="Rechercher par nom ou CVE"
+                [(ngModel)]="searchTerm"
+                (input)="applyFilters()">
+            </div>
+
+            <button class="reset-button" (click)="resetFilters()">
+              <mat-icon>filter_alt_off</mat-icon>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-container">
+          <div class="grid-item" style="grid-column: span 2; grid-row: span 2;">
+            <app-top-vulnerabilities></app-top-vulnerabilities>
+          </div>
+          <div class="grid-item" style="grid-column: span 1; grid-row: span 2;">
+            <app-severity-distribution></app-severity-distribution>
+          </div>
+          <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-monthly-trends></app-monthly-trends>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Cyber Threat Intelligence Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>gps_fixed</mat-icon>
+        <span>Menaces</span>
+      </ng-template>
+      <div class="tab-content">
+        <div class="grid-container">
+          <div class="grid-item" style="grid-column: span 2; grid-row: span 2;">
+            <app-threat-map></app-threat-map>
+          </div>
+          <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-mitre-heatmap></app-mitre-heatmap>
+          </div>
+          <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-threat-evolution></app-threat-evolution>
+          </div>
+          <!-- These components will be implemented later -->
+          <!-- <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-event-timeline></app-event-timeline>
+          </div>
+          <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-osint-treemap></app-osint-treemap>
+          </div> -->
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Attack Surface Management Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>radar</mat-icon>
+        <span>Surface d'Attaque</span>
+      </ng-template>
+      <div class="tab-content">
+        <div class="grid-container">
+          <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-attack-surface></app-attack-surface>
+          </div>
+          <div class="grid-item" style="grid-column: span 2; grid-row: span 2;">
+            <app-external-risks></app-external-risks>
+          </div>
+          <div class="grid-item" style="grid-column: span 1; grid-row: span 2;">
+            <app-risk-score></app-risk-score>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- SOAR Tab -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>autorenew</mat-icon>
+        <span>SOAR</span>
+      </ng-template>
+      <div class="tab-content">
+        <div class="grid-container">
+          <div class="grid-item" style="grid-column: span 3; grid-row: span 2;">
+            <app-incident-timeline></app-incident-timeline>
+          </div>
+          <div class="grid-item" style="grid-column: span 1; grid-row: span 2;">
+            <app-resolution-rate></app-resolution-rate>
+          </div>
+          <div class="grid-item" style="grid-column: span 2; grid-row: span 2;">
+            <app-active-playbooks></app-active-playbooks>
+          </div>
+          <!-- This component will be implemented later -->
+          <!-- <div class="grid-item" style="grid-column: span 6; grid-row: span 3;">
+            <app-soar-workflow></app-soar-workflow>
+          </div> -->
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Global Information Section (like image 8) -->
+  <div class="global-information-section">
+    <h3>Informations Globales</h3>
+    <p>
+      <!-- Placeholder content for global information -->
+      Cette section présente des informations globales consolidées issues des différents modules.
+    </p>
+  </div>
+</div>

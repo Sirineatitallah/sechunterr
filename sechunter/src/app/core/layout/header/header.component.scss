@@ -10,6 +10,75 @@
   font-family: 'Space Mono', monospace;
   user-select: none;
 
+  .quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .new-report-btn {
+      background: linear-gradient(45deg, #00f3ff, #bc13fe);
+      color: white;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+      }
+    }
+
+    .alerts-btn, .info-btn {
+      position: relative;
+      color: var(--cyber-blue, #00f3ff);
+      filter: drop-shadow(0 0 6px var(--cyber-blue, #00f3ff));
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        color: var(--neon-purple, #bc13fe);
+        filter: drop-shadow(0 0 10px var(--neon-purple, #bc13fe));
+      }
+    }
+
+    .alerts-btn {
+      .badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ff4757;
+        color: white;
+        font-size: 0.7rem;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 6px rgba(255, 71, 87, 0.7);
+      }
+
+      .rotating-icon {
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
   .branding {
     display: flex;
     align-items: center;

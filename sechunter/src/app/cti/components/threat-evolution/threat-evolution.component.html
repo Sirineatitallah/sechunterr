@@ -1,0 +1,71 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Évolution des Menaces</h3>
+    <div class="chart-actions">
+      <mat-button-toggle-group [value]="selectedTimeRange?.id">
+        <mat-button-toggle *ngFor="let range of timeRanges" [value]="range.id" (click)="setTimeRange(range.id)">
+          {{ range.label }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="chart-wrapper">
+      <ngx-charts-area-chart
+        [view]="view"
+        [scheme]="colorScheme"
+        [results]="chartData"
+        [gradient]="gradient"
+        [xAxis]="showXAxis"
+        [yAxis]="showYAxis"
+        [legend]="showLegend"
+        [showXAxisLabel]="showXAxisLabel"
+        [showYAxisLabel]="showYAxisLabel"
+        [xAxisLabel]="xAxisLabel"
+        [yAxisLabel]="yAxisLabel"
+        [xAxisTickFormatting]="formatDate">
+      </ngx-charts-area-chart>
+    </div>
+    <div class="chart-legend">
+      <h4>Catégories de Menaces</h4>
+      <div class="category-list">
+        <div *ngFor="let category of categories"
+             class="category-item"
+             [class.disabled]="!category.enabled"
+             (click)="toggleCategory(category)">
+          <div class="category-color" [style.background-color]="getCategoryColor(category.id)"></div>
+          <div class="category-name">{{ category.name }}</div>
+          <div class="category-toggle">
+            <mat-icon>{{ category.enabled ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="distribution">
+      <div class="distribution-item">
+        <div class="item-label">Malware</div>
+        <div class="item-value">40%</div>
+      </div>
+      <div class="distribution-item">
+        <div class="item-label">Phishing</div>
+        <div class="item-value">35%</div>
+      </div>
+      <div class="distribution-item">
+        <div class="item-label">DDoS</div>
+        <div class="item-value">15%</div>
+      </div>
+      <div class="distribution-item">
+        <div class="item-label">Ransomware</div>
+        <div class="item-value">10%</div>
+      </div>
+    </div>
+  </div>
+</div>

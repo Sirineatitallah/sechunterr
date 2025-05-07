@@ -1,0 +1,148 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Timeline des Événements CTI</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="zoomIn()" matTooltip="Zoom In">
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+      <button mat-icon-button (click)="zoomOut()" matTooltip="Zoom Out">
+        <mat-icon>zoom_out</mat-icon>
+      </button>
+      <button mat-icon-button (click)="moveToNow()" matTooltip="Maintenant">
+        <mat-icon>access_time</mat-icon>
+      </button>
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="chart-filters">
+    <div class="filter-section">
+      <h4>Sévérité</h4>
+      <div class="filter-options">
+        <div class="filter-option" 
+             [class.active]="selectedSeverities.includes('critical')"
+             (click)="toggleSeverity('critical')">
+          <div class="severity-indicator critical"></div>
+          <span>Critique</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedSeverities.includes('high')"
+             (click)="toggleSeverity('high')">
+          <div class="severity-indicator high"></div>
+          <span>Haute</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedSeverities.includes('medium')"
+             (click)="toggleSeverity('medium')">
+          <div class="severity-indicator medium"></div>
+          <span>Moyenne</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedSeverities.includes('low')"
+             (click)="toggleSeverity('low')">
+          <div class="severity-indicator low"></div>
+          <span>Basse</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4>Type</h4>
+      <div class="filter-options">
+        <div class="filter-option" 
+             [class.active]="selectedTypes.includes('malware')"
+             (click)="toggleType('malware')">
+          <mat-icon>bug_report</mat-icon>
+          <span>Malware</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedTypes.includes('exploit')"
+             (click)="toggleType('exploit')">
+          <mat-icon>flash_on</mat-icon>
+          <span>Exploit</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedTypes.includes('vulnerability')"
+             (click)="toggleType('vulnerability')">
+          <mat-icon>security</mat-icon>
+          <span>Vulnérabilité</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedTypes.includes('campaign')"
+             (click)="toggleType('campaign')">
+          <mat-icon>campaign</mat-icon>
+          <span>Campagne</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="selectedTypes.includes('threat-actor')"
+             (click)="toggleType('threat-actor')">
+          <mat-icon>person</mat-icon>
+          <span>Acteur</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4>Période</h4>
+      <div class="filter-options">
+        <div class="filter-option" 
+             [class.active]="timeRange === 'day'"
+             (click)="setTimeRange('day')">
+          <span>24h</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="timeRange === 'week'"
+             (click)="setTimeRange('week')">
+          <span>7j</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="timeRange === 'month'"
+             (click)="setTimeRange('month')">
+          <span>30j</span>
+        </div>
+        <div class="filter-option" 
+             [class.active]="timeRange === 'year'"
+             (click)="setTimeRange('year')">
+          <span>1an</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-content">
+    <div #timelineContainer class="timeline-container"></div>
+  </div>
+
+  <div class="chart-footer">
+    <div class="timeline-legend">
+      <div class="legend-item malware">
+        <div class="legend-color"></div>
+        <div class="legend-label">Malware</div>
+      </div>
+      <div class="legend-item exploit">
+        <div class="legend-color"></div>
+        <div class="legend-label">Exploit</div>
+      </div>
+      <div class="legend-item vulnerability">
+        <div class="legend-color"></div>
+        <div class="legend-label">Vulnérabilité</div>
+      </div>
+      <div class="legend-item campaign">
+        <div class="legend-color"></div>
+        <div class="legend-label">Campagne</div>
+      </div>
+      <div class="legend-item threat-actor">
+        <div class="legend-color"></div>
+        <div class="legend-label">Acteur de menace</div>
+      </div>
+    </div>
+    <div class="chart-info">
+      <span>Cliquez sur un événement pour plus de détails</span>
+    </div>
+  </div>
+</div>

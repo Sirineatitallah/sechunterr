@@ -1,1 +1,146 @@
-<p>cti works!</p>
+<div class="cti-dashboard">
+  <div class="dashboard-header">
+    <h2>Cyber Threat Intelligence</h2>
+    <div class="dashboard-controls">
+      <div class="time-range-selector">
+        <span class="control-label">Période:</span>
+        <div class="time-range-buttons">
+          <button
+            *ngFor="let range of timeRanges"
+            [class.active]="selectedTimeRange === range.id"
+            (click)="setTimeRange(range.id)">
+            {{ range.label }}
+          </button>
+        </div>
+      </div>
+      <button class="refresh-button" (click)="refreshAll()">
+        <mat-icon>refresh</mat-icon>
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- Menaces Récentes Section -->
+  <div class="recent-threats-section">
+    <h3>Menaces Récentes</h3>
+    <div class="threats-list">
+      <div *ngFor="let threat of recentThreats" class="threat-item" [class]="'severity-' + threat.severity">
+        <div class="threat-icon">
+          <mat-icon>{{ getThreatIcon(threat.type) }}</mat-icon>
+        </div>
+        <div class="threat-details">
+          <div class="threat-title">{{ threat.title }}</div>
+          <div class="threat-meta">
+            <span class="threat-source">{{ threat.source }}</span>
+            <span class="threat-time">{{ threat.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+        <div class="threat-severity">{{ threat.severity }}</div>
+        <div class="threat-actions">
+          <button mat-icon-button matTooltip="Analyser">
+            <mat-icon>search</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Bloquer">
+            <mat-icon>block</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 5 Vulnérabilités Section -->
+  <div class="top-vulnerabilities-section">
+    <h3>Top 5 Vulnérabilités</h3>
+    <div class="vulnerabilities-list">
+      <div *ngFor="let vuln of topVulnerabilities; let i = index" class="vulnerability-item" [class]="'severity-' + vuln.severity">
+        <div class="vuln-rank">{{ i + 1 }}</div>
+        <div class="vuln-details">
+          <div class="vuln-title">{{ vuln.title }}</div>
+          <div class="vuln-meta">
+            <span class="vuln-cve">{{ vuln.cve }}</span>
+            <span class="vuln-cvss">CVSS: {{ vuln.cvss }}</span>
+          </div>
+        </div>
+        <div class="vuln-severity">{{ vuln.severity }}</div>
+        <div class="vuln-actions">
+          <button mat-icon-button matTooltip="Détails">
+            <mat-icon>info</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Remédier">
+            <mat-icon>build</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Visualizations Grid -->
+  <div class="visualizations-grid">
+    <div class="grid-item threat-map">
+      <app-threat-map></app-threat-map>
+    </div>
+    <div class="grid-item mitre-heatmap">
+      <app-mitre-heatmap></app-mitre-heatmap>
+    </div>
+    <div class="grid-item threat-evolution">
+      <app-threat-evolution></app-threat-evolution>
+    </div>
+  </div>
+
+  <!-- Additional Insights Section -->
+  <div class="additional-insights">
+    <div class="insight-card threat-actors">
+      <h3>Acteurs de Menaces Actifs</h3>
+      <div class="actors-list">
+        <div *ngFor="let actor of threatActors" class="actor-item">
+          <div class="actor-icon" [style.background-color]="actor.color">
+            {{ actor.name.charAt(0) }}
+          </div>
+          <div class="actor-details">
+            <div class="actor-name">{{ actor.name }}</div>
+            <div class="actor-meta">
+              <span class="actor-type">{{ actor.type }}</span>
+              <span class="actor-activity">{{ actor.activityLevel }} activité</span>
+            </div>
+          </div>
+          <div class="actor-confidence">
+            <div class="confidence-label">Confiance</div>
+            <div class="confidence-value">{{ actor.confidence }}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-card ioc-summary">
+      <h3>Résumé des IOCs</h3>
+      <div class="ioc-stats">
+        <div class="ioc-stat-item">
+          <div class="stat-value">{{ iocStats.ipAddresses }}</div>
+          <div class="stat-label">Adresses IP</div>
+        </div>
+        <div class="ioc-stat-item">
+          <div class="stat-value">{{ iocStats.domains }}</div>
+          <div class="stat-label">Domaines</div>
+        </div>
+        <div class="ioc-stat-item">
+          <div class="stat-value">{{ iocStats.hashes }}</div>
+          <div class="stat-label">Hashes</div>
+        </div>
+        <div class="ioc-stat-item">
+          <div class="stat-value">{{ iocStats.urls }}</div>
+          <div class="stat-label">URLs</div>
+        </div>
+      </div>
+      <div class="ioc-actions">
+        <button mat-button color="primary">
+          <mat-icon>cloud_download</mat-icon>
+          Exporter IOCs
+        </button>
+        <button mat-button color="accent">
+          <mat-icon>share</mat-icon>
+          Partager
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

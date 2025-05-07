@@ -1,0 +1,261 @@
+<div class="threat-relationship-container">
+  <!-- Loading overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Graph container -->
+  <div class="graph-container" #graphContainer></div>
+
+  <!-- Controls panel -->
+  <div class="controls-panel">
+    <div class="panel-header">
+      <h3>Threat Relationship Graph</h3>
+      <button mat-icon-button matTooltip="Reset View" (click)="resetView()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+
+    <div class="panel-content">
+      <div class="filter-section">
+        <h4>Filters</h4>
+        
+        <div class="filter-group">
+          <label>Node Categories</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-threat" checked>
+              <label for="filter-threat">
+                <span class="color-dot threat-color"></span>
+                Threats
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-vulnerability" checked>
+              <label for="filter-vulnerability">
+                <span class="color-dot vulnerability-color"></span>
+                Vulnerabilities
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-asset" checked>
+              <label for="filter-asset">
+                <span class="color-dot asset-color"></span>
+                Assets
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-actor" checked>
+              <label for="filter-actor">
+                <span class="color-dot actor-color"></span>
+                Actors
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-campaign" checked>
+              <label for="filter-campaign">
+                <span class="color-dot campaign-color"></span>
+                Campaigns
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Relationship Types</label>
+          <div class="checkbox-group">
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-uses" checked>
+              <label for="filter-uses">
+                <span class="line-sample uses-line"></span>
+                Uses
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-targets" checked>
+              <label for="filter-targets">
+                <span class="line-sample targets-line"></span>
+                Targets
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-exploits" checked>
+              <label for="filter-exploits">
+                <span class="line-sample exploits-line"></span>
+                Exploits
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-attributed" checked>
+              <label for="filter-attributed">
+                <span class="line-sample attributed-line"></span>
+                Attributed To
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-part-of" checked>
+              <label for="filter-part-of">
+                <span class="line-sample part-of-line"></span>
+                Part Of
+              </label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="filter-related" checked>
+              <label for="filter-related">
+                <span class="line-sample related-line"></span>
+                Related To
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Confidence Level</label>
+          <div class="slider-container">
+            <input type="range" min="0" max="100" value="50" class="confidence-slider">
+            <div class="slider-labels">
+              <span>Low</span>
+              <span>Medium</span>
+              <span>High</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend-section">
+        <h4>Legend</h4>
+        <div class="legend-items">
+          <div class="legend-group">
+            <h5>Node Types</h5>
+            <div class="legend-item">
+              <span class="legend-symbol threat-symbol">T</span>
+              <span class="legend-label">Threat</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-symbol vulnerability-symbol">V</span>
+              <span class="legend-label">Vulnerability</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-symbol asset-symbol">A</span>
+              <span class="legend-label">Asset</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-symbol actor-symbol">H</span>
+              <span class="legend-label">Threat Actor</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-symbol campaign-symbol">C</span>
+              <span class="legend-label">Campaign</span>
+            </div>
+          </div>
+          
+          <div class="legend-group">
+            <h5>Relationship Types</h5>
+            <div class="legend-item">
+              <span class="legend-line uses-line"></span>
+              <span class="legend-label">Uses</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line targets-line"></span>
+              <span class="legend-label">Targets</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line exploits-line"></span>
+              <span class="legend-label">Exploits</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line attributed-line"></span>
+              <span class="legend-label">Attributed To</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line part-of-line"></span>
+              <span class="legend-label">Part Of</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-line related-line"></span>
+              <span class="legend-label">Related To</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Node details panel -->
+  <div class="details-panel" *ngIf="selectedNode">
+    <div class="panel-header">
+      <h3>Node Details</h3>
+      <button mat-icon-button (click)="selectedNode = null">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="panel-content">
+      <div class="node-header">
+        <div class="node-icon" [ngClass]="selectedNode.category + '-symbol'">
+          {{getNodeIcon(selectedNode.category)}}
+        </div>
+        <div class="node-title">
+          <h4>{{selectedNode.name}}</h4>
+          <span class="node-type">{{selectedNode.type}}</span>
+        </div>
+        <div class="node-severity" [ngClass]="'severity-' + selectedNode.severity">
+          {{selectedNode.severity}}
+        </div>
+      </div>
+
+      <div class="node-details">
+        <div class="detail-item" *ngIf="selectedNode.description">
+          <label>Description</label>
+          <p>{{selectedNode.description}}</p>
+        </div>
+        
+        <div class="detail-item" *ngIf="selectedNode.firstSeen">
+          <label>First Seen</label>
+          <p>{{selectedNode.firstSeen | date:'medium'}}</p>
+        </div>
+        
+        <div class="detail-item" *ngIf="selectedNode.lastSeen">
+          <label>Last Seen</label>
+          <p>{{selectedNode.lastSeen | date:'medium'}}</p>
+        </div>
+      </div>
+
+      <div class="node-relationships">
+        <h5>Relationships</h5>
+        
+        <div class="relationship-list">
+          <!-- This would be populated with actual relationships -->
+          <div class="relationship-item">
+            <div class="relationship-icon actor-symbol">H</div>
+            <div class="relationship-content">
+              <div class="relationship-name">APT29</div>
+              <div class="relationship-type">attributed-to</div>
+            </div>
+            <div class="relationship-confidence">90%</div>
+          </div>
+          
+          <div class="relationship-item">
+            <div class="relationship-icon vulnerability-symbol">V</div>
+            <div class="relationship-content">
+              <div class="relationship-name">CVE-2021-44228</div>
+              <div class="relationship-type">exploits</div>
+            </div>
+            <div class="relationship-confidence">85%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button mat-raised-button color="primary">
+          <mat-icon>visibility</mat-icon>
+          Focus on Node
+        </button>
+        <button mat-stroked-button color="primary">
+          <mat-icon>share</mat-icon>
+          Export
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

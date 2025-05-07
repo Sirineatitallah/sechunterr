@@ -1,1 +1,228 @@
-<p>asm works!</p>
+<div class="asm-dashboard">
+  <div class="dashboard-header">
+    <h2>Attack Surface Management</h2>
+    <div class="dashboard-controls">
+      <div class="time-range-selector">
+        <span class="control-label">Période:</span>
+        <div class="time-range-buttons">
+          <button
+            *ngFor="let range of timeRanges"
+            [class.active]="selectedTimeRange === range.id"
+            (click)="setTimeRange(range.id)">
+            {{ range.label }}
+          </button>
+        </div>
+      </div>
+      <button class="refresh-button" (click)="refreshAll()">
+        <mat-icon>refresh</mat-icon>
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- Asset Summary Section -->
+  <div class="asset-summary-section">
+    <h3>Résumé des Actifs</h3>
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <mat-icon>devices</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ assetSummary.totalAssets }}</div>
+          <div class="card-label">Actifs Totaux</div>
+        </div>
+        <div class="card-trend" [class.positive]="assetSummary.trend > 0" [class.negative]="assetSummary.trend < 0">
+          <mat-icon>{{ assetSummary.trend > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+          <span>{{ assetSummary.trend }}%</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon critical">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ assetSummary.criticalAssets }}</div>
+          <div class="card-label">Actifs Critiques</div>
+        </div>
+        <div class="card-percentage">{{ (assetSummary.criticalAssets / assetSummary.totalAssets * 100).toFixed(1) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon warning">
+          <mat-icon>visibility_off</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ assetSummary.shadowIT }}</div>
+          <div class="card-label">Shadow IT</div>
+        </div>
+        <div class="card-percentage">{{ (assetSummary.shadowIT / assetSummary.totalAssets * 100).toFixed(1) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon success">
+          <mat-icon>verified_user</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ assetSummary.securedAssets }}</div>
+          <div class="card-label">Actifs Sécurisés</div>
+        </div>
+        <div class="card-percentage">{{ (assetSummary.securedAssets / assetSummary.totalAssets * 100).toFixed(1) }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Discoveries Section -->
+  <div class="recent-discoveries-section">
+    <h3>Découvertes Récentes</h3>
+    <div class="discoveries-list">
+      <div *ngFor="let discovery of recentDiscoveries" class="discovery-item" [class]="'risk-' + discovery.riskLevel">
+        <div class="discovery-icon">
+          <mat-icon>{{ getDiscoveryIcon(discovery.type) }}</mat-icon>
+        </div>
+        <div class="discovery-details">
+          <div class="discovery-title">{{ discovery.title }}</div>
+          <div class="discovery-meta">
+            <span class="discovery-type">{{ discovery.type }}</span>
+            <span class="discovery-time">{{ discovery.timestamp | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+        <div class="discovery-risk">{{ discovery.riskLevel }}</div>
+        <div class="discovery-actions">
+          <button mat-icon-button matTooltip="Analyser">
+            <mat-icon>search</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Sécuriser">
+            <mat-icon>security</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Visualizations Grid -->
+  <div class="visualizations-grid">
+    <div class="grid-item attack-surface-map">
+      <app-attack-surface></app-attack-surface>
+    </div>
+    <div class="grid-item risk-score">
+      <app-risk-score></app-risk-score>
+    </div>
+    <div class="grid-item external-risks">
+      <app-external-risks></app-external-risks>
+    </div>
+  </div>
+
+  <!-- Asset Categories Section -->
+  <div class="asset-categories-section">
+    <h3>Catégories d'Actifs</h3>
+    <div class="categories-chart">
+      <div class="chart-legend">
+        <div *ngFor="let category of assetCategories" class="legend-item">
+          <div class="legend-color" [style.background-color]="category.color"></div>
+          <div class="legend-label">{{ category.name }}</div>
+          <div class="legend-value">{{ category.count }}</div>
+          <div class="legend-percentage">{{ (category.count / getTotalAssetCount() * 100).toFixed(1) }}%</div>
+        </div>
+      </div>
+      <div class="chart-visual">
+        <div class="donut-chart">
+          <!-- Placeholder for actual chart implementation -->
+          <div class="donut-placeholder">
+            <div *ngFor="let category of assetCategories; let i = index"
+                 class="donut-segment"
+                 [style.background-color]="category.color"
+                 [style.transform]="'rotate(' + getSegmentRotation(i) + 'deg)'"
+                 [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getSegmentPath(i) + ', 50% 0%)'">
+            </div>
+            <div class="donut-center">
+              <div class="center-value">{{ getTotalAssetCount() }}</div>
+              <div class="center-label">Actifs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exposure Metrics Section -->
+  <div class="exposure-metrics-section">
+    <h3>Métriques d'Exposition</h3>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-header">
+          <h4>Ports Ouverts</h4>
+          <div class="metric-trend" [class.positive]="exposureMetrics.openPorts.trend < 0" [class.negative]="exposureMetrics.openPorts.trend > 0">
+            <mat-icon>{{ exposureMetrics.openPorts.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ exposureMetrics.openPorts.trend }}%</span>
+          </div>
+        </div>
+        <div class="metric-value">{{ exposureMetrics.openPorts.value }}</div>
+        <div class="metric-chart">
+          <!-- Placeholder for chart -->
+          <div class="bar-chart">
+            <div *ngFor="let item of exposureMetrics.openPorts.history"
+                 class="bar-item"
+                 [style.height]="(item / getMaxHistoryValue(exposureMetrics.openPorts.history) * 100) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <h4>Services Exposés</h4>
+          <div class="metric-trend" [class.positive]="exposureMetrics.exposedServices.trend < 0" [class.negative]="exposureMetrics.exposedServices.trend > 0">
+            <mat-icon>{{ exposureMetrics.exposedServices.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ exposureMetrics.exposedServices.trend }}%</span>
+          </div>
+        </div>
+        <div class="metric-value">{{ exposureMetrics.exposedServices.value }}</div>
+        <div class="metric-chart">
+          <!-- Placeholder for chart -->
+          <div class="bar-chart">
+            <div *ngFor="let item of exposureMetrics.exposedServices.history"
+                 class="bar-item"
+                 [style.height]="(item / getMaxHistoryValue(exposureMetrics.exposedServices.history) * 100) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <h4>Domaines Non Sécurisés</h4>
+          <div class="metric-trend" [class.positive]="exposureMetrics.unsecuredDomains.trend < 0" [class.negative]="exposureMetrics.unsecuredDomains.trend > 0">
+            <mat-icon>{{ exposureMetrics.unsecuredDomains.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ exposureMetrics.unsecuredDomains.trend }}%</span>
+          </div>
+        </div>
+        <div class="metric-value">{{ exposureMetrics.unsecuredDomains.value }}</div>
+        <div class="metric-chart">
+          <!-- Placeholder for chart -->
+          <div class="bar-chart">
+            <div *ngFor="let item of exposureMetrics.unsecuredDomains.history"
+                 class="bar-item"
+                 [style.height]="(item / getMaxHistoryValue(exposureMetrics.unsecuredDomains.history) * 100) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <h4>Certificats Expirés</h4>
+          <div class="metric-trend" [class.positive]="exposureMetrics.expiredCertificates.trend < 0" [class.negative]="exposureMetrics.expiredCertificates.trend > 0">
+            <mat-icon>{{ exposureMetrics.expiredCertificates.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ exposureMetrics.expiredCertificates.trend }}%</span>
+          </div>
+        </div>
+        <div class="metric-value">{{ exposureMetrics.expiredCertificates.value }}</div>
+        <div class="metric-chart">
+          <!-- Placeholder for chart -->
+          <div class="bar-chart">
+            <div *ngFor="let item of exposureMetrics.expiredCertificates.history"
+                 class="bar-item"
+                 [style.height]="(item / getMaxHistoryValue(exposureMetrics.expiredCertificates.history) * 100) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

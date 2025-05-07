@@ -1,5 +1,256 @@
-<!-- Update vi.component.html -->
-<div class="cyber-container">
-  <h2>VI Dashboard</h2>
-  <app-widget [config]="widgetConfig"></app-widget>
+<div class="vi-dashboard">
+  <div class="dashboard-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/main" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Retour au Dashboard</span>
+      </a>
+      <h2>Vulnerability Intelligence</h2>
+    </div>
+    <div class="dashboard-controls">
+      <div class="time-range-selector">
+        <span class="control-label">Période:</span>
+        <div class="time-range-buttons">
+          <button
+            *ngFor="let range of timeRanges"
+            [class.active]="selectedTimeRange === range.id"
+            (click)="setTimeRange(range.id)">
+            {{ range.label }}
+          </button>
+        </div>
+      </div>
+      <button class="refresh-button" (click)="refreshAll()">
+        <mat-icon>refresh</mat-icon>
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- Vulnerability Summary Section -->
+  <div class="vulnerability-summary-section">
+    <h3>Résumé des Vulnérabilités</h3>
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <mat-icon>bug_report</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ vulnerabilitySummary.totalVulnerabilities }}</div>
+          <div class="card-label">Vulnérabilités Totales</div>
+        </div>
+        <div class="card-trend" [class.positive]="vulnerabilitySummary.trend < 0" [class.negative]="vulnerabilitySummary.trend > 0">
+          <mat-icon>{{ vulnerabilitySummary.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+          <span>{{ vulnerabilitySummary.trend }}%</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon critical">
+          <mat-icon>priority_high</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ vulnerabilitySummary.criticalVulnerabilities }}</div>
+          <div class="card-label">Critiques</div>
+        </div>
+        <div class="card-percentage">{{ (vulnerabilitySummary.criticalVulnerabilities / vulnerabilitySummary.totalVulnerabilities * 100).toFixed(1) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon warning">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ vulnerabilitySummary.highVulnerabilities }}</div>
+          <div class="card-label">Élevées</div>
+        </div>
+        <div class="card-percentage">{{ (vulnerabilitySummary.highVulnerabilities / vulnerabilitySummary.totalVulnerabilities * 100).toFixed(1) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon success">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ vulnerabilitySummary.patchedVulnerabilities }}</div>
+          <div class="card-label">Corrigées</div>
+        </div>
+        <div class="card-percentage">{{ (vulnerabilitySummary.patchedVulnerabilities / vulnerabilitySummary.totalVulnerabilities * 100).toFixed(1) }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Vulnerabilities Section -->
+  <div class="top-vulnerabilities-section">
+    <div class="section-header">
+      <h3>Vulnérabilités Critiques</h3>
+      <button class="view-all-button">
+        Voir toutes <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+    <div class="vulnerabilities-table">
+      <div class="table-header">
+        <div class="header-cell cve-cell">CVE</div>
+        <div class="header-cell title-cell">Titre</div>
+        <div class="header-cell severity-cell">Sévérité</div>
+        <div class="header-cell cvss-cell">CVSS</div>
+        <div class="header-cell status-cell">Statut</div>
+        <div class="header-cell affected-cell">Systèmes Affectés</div>
+        <div class="header-cell actions-cell">Actions</div>
+      </div>
+      <div class="table-body">
+        <div *ngFor="let vulnerability of topVulnerabilities" class="table-row">
+          <div class="cell cve-cell">{{ vulnerability.cve }}</div>
+          <div class="cell title-cell">{{ vulnerability.title }}</div>
+          <div class="cell severity-cell">
+            <span class="severity-badge" [class]="'severity-' + vulnerability.severity">{{ vulnerability.severity }}</span>
+          </div>
+          <div class="cell cvss-cell">
+            <div class="cvss-score" [class]="getCvssClass(vulnerability.cvss)">{{ vulnerability.cvss }}</div>
+          </div>
+          <div class="cell status-cell">
+            <span class="status-badge" [class]="'status-' + vulnerability.status">{{ vulnerability.status }}</span>
+          </div>
+          <div class="cell affected-cell">{{ vulnerability.affectedSystems }}</div>
+          <div class="cell actions-cell">
+            <button mat-icon-button matTooltip="Voir les détails">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Créer un ticket">
+              <mat-icon>add_task</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visualizations Grid -->
+  <div class="visualizations-grid">
+    <div class="grid-item severity-distribution">
+      <app-severity-distribution></app-severity-distribution>
+    </div>
+    <div class="grid-item monthly-trends">
+      <app-monthly-trends></app-monthly-trends>
+    </div>
+    <div class="grid-item top-vulnerabilities">
+      <app-top-vulnerabilities></app-top-vulnerabilities>
+    </div>
+    <div class="grid-item vulnerability-detail">
+      <app-vulnerability-detail></app-vulnerability-detail>
+    </div>
+  </div>
+
+  <!-- Vulnerability Categories Section -->
+  <div class="vulnerability-categories-section">
+    <h3>Catégories de Vulnérabilités</h3>
+    <div class="categories-chart">
+      <div class="chart-legend">
+        <div *ngFor="let category of vulnerabilityCategories" class="legend-item">
+          <div class="legend-color" [style.background-color]="category.color"></div>
+          <div class="legend-label">{{ category.name }}</div>
+          <div class="legend-value">{{ category.count }}</div>
+          <div class="legend-percentage">{{ (category.count / getTotalCategoryCount() * 100).toFixed(1) }}%</div>
+        </div>
+      </div>
+      <div class="chart-visual">
+        <div class="donut-chart">
+          <!-- Placeholder for actual chart implementation -->
+          <div class="donut-placeholder">
+            <div *ngFor="let category of vulnerabilityCategories; let i = index"
+                 class="donut-segment"
+                 [style.background-color]="category.color"
+                 [style.transform]="'rotate(' + getSegmentRotation(i) + 'deg)'"
+                 [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getSegmentPath(i) + ', 50% 0%)'">
+            </div>
+            <div class="donut-center">
+              <div class="center-value">{{ getTotalCategoryCount() }}</div>
+              <div class="center-label">Vulnérabilités</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remediation Progress Section -->
+  <div class="remediation-section">
+    <h3>Progression des Corrections</h3>
+    <div class="remediation-grid">
+      <div class="remediation-card">
+        <div class="card-header">
+          <h4>Taux de Correction</h4>
+          <div class="time-trend positive">
+            <mat-icon>trending_up</mat-icon>
+            <span>{{ remediationMetrics.patchRate.trend }}%</span>
+          </div>
+        </div>
+        <div class="card-value">{{ remediationMetrics.patchRate.value }}%</div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="progress-chart">
+            <div class="progress-bar" [style.width]="remediationMetrics.patchRate.value + '%'"></div>
+          </div>
+        </div>
+      </div>
+      <div class="remediation-card">
+        <div class="card-header">
+          <h4>Temps Moyen de Correction</h4>
+          <div class="time-trend" [class.positive]="remediationMetrics.meanTimeToRemediate.trend < 0" [class.negative]="remediationMetrics.meanTimeToRemediate.trend > 0">
+            <mat-icon>{{ remediationMetrics.meanTimeToRemediate.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ remediationMetrics.meanTimeToRemediate.trend }}%</span>
+          </div>
+        </div>
+        <div class="card-value">{{ remediationMetrics.meanTimeToRemediate.value }} jours</div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="line-chart">
+            <div *ngFor="let point of remediationMetrics.meanTimeToRemediate.history; let i = index"
+                 class="chart-point"
+                 [style.left]="(i / (remediationMetrics.meanTimeToRemediate.history.length - 1) * 100) + '%'"
+                 [style.bottom]="(point / getMaxHistoryValue(remediationMetrics.meanTimeToRemediate.history) * 80) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="remediation-card">
+        <div class="card-header">
+          <h4>Vulnérabilités par Système</h4>
+        </div>
+        <div class="card-chart">
+          <div class="systems-chart">
+            <div *ngFor="let system of remediationMetrics.vulnerabilitiesBySystem" class="system-item">
+              <div class="system-name">{{ system.name }}</div>
+              <div class="system-bar-container">
+                <div class="system-bar" [style.width]="(system.count / getMaxSystemCount() * 100) + '%'" [style.background-color]="system.color"></div>
+              </div>
+              <div class="system-count">{{ system.count }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="remediation-card">
+        <div class="card-header">
+          <h4>Statut des Corrections</h4>
+        </div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="donut-chart">
+            <div class="donut-segments">
+              <div *ngFor="let status of remediationMetrics.remediationStatus; let i = index"
+                   class="donut-segment"
+                   [style.background-color]="status.color"
+                   [style.transform]="'rotate(' + getStatusRotation(i) + 'deg)'"
+                   [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getStatusPath(i) + ', 50% 0%)'">
+              </div>
+            </div>
+            <div class="donut-center"></div>
+          </div>
+          <div class="donut-legend">
+            <div *ngFor="let status of remediationMetrics.remediationStatus" class="legend-item">
+              <div class="legend-color" [style.background-color]="status.color"></div>
+              <div class="legend-label">{{ status.name }}</div>
+              <div class="legend-value">{{ status.percentage }}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

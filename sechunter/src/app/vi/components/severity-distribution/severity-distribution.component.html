@@ -1,0 +1,69 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Répartition par Gravité</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="chart-wrapper">
+      <ngx-charts-pie-chart
+        [view]="view"
+        [scheme]="colorScheme"
+        [results]="chartData"
+        [gradient]="gradient"
+        [legend]="showLegend"
+        [labels]="showLabels"
+        [doughnut]="isDoughnut"
+        [legendPosition]="legendPosition"
+        [customColors]="[
+          { name: 'Critique', value: '#ff4757' },
+          { name: 'Haute', value: '#ffa502' },
+          { name: 'Moyenne', value: '#ffdb58' },
+          { name: 'Faible', value: '#2ed573' }
+        ]">
+      </ngx-charts-pie-chart>
+    </div>
+    <div class="chart-stats">
+      <div class="total-count">
+        <div class="count-value">{{ totalVulnerabilities }}</div>
+        <div class="count-label">Total Vulnérabilités</div>
+      </div>
+      <div class="severity-stats">
+        <div class="severity-item critical">
+          <div class="severity-name">Critique</div>
+          <div class="severity-bar">
+            <div class="bar-fill" [style.width]="getPercentage('Critique') + '%'"></div>
+          </div>
+          <div class="severity-value">{{ getCount('Critique') }}</div>
+        </div>
+        <div class="severity-item high">
+          <div class="severity-name">Haute</div>
+          <div class="severity-bar">
+            <div class="bar-fill" [style.width]="getPercentage('Haute') + '%'"></div>
+          </div>
+          <div class="severity-value">{{ getCount('Haute') }}</div>
+        </div>
+        <div class="severity-item medium">
+          <div class="severity-name">Moyenne</div>
+          <div class="severity-bar">
+            <div class="bar-fill" [style.width]="getPercentage('Moyenne') + '%'"></div>
+          </div>
+          <div class="severity-value">{{ getCount('Moyenne') }}</div>
+        </div>
+        <div class="severity-item low">
+          <div class="severity-name">Faible</div>
+          <div class="severity-bar">
+            <div class="bar-fill" [style.width]="getPercentage('Faible') + '%'"></div>
+          </div>
+          <div class="severity-value">{{ getCount('Faible') }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

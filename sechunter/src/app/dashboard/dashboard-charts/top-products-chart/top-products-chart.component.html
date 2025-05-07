@@ -1,0 +1,49 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Top Products</h3>
+  </div>
+  <div class="chart-content">
+    <div class="products-table">
+      <div class="table-header">
+        <div class="header-cell name">Name</div>
+        <div class="header-cell">Popularity</div>
+        <div class="header-cell">Sales</div>
+        <div class="header-cell">Score</div>
+      </div>
+      <div class="table-body">
+        <div class="table-row" *ngFor="let product of products; let i = index">
+          <div class="cell name">
+            <span class="rank">{{ i + 1 }}</span>
+            <span class="product-name">{{ product.name }}</span>
+          </div>
+          <div class="cell">
+            <div class="progress-bar">
+              <div class="progress" [style.width.%]="product.popularity" [style.background-color]="getPopularityColor(product.popularity)"></div>
+            </div>
+          </div>
+          <div class="cell">
+            <span class="sales-value" [style.color]="getSalesColor(product.sales)">{{ product.sales | number }}</span>
+          </div>
+          <div class="cell">
+            <span class="score-value" [style.color]="getScoreColor(product.score)">{{ product.score }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <ngx-charts-bar-horizontal
+      [view]="view"
+      [scheme]="colorScheme"
+      [results]="barChartData"
+      [gradient]="gradient"
+      [xAxis]="showXAxis"
+      [yAxis]="showYAxis"
+      [legend]="showLegend"
+      [showXAxisLabel]="showXAxisLabel"
+      [xAxisLabel]="xAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      (select)="onSelect($event)">
+    </ngx-charts-bar-horizontal>
+  </div>
+</div>

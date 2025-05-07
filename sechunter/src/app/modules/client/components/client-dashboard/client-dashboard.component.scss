@@ -1,0 +1,643 @@
+.client-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--client-bg-color, #f0f9ff);
+  color: var(--client-text-color, #0c4a6e);
+  
+  .dashboard-header {
+    padding: 24px;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--client-heading-color, #0c4a6e);
+    }
+    
+    .welcome-message {
+      margin-bottom: 24px;
+      color: var(--client-text-secondary, #0369a1);
+      font-size: 1.1rem;
+    }
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      
+      .stat-card {
+        background-color: var(--client-card-bg, white);
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        
+        .stat-value {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-bottom: 8px;
+          color: var(--client-accent-color, #0ea5e9);
+          
+          &.score-excellent {
+            color: var(--score-excellent, #10b981);
+          }
+          
+          &.score-good {
+            color: var(--score-good, #0ea5e9);
+          }
+          
+          &.score-fair {
+            color: var(--score-fair, #f59e0b);
+          }
+          
+          &.score-poor {
+            color: var(--score-poor, #ef4444);
+          }
+        }
+        
+        .stat-label {
+          font-size: 1rem;
+          font-weight: 500;
+          margin-bottom: 12px;
+          color: var(--client-text-color, #0c4a6e);
+        }
+        
+        .stat-description {
+          font-size: 0.875rem;
+          color: var(--client-text-secondary, #0369a1);
+          
+          .score-excellent {
+            color: var(--score-excellent, #10b981);
+            font-weight: 600;
+          }
+          
+          .score-good {
+            color: var(--score-good, #0ea5e9);
+            font-weight: 600;
+          }
+          
+          .score-fair {
+            color: var(--score-fair, #f59e0b);
+            font-weight: 600;
+          }
+          
+          .score-poor {
+            color: var(--score-poor, #ef4444);
+            font-weight: 600;
+          }
+        }
+        
+        .stat-breakdown {
+          font-size: 0.875rem;
+          color: var(--client-text-secondary, #0369a1);
+          
+          .vuln-critical, .priority-critical {
+            color: var(--vuln-critical, #ef4444);
+            font-weight: 600;
+          }
+          
+          .vuln-high, .priority-high {
+            color: var(--vuln-high, #f97316);
+            font-weight: 600;
+          }
+          
+          .vuln-medium, .priority-medium {
+            color: var(--vuln-medium, #3b82f6);
+          }
+          
+          .vuln-low, .priority-low {
+            color: var(--vuln-low, #10b981);
+          }
+        }
+      }
+    }
+  }
+  
+  .dashboard-tabs {
+    flex: 1;
+    background-color: var(--client-bg-color, #f0f9ff);
+    
+    ::ng-deep {
+      .mat-mdc-tab-header {
+        background-color: var(--client-tab-bg, #e0f2fe);
+        border-bottom: 1px solid var(--client-border-color, #bae6fd);
+      }
+      
+      .mat-mdc-tab {
+        color: var(--client-text-secondary, #0369a1);
+        
+        &.mat-mdc-tab-active {
+          color: var(--client-accent-color, #0ea5e9);
+        }
+      }
+      
+      .mat-mdc-tab-body-wrapper {
+        flex: 1;
+      }
+    }
+    
+    .tab-content {
+      padding: 24px;
+      height: 100%;
+      overflow-y: auto;
+      
+      .tab-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        
+        h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--client-heading-color, #0c4a6e);
+        }
+      }
+      
+      .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        
+        .overview-card {
+          background-color: var(--client-card-bg, white);
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+          
+          ::ng-deep {
+            .mat-mdc-card-header {
+              padding: 16px;
+              border-bottom: 1px solid var(--client-border-color, #bae6fd);
+            }
+            
+            .mat-mdc-card-title {
+              color: var(--client-heading-color, #0c4a6e);
+              font-size: 1.25rem;
+            }
+          }
+          
+          .vulnerability-table {
+            width: 100%;
+            border-collapse: collapse;
+            
+            th, td {
+              padding: 12px;
+              text-align: left;
+              border-bottom: 1px solid var(--client-border-color, #bae6fd);
+            }
+            
+            th {
+              font-weight: 600;
+              color: var(--client-text-color, #0c4a6e);
+            }
+            
+            td {
+              color: var(--client-text-secondary, #0369a1);
+            }
+            
+            .severity-critical {
+              color: var(--vuln-critical, #ef4444);
+              font-weight: 600;
+            }
+            
+            .severity-high {
+              color: var(--vuln-high, #f97316);
+              font-weight: 600;
+            }
+            
+            .severity-medium {
+              color: var(--vuln-medium, #3b82f6);
+            }
+            
+            .severity-low {
+              color: var(--vuln-low, #10b981);
+            }
+            
+            .vuln-name {
+              font-weight: 500;
+            }
+            
+            .vuln-id {
+              font-size: 0.75rem;
+              color: var(--client-text-tertiary, #64748b);
+            }
+            
+            .status-badge {
+              display: inline-block;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 0.75rem;
+              font-weight: 600;
+              
+              &.status-open {
+                background-color: #fee2e2;
+                color: #ef4444;
+              }
+              
+              &.status-in-progress {
+                background-color: #e0f2fe;
+                color: #0ea5e9;
+              }
+              
+              &.status-resolved {
+                background-color: #dcfce7;
+                color: #10b981;
+              }
+            }
+          }
+          
+          .threat-intel-list {
+            .threat-intel-item {
+              padding: 16px;
+              border-bottom: 1px solid var(--client-border-color, #bae6fd);
+              
+              &:last-child {
+                border-bottom: none;
+              }
+              
+              .threat-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                
+                .threat-type {
+                  font-weight: 600;
+                  color: var(--client-text-color, #0c4a6e);
+                }
+                
+                .threat-relevance {
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  
+                  &.relevance-high {
+                    color: var(--vuln-critical, #ef4444);
+                  }
+                  
+                  &.relevance-medium {
+                    color: var(--vuln-high, #f97316);
+                  }
+                  
+                  &.relevance-low {
+                    color: var(--vuln-medium, #3b82f6);
+                  }
+                }
+              }
+              
+              .threat-name {
+                font-size: 1.125rem;
+                font-weight: 500;
+                margin-bottom: 8px;
+                color: var(--client-text-color, #0c4a6e);
+              }
+              
+              .threat-sector {
+                font-size: 0.875rem;
+                margin-bottom: 8px;
+                color: var(--client-text-secondary, #0369a1);
+              }
+              
+              .threat-description {
+                font-size: 0.875rem;
+                color: var(--client-text-secondary, #0369a1);
+              }
+            }
+          }
+          
+          .asm-report-content {
+            padding: 16px;
+            
+            .asm-chart {
+              height: 200px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-bottom: 16px;
+              
+              .placeholder-chart {
+                color: var(--client-text-secondary, #0369a1);
+                font-style: italic;
+                text-align: center;
+                padding: 16px;
+                border: 1px dashed var(--client-border-color, #bae6fd);
+                border-radius: 4px;
+                width: 100%;
+              }
+            }
+            
+            .asm-stats {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+              gap: 16px;
+              
+              .asm-stat {
+                .stat-label {
+                  font-size: 0.875rem;
+                  color: var(--client-text-secondary, #0369a1);
+                  margin-bottom: 4px;
+                }
+                
+                .stat-value {
+                  font-size: 1.25rem;
+                  font-weight: 600;
+                  color: var(--client-text-color, #0c4a6e);
+                  margin-bottom: 8px;
+                }
+              }
+            }
+          }
+          
+          .instance-list {
+            .instance-item {
+              padding: 16px;
+              border-bottom: 1px solid var(--client-border-color, #bae6fd);
+              
+              &:last-child {
+                border-bottom: none;
+              }
+              
+              .instance-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+                
+                .instance-name {
+                  font-weight: 600;
+                  color: var(--client-text-color, #0c4a6e);
+                }
+                
+                .instance-status {
+                  font-size: 0.875rem;
+                  font-weight: 600;
+                  padding: 2px 8px;
+                  border-radius: 4px;
+                  
+                  &.status-healthy {
+                    background-color: #dcfce7;
+                    color: #10b981;
+                  }
+                  
+                  &.status-warning {
+                    background-color: #fef3c7;
+                    color: #f59e0b;
+                  }
+                  
+                  &.status-critical {
+                    background-color: #fee2e2;
+                    color: #ef4444;
+                  }
+                  
+                  &.status-offline {
+                    background-color: #f3f4f6;
+                    color: #6b7280;
+                  }
+                }
+              }
+              
+              .instance-metrics {
+                margin-bottom: 16px;
+                
+                .metric-row {
+                  margin-bottom: 8px;
+                  
+                  span {
+                    display: block;
+                    font-size: 0.75rem;
+                    margin-bottom: 4px;
+                    color: var(--client-text-secondary, #0369a1);
+                  }
+                }
+              }
+              
+              .instance-actions {
+                display: flex;
+                justify-content: flex-end;
+              }
+            }
+          }
+        }
+      }
+      
+      table {
+        width: 100%;
+        background-color: var(--client-card-bg, white);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        
+        ::ng-deep {
+          .mat-mdc-header-row {
+            background-color: var(--client-table-header-bg, #e0f2fe);
+          }
+          
+          .mat-mdc-header-cell {
+            color: var(--client-text-color, #0c4a6e);
+            font-weight: 600;
+          }
+          
+          .mat-mdc-cell {
+            color: var(--client-text-secondary, #0369a1);
+          }
+          
+          .mat-mdc-row:hover {
+            background-color: var(--client-row-hover, #f0f9ff);
+          }
+        }
+        
+        .unread {
+          font-weight: 600;
+          color: var(--client-text-color, #0c4a6e);
+        }
+        
+        .priority-critical {
+          color: var(--priority-critical, #ef4444);
+          font-weight: 600;
+        }
+        
+        .priority-high {
+          color: var(--priority-high, #f97316);
+          font-weight: 600;
+        }
+        
+        .priority-medium {
+          color: var(--priority-medium, #3b82f6);
+        }
+        
+        .priority-low {
+          color: var(--priority-low, #10b981);
+        }
+        
+        .message-title {
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+        
+        .message-preview {
+          font-size: 0.875rem;
+          color: var(--client-text-tertiary, #64748b);
+          margin-bottom: 4px;
+        }
+        
+        .message-sender {
+          font-size: 0.75rem;
+          color: var(--client-text-tertiary, #64748b);
+        }
+      }
+      
+      .reports-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        
+        .report-card {
+          background-color: var(--client-card-bg, white);
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+          
+          ::ng-deep {
+            .mat-mdc-card-header {
+              padding: 16px;
+              border-bottom: 1px solid var(--client-border-color, #bae6fd);
+            }
+            
+            .mat-mdc-card-title {
+              color: var(--client-heading-color, #0c4a6e);
+              font-size: 1.25rem;
+            }
+            
+            .mat-mdc-card-subtitle {
+              color: var(--client-text-tertiary, #64748b);
+            }
+          }
+          
+          .report-preview {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            .placeholder-chart {
+              color: var(--client-text-secondary, #0369a1);
+              font-style: italic;
+              text-align: center;
+              padding: 16px;
+              border: 1px dashed var(--client-border-color, #bae6fd);
+              border-radius: 4px;
+              width: 100%;
+            }
+          }
+        }
+      }
+      
+      .support-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        
+        .support-card {
+          background-color: var(--client-card-bg, white);
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+          
+          ::ng-deep {
+            .mat-mdc-card-header {
+              padding: 16px;
+              border-bottom: 1px solid var(--client-border-color, #bae6fd);
+            }
+            
+            .mat-mdc-card-title {
+              color: var(--client-heading-color, #0c4a6e);
+              font-size: 1.25rem;
+            }
+          }
+          
+          .contact-methods {
+            margin-top: 16px;
+            
+            .contact-method {
+              display: flex;
+              align-items: center;
+              margin-bottom: 12px;
+              
+              mat-icon {
+                margin-right: 8px;
+                color: var(--client-accent-color, #0ea5e9);
+              }
+            }
+          }
+          
+          .emergency-contact {
+            display: flex;
+            align-items: center;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: #fee2e2;
+            border-radius: 4px;
+            
+            mat-icon {
+              margin-right: 8px;
+              color: #ef4444;
+            }
+            
+            span {
+              font-weight: 600;
+              color: #ef4444;
+            }
+          }
+          
+          .kb-articles {
+            margin-top: 16px;
+            
+            .kb-article {
+              display: flex;
+              align-items: center;
+              margin-bottom: 12px;
+              padding: 8px;
+              border-radius: 4px;
+              transition: background-color 0.2s ease;
+              
+              &:hover {
+                background-color: var(--client-hover-color, #e0f2fe);
+                cursor: pointer;
+              }
+              
+              mat-icon {
+                margin-right: 8px;
+                color: var(--client-accent-color, #0ea5e9);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Variables for client theme
+:host {
+  --client-bg-color: #f0f9ff;
+  --client-card-bg: white;
+  --client-border-color: #bae6fd;
+  --client-text-color: #0c4a6e;
+  --client-text-secondary: #0369a1;
+  --client-text-tertiary: #64748b;
+  --client-heading-color: #0c4a6e;
+  --client-accent-color: #0ea5e9;
+  --client-tab-bg: #e0f2fe;
+  --client-table-header-bg: #e0f2fe;
+  --client-row-hover: #f0f9ff;
+  --client-hover-color: #e0f2fe;
+  
+  --score-excellent: #10b981;
+  --score-good: #0ea5e9;
+  --score-fair: #f59e0b;
+  --score-poor: #ef4444;
+  
+  --vuln-critical: #ef4444;
+  --vuln-high: #f97316;
+  --vuln-medium: #3b82f6;
+  --vuln-low: #10b981;
+  
+  --priority-critical: #ef4444;
+  --priority-high: #f97316;
+  --priority-medium: #3b82f6;
+  --priority-low: #10b981;
+}

@@ -1,0 +1,250 @@
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(26, 27, 38, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 243, 255, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(10, 14, 31, 0.5);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+  
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  .chart-actions {
+    display: flex;
+    gap: 0.5rem;
+    
+    button {
+      color: #e1e1e6;
+      
+      &:hover {
+        color: #00f3ff;
+      }
+    }
+  }
+}
+
+.chart-content {
+  flex: 1;
+  display: flex;
+  
+  .map-container {
+    flex: 1;
+    height: 100%;
+    min-height: 300px;
+    
+    ::ng-deep {
+      .leaflet-container {
+        background-color: #10121b;
+      }
+      
+      .leaflet-control-zoom {
+        border: none;
+        margin: 15px 15px 0 0;
+        
+        a {
+          background-color: rgba(16, 18, 27, 0.8);
+          color: #e1e1e6;
+          border: 1px solid rgba(0, 243, 255, 0.3);
+          
+          &:hover {
+            background-color: rgba(0, 243, 255, 0.2);
+          }
+        }
+      }
+      
+      .custom-tooltip {
+        background: rgba(16, 18, 27, 0.9);
+        border: 1px solid rgba(0, 243, 255, 0.3);
+        border-radius: 4px;
+        padding: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        
+        .leaflet-tooltip-content {
+          padding: 0;
+        }
+        
+        .map-tooltip {
+          padding: 0.75rem;
+          
+          .tooltip-country {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+          }
+          
+          .tooltip-count {
+            color: #00f3ff;
+            margin-bottom: 0.25rem;
+          }
+          
+          .tooltip-percentage {
+            font-size: 0.8rem;
+            color: #a8a3a3;
+          }
+        }
+      }
+      
+      .threat-marker-container {
+        .threat-marker {
+          width: 10px;
+          height: 10px;
+          background-color: rgba(255, 71, 87, 0.8);
+          border-radius: 50%;
+          box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+          animation: pulse 1.5s infinite;
+        }
+      }
+    }
+  }
+  
+  .threat-sources {
+    width: 250px;
+    padding: 1rem;
+    border-left: 1px solid rgba(0, 243, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    
+    h4 {
+      margin: 0 0 1rem 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #ffffff;
+    }
+    
+    .source-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      overflow-y: auto;
+      
+      .source-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: rgba(16, 18, 27, 0.5);
+        border-radius: 8px;
+        border-left: 3px solid;
+        
+        .source-info {
+          flex: 1;
+          
+          .source-country {
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+          }
+          
+          .source-count {
+            font-size: 0.8rem;
+            color: #a8a3a3;
+          }
+        }
+        
+        .source-percentage {
+          font-weight: 600;
+          color: #00f3ff;
+          margin-right: 0.5rem;
+        }
+        
+        .source-toggle {
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            color: #a8a3a3;
+          }
+        }
+      }
+    }
+  }
+}
+
+.chart-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid rgba(0, 243, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .total-threats {
+    display: flex;
+    flex-direction: column;
+    
+    .total-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00f3ff;
+      line-height: 1;
+    }
+    
+    .total-label {
+      font-size: 0.8rem;
+      color: #a8a3a3;
+      margin-top: 0.25rem;
+    }
+  }
+  
+  .map-controls {
+    .control-hint {
+      display: flex;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #a8a3a3;
+      
+      mat-icon {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        margin-right: 0.25rem;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .chart-content {
+    flex-direction: column;
+    
+    .threat-sources {
+      width: auto;
+      border-left: none;
+      border-top: 1px solid rgba(0, 243, 255, 0.1);
+    }
+  }
+}

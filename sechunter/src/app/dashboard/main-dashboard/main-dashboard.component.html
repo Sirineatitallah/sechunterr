@@ -1,0 +1,258 @@
+<div class="dashboard-content">
+  <!-- Sidebar (Left) -->
+  <aside class="dashboard-sidebar">
+    <app-sidebar></app-sidebar>
+  </aside>
+
+  <!-- Main Content (Right) -->
+  <main class="dashboard-main">
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+      <h1>Security Operations</h1>
+      <div class="header-actions">
+        <button mat-button color="primary" class="cyber-button">
+          <mat-icon>refresh</mat-icon>
+          Refresh Data
+        </button>
+        <button mat-button color="accent" class="cyber-button">
+          <mat-icon>add</mat-icon>
+          Nouveau Rapport
+        </button>
+      </div>
+    </header>
+
+    <!-- Instance Manager Section -->
+    <section class="instance-manager">
+      <h2>
+        <mat-icon>dns</mat-icon>
+        Instance Manager
+      </h2>
+      <div class="instance-list">
+        <div *ngFor="let instance of instances" class="instance-item">
+          <span class="status-indicator" [ngClass]="getStatusClass(instance.status)"></span>
+          <span class="instance-name">{{ instance.name }}</span>
+          <span class="instance-last-scan">Last scan: {{ formatDate(instance.lastScan) }}</span>
+          <div class="instance-actions">
+            <button mat-icon-button>
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+      <button class="add-instance-btn" (click)="addInstance()">
+        <mat-icon>add</mat-icon>
+        Ajouter une Instance
+      </button>
+    </section>
+
+    <!-- Quick Widgets Section -->
+    <section class="favorites-widgets">
+      <h2>
+        <mat-icon>dashboard</mat-icon>
+        Favoris / Widgets Rapides
+      </h2>
+      <div class="widget-grid">
+        <div *ngFor="let widget of quickWidgets" class="quick-widget">
+          <h3>{{ widget.title }}</h3>
+          <div class="widget-value">{{ widget.value }}</div>
+          <div class="widget-trend" [ngClass]="widget.trendDirection">
+            <mat-icon>{{ widget.trendDirection === 'positive' ? 'trending_up' : 'trending_down' }}</mat-icon>
+            {{ widget.trend }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity Section -->
+    <section class="recent-activity">
+      <h2>
+        <mat-icon>history</mat-icon>
+        Historique des Actions
+      </h2>
+      <div class="activity-list">
+        <div *ngFor="let activity of recentActivities" class="activity-item">
+          <div class="activity-icon">
+            <mat-icon>{{ activity.icon }}</mat-icon>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">{{ activity.title }}</div>
+            <div class="activity-time">{{ activity.time }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Filter -->
+    <app-dashboard-filter></app-dashboard-filter>
+
+    <!-- Drill Down View -->
+    <app-drill-down-view *ngIf="isDrillDownActive"></app-drill-down-view>
+
+    <!-- Main Dashboard Widgets -->
+    <div class="widget-grid">
+      <!-- Vulnerability Distribution Widget -->
+      <div class="widget" style="grid-column: span 2; grid-row: span 2;">
+        <div class="widget-header">
+          <h3>Vulnerability Distribution</h3>
+          <div class="widget-controls">
+            <button mat-icon-button (click)="refreshData()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="static-chart vulnerability-chart">
+            <div class="chart-bars">
+              <div *ngFor="let vuln of vulnerabilities"
+                   class="chart-bar {{ getSeverityClass(vuln.severity) }}"
+                   [style.height]="(vuln.count / 100) * 80 + '%'"
+                   (click)="onVulnerabilityClick(vuln.severity)">
+                <span class="bar-value">{{ vuln.count }}</span>
+                <span class="bar-label">{{ vuln.severity }}</span>
+              </div>
+            </div>
+            <div class="chart-footer">
+              <div class="trend-indicator" [ngClass]="vulnerabilities.length > 0 && vulnerabilities[0].trend < 0 ? 'positive' : 'negative'">
+                <mat-icon>{{ vulnerabilities.length > 0 && vulnerabilities[0].trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+                <span>{{ vulnerabilities.length > 0 ? vulnerabilities[0].trend : 0 }}% from last scan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Posture Widget -->
+      <div class="widget" style="grid-column: span 2; grid-row: span 2;">
+        <div class="widget-header">
+          <h3>Security Posture</h3>
+          <div class="widget-controls">
+            <button mat-icon-button (click)="refreshData()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="security-score">
+            <div class="score-circle">
+              <div class="score-value">{{ securityDomains.length > 0 ? securityDomains[0].score : 0 }}</div>
+              <div class="score-label">Security Score</div>
+            </div>
+            <div class="score-details">
+              <div *ngFor="let domain of securityDomains" class="score-item" (click)="onSecurityDomainClick(domain.name)">
+                <div class="item-label">{{ domain.name }}</div>
+                <div class="item-progress">
+                  <div class="progress-bar" [style.width]="domain.score + '%'"></div>
+                </div>
+                <div class="item-value">{{ domain.score }}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threat Intelligence Widget -->
+      <div class="widget" style="grid-column: span 4; grid-row: span 2;">
+        <div class="widget-header">
+          <h3>Global Threat Intelligence</h3>
+          <div class="widget-controls">
+            <button mat-icon-button (click)="refreshData()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="threat-alerts">
+            <div class="alert-list">
+              <div *ngFor="let alert of threatAlerts"
+                   class="alert-item {{ alert.severity }}"
+                   (click)="onThreatAlertClick(alert.id)">
+                <div class="alert-icon">
+                  <mat-icon>warning</mat-icon>
+                </div>
+                <div class="alert-content">
+                  <div class="alert-title">{{ alert.type }}</div>
+                  <div class="alert-details">
+                    <span class="alert-region">{{ alert.region }}</span>
+                    <span class="alert-time">{{ alert.time }}</span>
+                  </div>
+                  <div class="alert-source">Source: {{ alert.source }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="global-stats">
+              <div class="stat-item">
+                <span class="stat-value">358</span>
+                <span class="stat-label">Total Threats</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">{{ getCriticalCount() }}</span>
+                <span class="stat-label">Critical</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">+12%</span>
+                <span class="stat-label">Increase</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASM Heatmap Widget -->
+      <div class="widget" style="grid-column: span 2; grid-row: span 2;">
+        <div class="widget-header">
+          <h3>ASM Heatmap</h3>
+          <div class="widget-controls">
+            <button mat-icon-button (click)="refreshData()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="placeholder-content">
+            <p class="text-center">
+              <mat-icon class="placeholder-icon">security</mat-icon>
+              <span class="placeholder-text">Carte de Surface d'Attaque</span>
+              <span class="placeholder-subtext">Visualisation des actifs exposés et des vecteurs d'attaque potentiels</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOAR Workflow Widget -->
+      <div class="widget" style="grid-column: span 2; grid-row: span 2;">
+        <div class="widget-header">
+          <h3>SOAR Workflow</h3>
+          <div class="widget-controls">
+            <button mat-icon-button (click)="refreshData()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="widget-content">
+          <div class="placeholder-content">
+            <p class="text-center">
+              <mat-icon class="placeholder-icon">healing</mat-icon>
+              <span class="placeholder-text">Orchestration et Automatisation</span>
+              <span class="placeholder-subtext">Workflows de réponse aux incidents et playbooks de sécurité</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

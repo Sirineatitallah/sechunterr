@@ -1,14 +1,93 @@
-<div class="instance-manager p-2 border-r border-gray-300 h-full flex flex-col">
-  <h2 class="text-lg font-bold mb-4">Instance Manager</h2>
-  <button (click)="onAggregateInstance()" class="mb-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-    Agréger une instance
-  </button>
-  <ul class="flex-grow overflow-auto">
-    <li *ngFor="let client of clients" (click)="onSelectClient(client)" class="flex items-center cursor-pointer mb-2 hover:bg-gray-100 p-1 rounded">
-      <span class="mr-2" [ngClass]="{'text-green-500': client.status === 'OK', 'text-red-500': client.status === 'Alert'}">
-        {{ client.status === 'OK' ? '🟢' : '🔴' }}
-      </span>
-      {{ client.name }}
-    </li>
-  </ul>
+<div class="instance-manager">
+  <div class="instance-header">
+    <h2>Instance Manager</h2>
+
+    <!-- Admin-only controls -->
+    <div class="admin-controls" *ngIf="isAdmin">
+      <button mat-raised-button color="primary" (click)="onCreateInstance()" matTooltip="Create a new instance">
+        <mat-icon>add</mat-icon> Create Instance
+      </button>
+      <button mat-raised-button color="accent" (click)="forceScanAll()" matTooltip="Force a global scan on all instances">
+        <mat-icon>security</mat-icon> Force Global Scan
+      </button>
+    </div>
+
+    <!-- Client-only controls -->
+    <div class="client-controls" *ngIf="!isAdmin">
+      <button mat-raised-button color="primary" (click)="onRequestScan(selectedInstance?.id || '', ScanType.QUICK, $event)"
+              [disabled]="!selectedInstance" matTooltip="Request a manual scan">
+        <mat-icon>search</mat-icon> Request Scan
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading instances...</p>
+  </div>
+
+  <!-- Instances list -->
+  <div class="instances-list" *ngIf="!isLoading">
+    <div class="instance-item" *ngFor="let instance of instances"
+         [class.selected]="selectedInstance?.id === instance.id"
+         (click)="onSelectInstance(instance)">
+
+      <div class="instance-status">
+        <span [class]="getStatusClass(instance.status)">{{ getStatusIcon(instance.status) }}</span>
+      </div>
+
+      <div class="instance-info">
+        <div class="instance-name">{{ instance.name }}</div>
+        <div class="instance-client" *ngIf="isAdmin">{{ instance.clientName }}</div>
+
+        <!-- Admin view: detailed metrics -->
+        <div class="instance-metrics" *ngIf="isAdmin && instance.metrics">
+          <div class="metric">
+            <span>CPU: {{ instance.metrics.cpu }}%</span>
+            <mat-progress-bar mode="determinate" [value]="instance.metrics.cpu"></mat-progress-bar>
+          </div>
+          <div class="metric">
+            <span>Memory: {{ instance.metrics.memory }}%</span>
+            <mat-progress-bar mode="determinate" [value]="instance.metrics.memory"></mat-progress-bar>
+          </div>
+          <div class="metric" *ngIf="instance.metrics.vulnerabilities">
+            <span>Vulnerabilities:
+              <span class="vuln critical">{{ instance.metrics.vulnerabilities.critical }}</span> /
+              <span class="vuln high">{{ instance.metrics.vulnerabilities.high }}</span> /
+              <span class="vuln medium">{{ instance.metrics.vulnerabilities.medium }}</span> /
+              <span class="vuln low">{{ instance.metrics.vulnerabilities.low }}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Client view: simplified metrics -->
+        <div class="instance-metrics-simple" *ngIf="!isAdmin && instance.metrics">
+          <div class="last-scan" *ngIf="instance.lastScan">
+            Last scan: {{ instance.lastScan | date:'short' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin-only actions -->
+      <div class="instance-actions" *ngIf="isAdmin">
+        <button mat-icon-button color="primary" matTooltip="Request scan"
+                (click)="onRequestScan(instance.id, ScanType.QUICK, $event)">
+          <mat-icon>search</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" matTooltip="Delete instance"
+                (click)="onDeleteInstance(instance.id, $event)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="instances.length === 0">
+      <p>No instances available.</p>
+      <button mat-raised-button color="primary" *ngIf="isAdmin" (click)="onCreateInstance()">
+        Create your first instance
+      </button>
+    </div>
+  </div>
 </div>

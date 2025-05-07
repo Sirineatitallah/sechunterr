@@ -3,21 +3,21 @@
   <div class="auth-card">
     <div class="cyber-gradient"></div>
     <div class="neon-grid"></div>
-    
+
     <div class="auth-content">
       <header class="auth-header">
         <h1 class="auth-title glitch" data-text="Welcome Back">Welcome Back</h1>
         <p class="auth-subtitle">Secure Gateway to VOC Ecosystem</p>
       </header>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <form [formGroup]="loginForm" class="auth-form">
         <div class="input-field cyber-input">
           <label for="id" class="hologram-label">Enterprise ID</label>
-          <input 
-            type="text" 
-            id="id" 
+          <input
+            type="text"
+            id="id"
             formControlName="id"
-            autocomplete="off" 
+            autocomplete="off"
             required
           >
           <div class="cyber-border"></div>
@@ -26,17 +26,17 @@
 
         <div class="input-field cyber-input">
           <label for="password" class="hologram-label">Access Code</label>
-          <input 
-            [type]="showPassword ? 'text' : 'password'" 
-            id="password" 
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            id="password"
             formControlName="password"
-            autocomplete="off" 
+            autocomplete="off"
             required
             (input)="updatePasswordStrength()"
           >
           <div class="cyber-border"></div>
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="password-toggle cyber-button"
             (click)="togglePasswordVisibility()"
             title="Toggle password visibility"
@@ -44,15 +44,13 @@
           >
             <i class="icon" [class.icon-eye]="!showPassword" [class.icon-eye-blocked]="showPassword"></i>
           </button>
-          
-          <div class="password-strength-indicator">
-            <div class="strength-bar" [style.width.%]="strengthPercentage" 
-                 [class]="'strength-' + passwordStrength"></div>
-            <div class="strength-labels">
-              <span *ngFor="let level of strengthLevels" [class.active]="level <= strengthLevel">
-                {{ level }}
-              </span>
-            </div>
+          <!-- Password strength bar -->
+          <div class="password-strength-bar-container">
+            <div
+              class="password-strength-bar"
+              [ngClass]="passwordStrength"
+              [style.width.%]="strengthPercentage"
+            ></div>
           </div>
         </div>
 
@@ -75,14 +73,19 @@
           </div>
         </div>
 
+        <!-- Error Message -->
+        <div *ngIf="error" class="error-message">
+          <i class="icon icon-warning"></i>
+          <span>{{ error }}</span>
+        </div>
+
         <!-- Sign In Button -->
-        <button 
-          type="submit" 
+        <button
+          type="button"
           class="auth-button cyber-button"
-          [disabled]="loginForm.invalid || isLoading"
+          (click)="onSubmit()"
         >
-          <span *ngIf="!isLoading">SIGN IN</span>
-          <span *ngIf="isLoading" class="cyber-loader"></span>
+          <span>SIGN IN</span>
         </button>
       </form>
 
@@ -97,16 +100,9 @@
             <span>Zero Trust Architecture</span>
           </div>
         </div>
-        <div class="security-badges">
-        </div>
-        
+
         <p class="auth-switch">
-          don't have an account ? 
-          <a routerLink="/signup" 
-          class="neon-link"
-          queryParamsHandling="preserve">
-          Create an account
-          </a>
+          don't have an account ? <a routerLink="/signup" class="neon-link" queryParamsHandling="preserve">Create an account</a>
         </p>
       </footer>
     </div>

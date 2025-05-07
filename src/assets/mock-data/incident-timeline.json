@@ -1,0 +1,119 @@
+{
+  "title": "Timeline des Incidents",
+  "data": {
+    "incidents": [
+      {
+        "id": "INC-2023-001",
+        "title": "Tentative d'intrusion détectée",
+        "severity": "High",
+        "status": "Resolved",
+        "startTime": "2023-08-15T08:23:15Z",
+        "endTime": "2023-08-15T14:45:30Z",
+        "duration": "6h 22m",
+        "source": "Firewall",
+        "affectedSystems": ["Web Server", "Database"],
+        "description": "Multiple failed login attempts detected from suspicious IP addresses.",
+        "actions": [
+          {
+            "time": "2023-08-15T08:25:10Z",
+            "action": "Alert triggered",
+            "user": "System"
+          },
+          {
+            "time": "2023-08-15T08:30:45Z",
+            "action": "Investigation started",
+            "user": "John Doe"
+          },
+          {
+            "time": "2023-08-15T09:15:22Z",
+            "action": "IP addresses blocked",
+            "user": "Jane Smith"
+          },
+          {
+            "time": "2023-08-15T14:45:30Z",
+            "action": "Incident closed",
+            "user": "John Doe"
+          }
+        ]
+      },
+      {
+        "id": "INC-2023-002",
+        "title": "Malware détecté",
+        "severity": "Critical",
+        "status": "In Progress",
+        "startTime": "2023-08-20T15:10:05Z",
+        "endTime": null,
+        "duration": "Ongoing",
+        "source": "Endpoint Protection",
+        "affectedSystems": ["Workstation-15", "Workstation-22"],
+        "description": "Trojan detected on multiple workstations in the finance department.",
+        "actions": [
+          {
+            "time": "2023-08-20T15:10:05Z",
+            "action": "Alert triggered",
+            "user": "System"
+          },
+          {
+            "time": "2023-08-20T15:15:30Z",
+            "action": "Investigation started",
+            "user": "Jane Smith"
+          },
+          {
+            "time": "2023-08-20T15:45:12Z",
+            "action": "Affected systems isolated",
+            "user": "Mike Johnson"
+          },
+          {
+            "time": "2023-08-20T16:30:45Z",
+            "action": "Malware analysis started",
+            "user": "Security Team"
+          }
+        ]
+      },
+      {
+        "id": "INC-2023-003",
+        "title": "Service indisponible",
+        "severity": "Medium",
+        "status": "Resolved",
+        "startTime": "2023-08-25T10:05:22Z",
+        "endTime": "2023-08-25T11:30:15Z",
+        "duration": "1h 25m",
+        "source": "Monitoring System",
+        "affectedSystems": ["API Gateway"],
+        "description": "API Gateway service unavailable due to high CPU usage.",
+        "actions": [
+          {
+            "time": "2023-08-25T10:05:22Z",
+            "action": "Alert triggered",
+            "user": "System"
+          },
+          {
+            "time": "2023-08-25T10:10:45Z",
+            "action": "Investigation started",
+            "user": "DevOps Team"
+          },
+          {
+            "time": "2023-08-25T10:45:30Z",
+            "action": "Service restarted",
+            "user": "Mike Johnson"
+          },
+          {
+            "time": "2023-08-25T11:30:15Z",
+            "action": "Incident closed",
+            "user": "Jane Smith"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "total": 15,
+      "open": 3,
+      "resolved": 12,
+      "critical": 2,
+      "high": 5,
+      "medium": 6,
+      "low": 2,
+      "avgResolutionTime": "4h 15m"
+    }
+  }
+}

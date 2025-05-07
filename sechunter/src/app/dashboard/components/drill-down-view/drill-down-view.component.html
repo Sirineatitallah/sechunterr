@@ -1,0 +1,334 @@
+<div class="drill-down-container" *ngIf="activeViewType">
+  <div class="drill-down-header">
+    <div class="header-content">
+      <h2 *ngIf="activeViewType === 'vulnerability'">
+        <mat-icon class="header-icon" [ngClass]="getSeverityClass(selectedVulnerability?.severity || '')">bug_report</mat-icon>
+        {{ selectedVulnerability?.name }}
+      </h2>
+      <h2 *ngIf="activeViewType === 'domain'">
+        <mat-icon class="header-icon">security</mat-icon>
+        {{ selectedDomain?.name }}
+      </h2>
+      <h2 *ngIf="activeViewType === 'threat'">
+        <mat-icon class="header-icon" [ngClass]="getSeverityClass(selectedThreat?.severity || '')">warning</mat-icon>
+        {{ selectedThreat?.type }}
+      </h2>
+
+      <div class="header-badges">
+        <!-- Vulnerability badges -->
+        <div *ngIf="activeViewType === 'vulnerability'" class="badge" [ngClass]="getSeverityClass(selectedVulnerability?.severity || '')">
+          {{ selectedVulnerability?.severity }}
+        </div>
+        <div *ngIf="activeViewType === 'vulnerability' && selectedVulnerability?.cve" class="badge cve">
+          {{ selectedVulnerability?.cve }}
+        </div>
+        <div *ngIf="activeViewType === 'vulnerability'" class="badge" [ngClass]="getStatusClass(selectedVulnerability?.status || '')">
+          {{ selectedVulnerability?.status?.replace('_', ' ') | titlecase }}
+        </div>
+
+        <!-- Domain badges -->
+        <div *ngIf="activeViewType === 'domain'" class="badge score">
+          Score: {{ selectedDomain?.score }}%
+        </div>
+        <div *ngIf="activeViewType === 'domain'" class="badge" [ngClass]="getDomainTrendClass()">
+          <mat-icon>{{ getDomainTrendIcon() }}</mat-icon>
+          {{ getDomainTrendValue() }}%
+        </div>
+        <div *ngIf="activeViewType === 'domain'" class="badge issues">
+          {{ selectedDomain?.issues }} Issues
+        </div>
+
+        <!-- Threat badges -->
+        <div *ngIf="activeViewType === 'threat'" class="badge" [ngClass]="getSeverityClass(selectedThreat?.severity || '')">
+          {{ selectedThreat?.severity | titlecase }}
+        </div>
+        <div *ngIf="activeViewType === 'threat'" class="badge region">
+          {{ selectedThreat?.region }}
+        </div>
+        <div *ngIf="activeViewType === 'threat'" class="badge source">
+          Source: {{ selectedThreat?.source }}
+        </div>
+      </div>
+    </div>
+
+    <button mat-icon-button class="close-button" (click)="closeDrillDown()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="drill-down-content">
+    <!-- Vulnerability Details -->
+    <div *ngIf="activeViewType === 'vulnerability'" class="vulnerability-details">
+      <mat-tab-group animationDuration="200ms">
+        <mat-tab label="Overview">
+          <div class="tab-content">
+            <div class="detail-section">
+              <h3>Description</h3>
+              <p>{{ selectedVulnerability?.description }}</p>
+            </div>
+
+            <div class="detail-section">
+              <h3>Affected Assets</h3>
+              <div class="asset-chips">
+                <div *ngFor="let asset of selectedVulnerability?.affectedAssets" class="asset-chip">
+                  <mat-icon>devices</mat-icon>
+                  {{ asset }}
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Discovery Information</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Discovery Date</div>
+                  <div class="info-value">{{ selectedVulnerability?.discoveryDate | date }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Status</div>
+                  <div class="info-value" [ngClass]="getStatusClass(selectedVulnerability?.status || '')">
+                    {{ selectedVulnerability?.status?.replace('_', ' ') | titlecase }}
+                  </div>
+                </div>
+                <div class="info-item" *ngIf="selectedVulnerability?.cve">
+                  <div class="info-label">CVE ID</div>
+                  <div class="info-value">{{ selectedVulnerability?.cve }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Remediation">
+          <div class="tab-content">
+            <div class="detail-section">
+              <h3>Recommended Actions</h3>
+              <div class="action-steps">
+                <div class="action-step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h4>Patch Affected Systems</h4>
+                    <p>Apply the latest security patches to all affected systems.</p>
+                  </div>
+                </div>
+                <div class="action-step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h4>Implement Input Validation</h4>
+                    <p>Add proper input validation to prevent malicious input.</p>
+                  </div>
+                </div>
+                <div class="action-step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h4>Verify Fix</h4>
+                    <p>Conduct security testing to verify the vulnerability has been remediated.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Timeline</h3>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-icon">
+                    <mat-icon>search</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-date">{{ selectedVulnerability?.discoveryDate | date }}</div>
+                    <div class="timeline-title">Vulnerability Discovered</div>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-icon">
+                    <mat-icon>assessment</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-date">{{ selectedVulnerability?.discoveryDate | date:'mediumDate' }}</div>
+                    <div class="timeline-title">Risk Assessment Completed</div>
+                  </div>
+                </div>
+                <div class="timeline-item" *ngIf="selectedVulnerability?.status === 'in_progress'">
+                  <div class="timeline-icon">
+                    <mat-icon>engineering</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    <div class="timeline-date">In Progress</div>
+                    <div class="timeline-title">Remediation Underway</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Security Domain Details -->
+    <div *ngIf="activeViewType === 'domain'" class="domain-details">
+      <mat-tab-group animationDuration="200ms">
+        <mat-tab label="Overview">
+          <div class="tab-content">
+            <div class="detail-section">
+              <h3>Security Score</h3>
+              <div class="score-container">
+                <div class="score-circle">
+                  <div class="score-value">{{ selectedDomain?.score }}</div>
+                  <div class="score-label">out of 100</div>
+                </div>
+                <div class="score-trend">
+                  <div class="trend-label">Trend</div>
+                  <div class="trend-value" [ngClass]="getDomainTrendClass()">
+                    <mat-icon>{{ getDomainTrendIcon() }}</mat-icon>
+                    {{ getDomainTrendValue() }}%
+                  </div>
+                  <div class="trend-description">
+                    {{ getDomainTrendDirection() }} from previous assessment
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Issues ({{ selectedDomain?.issues }})</h3>
+              <div class="issues-summary">
+                <div class="issue-category">
+                  <div class="category-name">Critical</div>
+                  <div class="category-bar">
+                    <div class="bar-fill critical" style="width: 20%;"></div>
+                  </div>
+                  <div class="category-count">2</div>
+                </div>
+                <div class="issue-category">
+                  <div class="category-name">High</div>
+                  <div class="category-bar">
+                    <div class="bar-fill high" style="width: 30%;"></div>
+                  </div>
+                  <div class="category-count">3</div>
+                </div>
+                <div class="issue-category">
+                  <div class="category-name">Medium</div>
+                  <div class="category-bar">
+                    <div class="bar-fill medium" style="width: 40%;"></div>
+                  </div>
+                  <div class="category-count">4</div>
+                </div>
+                <div class="issue-category">
+                  <div class="category-name">Low</div>
+                  <div class="category-bar">
+                    <div class="bar-fill low" style="width: 10%;"></div>
+                  </div>
+                  <div class="category-count">1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Recommendations">
+          <div class="tab-content">
+            <div class="detail-section">
+              <h3>Security Recommendations</h3>
+              <div class="recommendations-list">
+                <div *ngFor="let rec of selectedDomain?.recommendations" class="recommendation-item">
+                  <div class="recommendation-header">
+                    <div class="recommendation-title">{{ rec.action }}</div>
+                    <div class="recommendation-badges">
+                      <div class="badge" [ngClass]="getImpactClass(rec.impact)">
+                        {{ rec.impact | titlecase }} Impact
+                      </div>
+                      <div class="badge" [ngClass]="getEffortClass(rec.effort)">
+                        {{ rec.effort | titlecase }} Effort
+                      </div>
+                    </div>
+                  </div>
+                  <div class="recommendation-description">
+                    {{ rec.description }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <!-- Threat Details -->
+    <div *ngIf="activeViewType === 'threat'" class="threat-details">
+      <mat-tab-group animationDuration="200ms">
+        <mat-tab label="Overview">
+          <div class="tab-content">
+            <div class="detail-section">
+              <h3>Threat Details</h3>
+              <p>{{ selectedThreat?.details }}</p>
+            </div>
+
+            <div class="detail-section">
+              <h3>Indicators of Compromise</h3>
+              <div class="ioc-list">
+                <div *ngFor="let indicator of selectedThreat?.indicators" class="ioc-item">
+                  <mat-icon>warning</mat-icon>
+                  <span>{{ indicator }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Related Alerts</h3>
+              <div *ngIf="hasRelatedAlerts()" class="related-alerts">
+                <div *ngFor="let alertId of getRelatedAlerts()" class="related-alert">
+                  <div class="alert-id">{{ alertId }}</div>
+                  <div class="alert-action">
+                    <button mat-button color="accent">View</button>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!hasRelatedAlerts()" class="no-related-alerts">
+                No related alerts found.
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Response">
+          <div class="tab-content">
+            <div class="detail-section">
+              <h3>Recommended Response</h3>
+              <div class="response-steps">
+                <div class="response-step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h4>Isolate Affected Systems</h4>
+                    <p>Isolate affected systems from the network to prevent further spread.</p>
+                  </div>
+                </div>
+                <div class="response-step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h4>Analyze Indicators</h4>
+                    <p>Analyze indicators of compromise to understand the attack vector.</p>
+                  </div>
+                </div>
+                <div class="response-step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h4>Remediate</h4>
+                    <p>Remove malicious artifacts and patch vulnerabilities.</p>
+                  </div>
+                </div>
+                <div class="response-step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h4>Restore and Monitor</h4>
+                    <p>Restore systems to normal operation and monitor for any signs of persistence.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</div>

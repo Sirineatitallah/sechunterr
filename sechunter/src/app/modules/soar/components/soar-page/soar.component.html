@@ -1,1 +1,268 @@
-<p>soar works!</p>
+<div class="soar-dashboard">
+  <div class="dashboard-header">
+    <h2>Security Orchestration, Automation & Response</h2>
+    <div class="dashboard-controls">
+      <div class="time-range-selector">
+        <span class="control-label">Période:</span>
+        <div class="time-range-buttons">
+          <button
+            *ngFor="let range of timeRanges"
+            [class.active]="selectedTimeRange === range.id"
+            (click)="setTimeRange(range.id)">
+            {{ range.label }}
+          </button>
+        </div>
+      </div>
+      <button class="refresh-button" (click)="refreshAll()">
+        <mat-icon>refresh</mat-icon>
+        Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <!-- Incident Summary Section -->
+  <div class="incident-summary-section">
+    <h3>Résumé des Incidents</h3>
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="card-icon">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ incidentSummary.totalIncidents }}</div>
+          <div class="card-label">Incidents Totaux</div>
+        </div>
+        <div class="card-trend" [class.positive]="incidentSummary.trend < 0" [class.negative]="incidentSummary.trend > 0">
+          <mat-icon>{{ incidentSummary.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+          <span>{{ incidentSummary.trend }}%</span>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon critical">
+          <mat-icon>priority_high</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ incidentSummary.criticalIncidents }}</div>
+          <div class="card-label">Critiques</div>
+        </div>
+        <div class="card-percentage">{{ (incidentSummary.criticalIncidents / incidentSummary.totalIncidents * 100).toFixed(1) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon warning">
+          <mat-icon>error</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ incidentSummary.openIncidents }}</div>
+          <div class="card-label">En cours</div>
+        </div>
+        <div class="card-percentage">{{ (incidentSummary.openIncidents / incidentSummary.totalIncidents * 100).toFixed(1) }}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="card-icon success">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="card-content">
+          <div class="card-value">{{ incidentSummary.resolvedIncidents }}</div>
+          <div class="card-label">Résolus</div>
+        </div>
+        <div class="card-percentage">{{ (incidentSummary.resolvedIncidents / incidentSummary.totalIncidents * 100).toFixed(1) }}%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Incidents Section -->
+  <div class="active-incidents-section">
+    <div class="section-header">
+      <h3>Incidents Actifs</h3>
+      <button class="view-all-button">
+        Voir tous <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+    <div class="incidents-table">
+      <div class="table-header">
+        <div class="header-cell id-cell">ID</div>
+        <div class="header-cell title-cell">Titre</div>
+        <div class="header-cell severity-cell">Sévérité</div>
+        <div class="header-cell status-cell">Statut</div>
+        <div class="header-cell assignee-cell">Assigné à</div>
+        <div class="header-cell time-cell">Temps</div>
+        <div class="header-cell actions-cell">Actions</div>
+      </div>
+      <div class="table-body">
+        <div *ngFor="let incident of activeIncidents" class="table-row">
+          <div class="cell id-cell">{{ incident.id }}</div>
+          <div class="cell title-cell">{{ incident.title }}</div>
+          <div class="cell severity-cell">
+            <span class="severity-badge" [class]="'severity-' + incident.severity">{{ incident.severity }}</span>
+          </div>
+          <div class="cell status-cell">
+            <span class="status-badge" [class]="'status-' + incident.status">{{ incident.status }}</span>
+          </div>
+          <div class="cell assignee-cell">
+            <div class="assignee">
+              <div class="assignee-avatar" [style.background-color]="incident.assignee.color">
+                {{ incident.assignee.name.charAt(0) }}
+              </div>
+              <span class="assignee-name">{{ incident.assignee.name }}</span>
+            </div>
+          </div>
+          <div class="cell time-cell">{{ incident.timeElapsed }}</div>
+          <div class="cell actions-cell">
+            <button mat-icon-button matTooltip="Voir les détails">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Exécuter le playbook">
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Playbooks and Automation Section -->
+  <div class="playbooks-section">
+    <div class="section-header">
+      <h3>Playbooks et Automatisation</h3>
+      <div class="section-controls">
+        <div class="search-box">
+          <mat-icon>search</mat-icon>
+          <input type="text" placeholder="Rechercher un playbook...">
+        </div>
+        <button class="create-button">
+          <mat-icon>add</mat-icon>
+          Nouveau
+        </button>
+      </div>
+    </div>
+    <div class="playbooks-grid">
+      <div *ngFor="let playbook of playbooks" class="playbook-card">
+        <div class="playbook-header">
+          <div class="playbook-icon" [style.background-color]="playbook.color">
+            <mat-icon>{{ playbook.icon }}</mat-icon>
+          </div>
+          <div class="playbook-title">{{ playbook.name }}</div>
+          <button class="menu-button" mat-icon-button>
+            <mat-icon>more_vert</mat-icon>
+          </button>
+        </div>
+        <div class="playbook-content">
+          <div class="playbook-description">{{ playbook.description }}</div>
+          <div class="playbook-stats">
+            <div class="stat-item">
+              <div class="stat-value">{{ playbook.executionCount }}</div>
+              <div class="stat-label">Exécutions</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ playbook.successRate }}%</div>
+              <div class="stat-label">Succès</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">{{ playbook.avgTime }}</div>
+              <div class="stat-label">Temps moy.</div>
+            </div>
+          </div>
+        </div>
+        <div class="playbook-footer">
+          <button class="action-button">
+            <mat-icon>edit</mat-icon>
+            Éditer
+          </button>
+          <button class="action-button primary">
+            <mat-icon>play_arrow</mat-icon>
+            Exécuter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Section -->
+  <div class="analytics-section">
+    <h3>Analytiques SOAR</h3>
+    <div class="analytics-grid">
+      <div class="analytics-card response-time">
+        <div class="card-header">
+          <h4>Temps de Réponse Moyen</h4>
+          <div class="time-trend" [class.positive]="analytics.responseTime.trend < 0" [class.negative]="analytics.responseTime.trend > 0">
+            <mat-icon>{{ analytics.responseTime.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ analytics.responseTime.trend }}%</span>
+          </div>
+        </div>
+        <div class="card-value">{{ analytics.responseTime.value }} min</div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="line-chart">
+            <div *ngFor="let point of analytics.responseTime.history; let i = index"
+                 class="chart-point"
+                 [style.left]="(i / (analytics.responseTime.history.length - 1) * 100) + '%'"
+                 [style.bottom]="(point / getMaxHistoryValue(analytics.responseTime.history) * 80) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-card automation-rate">
+        <div class="card-header">
+          <h4>Taux d'Automatisation</h4>
+          <div class="time-trend positive">
+            <mat-icon>trending_up</mat-icon>
+            <span>{{ analytics.automationRate.trend }}%</span>
+          </div>
+        </div>
+        <div class="card-value">{{ analytics.automationRate.value }}%</div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="progress-chart">
+            <div class="progress-bar" [style.width]="analytics.automationRate.value + '%'"></div>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-card mttr">
+        <div class="card-header">
+          <h4>MTTR</h4>
+          <div class="time-trend" [class.positive]="analytics.mttr.trend < 0" [class.negative]="analytics.mttr.trend > 0">
+            <mat-icon>{{ analytics.mttr.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
+            <span>{{ analytics.mttr.trend }}%</span>
+          </div>
+        </div>
+        <div class="card-value">{{ analytics.mttr.value }} h</div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="line-chart">
+            <div *ngFor="let point of analytics.mttr.history; let i = index"
+                 class="chart-point"
+                 [style.left]="(i / (analytics.mttr.history.length - 1) * 100) + '%'"
+                 [style.bottom]="(point / getMaxHistoryValue(analytics.mttr.history) * 80) + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="analytics-card incident-types">
+        <div class="card-header">
+          <h4>Types d'Incidents</h4>
+        </div>
+        <div class="card-chart">
+          <!-- Placeholder for chart -->
+          <div class="donut-chart">
+            <div class="donut-segments">
+              <div *ngFor="let segment of analytics.incidentTypes; let i = index"
+                   class="donut-segment"
+                   [style.background-color]="segment.color"
+                   [style.transform]="'rotate(' + getSegmentRotation(i) + 'deg)'"
+                   [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getSegmentPath(i) + ', 50% 0%)'">
+              </div>
+            </div>
+            <div class="donut-center"></div>
+          </div>
+          <div class="donut-legend">
+            <div *ngFor="let type of analytics.incidentTypes" class="legend-item">
+              <div class="legend-color" [style.background-color]="type.color"></div>
+              <div class="legend-label">{{ type.name }}</div>
+              <div class="legend-value">{{ type.percentage }}%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

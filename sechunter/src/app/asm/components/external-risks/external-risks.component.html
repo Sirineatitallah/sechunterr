@@ -1,0 +1,106 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Top Risques Externes</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="filter-bar">
+      <button 
+        [class.active]="activeFilter === 'all'"
+        (click)="applyFilter('all')">
+        Tous ({{ externalRisks.length }})
+      </button>
+      <button 
+        class="critical"
+        [class.active]="activeFilter === 'critical'"
+        (click)="applyFilter('critical')">
+        Critique ({{ getCountBySeverity('critical') }})
+      </button>
+      <button 
+        class="high"
+        [class.active]="activeFilter === 'high'"
+        (click)="applyFilter('high')">
+        Haut ({{ getCountBySeverity('high') }})
+      </button>
+      <button 
+        class="medium"
+        [class.active]="activeFilter === 'medium'"
+        (click)="applyFilter('medium')">
+        Moyen ({{ getCountBySeverity('medium') }})
+      </button>
+      <button 
+        class="low"
+        [class.active]="activeFilter === 'low'"
+        (click)="applyFilter('low')">
+        Faible ({{ getCountBySeverity('low') }})
+      </button>
+    </div>
+    <div class="risks-list">
+      <div *ngFor="let risk of filteredRisks" class="risk-item">
+        <div class="risk-header">
+          <div class="risk-title">
+            <div class="risk-id">{{ risk.id }}</div>
+            <div class="risk-category">{{ risk.category }}</div>
+          </div>
+          <div class="risk-severity" [ngClass]="getSeverityClass(risk.severity)">
+            {{ risk.severity | titlecase }}
+          </div>
+        </div>
+        <div class="risk-description">{{ risk.description }}</div>
+        <div class="risk-details">
+          <div class="detail-item">
+            <mat-icon>computer</mat-icon>
+            <span>{{ risk.asset }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>calendar_today</mat-icon>
+            <span>{{ formatDate(risk.discoveryDate) }}</span>
+          </div>
+          <div class="detail-item">
+            <mat-icon>flag</mat-icon>
+            <span class="status" [ngClass]="getStatusClass(risk.status)">
+              {{ risk.status === 'in_progress' ? 'En cours' : (risk.status === 'open' ? 'Ouvert' : 'Résolu') }}
+            </span>
+          </div>
+        </div>
+        <div class="risk-remediation" *ngIf="risk.remediation">
+          <div class="remediation-label">Remédiation:</div>
+          <div class="remediation-text">{{ risk.remediation }}</div>
+        </div>
+        <div class="risk-actions">
+          <button mat-button color="primary">
+            <mat-icon>visibility</mat-icon>
+            Détails
+          </button>
+          <button mat-button color="accent">
+            <mat-icon>security</mat-icon>
+            Remédier
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="status-summary">
+      <div class="status-item open">
+        <div class="status-count">{{ getCountByStatus('open') }}</div>
+        <div class="status-label">Ouverts</div>
+      </div>
+      <div class="status-item in-progress">
+        <div class="status-count">{{ getCountByStatus('in_progress') }}</div>
+        <div class="status-label">En Cours</div>
+      </div>
+      <div class="status-item resolved">
+        <div class="status-count">{{ getCountByStatus('resolved') }}</div>
+        <div class="status-label">Résolus</div>
+      </div>
+    </div>
+  </div>
+</div>

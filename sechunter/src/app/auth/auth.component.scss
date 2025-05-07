@@ -6,9 +6,10 @@
   --cyber-blue: #00f3ff;
   --neon-purple: #bc13fe;
   --matrix-green: #00ff9d;
-  --hologram-gradient: linear-gradient(45deg, 
-    var(--cyber-blue) 0%, 
-    var(--neon-purple) 50%, 
+  --cyber-orange: #f7570c;
+  --hologram-gradient: linear-gradient(45deg,
+    var(--cyber-blue) 0%,
+    var(--neon-purple) 50%,
     var(--matrix-green) 100%);
 }
 
@@ -20,7 +21,7 @@
   background: radial-gradient(circle at center, #0a0e1f 0%, #020308 100%);
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -54,12 +55,30 @@
   background: var(--hologram-gradient);
   opacity: 0.1;
   animation: gradientFlow 8s linear infinite;
+  pointer-events: none; /* Allow mouse events to pass through */
+}
+
+.neon-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none; /* Allow mouse events to pass through */
+}
+
+.auth-content {
+  position: relative;
+  z-index: 5; /* Ensure content is above background elements */
 }
 
 .auth-header {
   text-align: center;
   margin-bottom: 2rem;
-  
+
   .brand-logo {
     width: 72px;
     margin-bottom: 1rem;
@@ -68,7 +87,7 @@
 
 .auth-title {
   font-size: 2rem;
-  color: #f7570c;
+  color: var(--cyber-orange);
   margin-bottom: 0.5rem;
 }
 
@@ -80,15 +99,25 @@
 .cyber-input {
   position: relative;
   margin-bottom: 1.5rem;
+  z-index: 10; /* Ensure inputs are clickable */
 
   input {
     width: 100%;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
     color: white;
     font-family: 'Space Mono', monospace;
     letter-spacing: 0.1em;
+    position: relative;
+    z-index: 10; /* Ensure inputs are clickable */
+
+    &:focus {
+      outline: none;
+      border-color: var(--cyber-blue);
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+    }
   }
 }
 
@@ -101,10 +130,11 @@
   border: none;
   color: var(--cyber-blue);
   cursor: pointer;
+  z-index: 15; /* Ensure button is clickable */
 }
 
 .auth-button {
-  background: var(--hologram-gradient);
+  background: linear-gradient(45deg, #00f3ff 0%, #bc13fe 50%, #00ff9d 100%);
   border: none;
   width: 100%;
   padding: 1.2rem;
@@ -115,10 +145,18 @@
   margin-top: 2rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  border-radius: 4px;
+  position: relative;
+  z-index: 20; /* Higher z-index to ensure button is clickable */
 
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(0, 243, 255, 0.3);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(0, 243, 255, 0.2);
   }
 
   &:disabled {
@@ -128,7 +166,10 @@
 }
 
 .security-criteria {
-  display: none; /* Not present in auth component */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .criteria-item {
@@ -136,26 +177,58 @@
   align-items: center;
   gap: 0.5rem;
   color: #a8a3a3;
+  font-size: 0.85rem;
 
   &.valid {
     color: var(--matrix-green);
   }
 }
 
-.password-strength-indicator {
-  display: none; /* Not present in auth component */
+.error-message {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: rgba(255, 59, 48, 0.1);
+  border-left: 3px solid #ff3b30;
+  color: #ff3b30;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.auth-footer {
+  margin-top: 2rem;
+}
+
+.security-badges {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #a8a3a3;
+  font-size: 0.85rem;
 }
 
 .auth-switch {
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   color: #a8a3a3;
 
   .neon-link {
     color: var(--cyber-blue);
     text-decoration: none;
     position: relative;
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -178,4 +251,3 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-

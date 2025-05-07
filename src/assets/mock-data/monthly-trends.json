@@ -1,0 +1,53 @@
+{
+  "title": "Tendances Mensuelles",
+  "data": {
+    "labels": ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"],
+    "datasets": [
+      {
+        "label": "Critique",
+        "data": [5, 8, 12, 10, 7, 9, 15, 18, 14, 12, 10, 8],
+        "borderColor": "#ff4d4d",
+        "backgroundColor": "rgba(255, 77, 77, 0.1)",
+        "fill": true
+      },
+      {
+        "label": "Élevée",
+        "data": [12, 15, 18, 22, 19, 16, 20, 25, 22, 18, 15, 12],
+        "borderColor": "#ff9933",
+        "backgroundColor": "rgba(255, 153, 51, 0.1)",
+        "fill": true
+      },
+      {
+        "label": "Moyenne",
+        "data": [20, 25, 30, 28, 24, 22, 26, 30, 28, 24, 20, 18],
+        "borderColor": "#ffcc00",
+        "backgroundColor": "rgba(255, 204, 0, 0.1)",
+        "fill": true
+      },
+      {
+        "label": "Faible",
+        "data": [15, 18, 20, 22, 25, 20, 18, 15, 12, 10, 8, 6],
+        "borderColor": "#33cc33",
+        "backgroundColor": "rgba(51, 204, 51, 0.1)",
+        "fill": true
+      }
+    ],
+    "summary": {
+      "total": {
+        "current": 272,
+        "previous": 245,
+        "change": "+11%"
+      },
+      "critical": {
+        "current": 24,
+        "previous": 20,
+        "change": "+20%"
+      },
+      "high": {
+        "current": 56,
+        "previous": 52,
+        "change": "+8%"
+      }
+    }
+  }
+}

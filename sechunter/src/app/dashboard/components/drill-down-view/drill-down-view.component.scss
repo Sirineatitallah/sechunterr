@@ -1,0 +1,678 @@
+.drill-down-container {
+  background: rgba(26, 27, 38, 0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 243, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.drill-down-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: rgba(10, 14, 31, 0.5);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+  
+  .header-content {
+    flex: 1;
+    
+    h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      
+      .header-icon {
+        margin-right: 0.75rem;
+        color: #00f3ff;
+        
+        &.critical {
+          color: #ff4757;
+        }
+        
+        &.high {
+          color: #ffa502;
+        }
+        
+        &.medium {
+          color: #ffdb58;
+        }
+        
+        &.low {
+          color: #2ed573;
+        }
+      }
+    }
+    
+    .header-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      
+      .badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        
+        &.critical {
+          background: rgba(255, 71, 87, 0.2);
+          border: 1px solid rgba(255, 71, 87, 0.5);
+          color: #ff4757;
+        }
+        
+        &.high {
+          background: rgba(255, 165, 2, 0.2);
+          border: 1px solid rgba(255, 165, 2, 0.5);
+          color: #ffa502;
+        }
+        
+        &.medium {
+          background: rgba(255, 219, 88, 0.2);
+          border: 1px solid rgba(255, 219, 88, 0.5);
+          color: #ffdb58;
+        }
+        
+        &.low {
+          background: rgba(46, 213, 115, 0.2);
+          border: 1px solid rgba(46, 213, 115, 0.5);
+          color: #2ed573;
+        }
+        
+        &.info {
+          background: rgba(0, 243, 255, 0.2);
+          border: 1px solid rgba(0, 243, 255, 0.5);
+          color: #00f3ff;
+        }
+        
+        &.cve {
+          background: rgba(188, 19, 254, 0.2);
+          border: 1px solid rgba(188, 19, 254, 0.5);
+          color: #bc13fe;
+        }
+        
+        &.open {
+          background: rgba(255, 71, 87, 0.2);
+          border: 1px solid rgba(255, 71, 87, 0.5);
+          color: #ff4757;
+        }
+        
+        &.in-progress {
+          background: rgba(255, 165, 2, 0.2);
+          border: 1px solid rgba(255, 165, 2, 0.5);
+          color: #ffa502;
+        }
+        
+        &.resolved {
+          background: rgba(46, 213, 115, 0.2);
+          border: 1px solid rgba(46, 213, 115, 0.5);
+          color: #2ed573;
+        }
+        
+        &.score {
+          background: rgba(0, 243, 255, 0.2);
+          border: 1px solid rgba(0, 243, 255, 0.5);
+          color: #00f3ff;
+        }
+        
+        &.issues {
+          background: rgba(255, 165, 2, 0.2);
+          border: 1px solid rgba(255, 165, 2, 0.5);
+          color: #ffa502;
+        }
+        
+        &.region {
+          background: rgba(188, 19, 254, 0.2);
+          border: 1px solid rgba(188, 19, 254, 0.5);
+          color: #bc13fe;
+        }
+        
+        &.source {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #e1e1e6;
+        }
+        
+        &.positive {
+          background: rgba(46, 213, 115, 0.2);
+          border: 1px solid rgba(46, 213, 115, 0.5);
+          color: #2ed573;
+          
+          mat-icon {
+            font-size: 16px;
+            height: 16px;
+            width: 16px;
+            margin-right: 0.25rem;
+          }
+        }
+        
+        &.negative {
+          background: rgba(255, 71, 87, 0.2);
+          border: 1px solid rgba(255, 71, 87, 0.5);
+          color: #ff4757;
+          
+          mat-icon {
+            font-size: 16px;
+            height: 16px;
+            width: 16px;
+            margin-right: 0.25rem;
+          }
+        }
+      }
+    }
+  }
+  
+  .close-button {
+    color: #e1e1e6;
+    
+    &:hover {
+      color: #ff4757;
+    }
+  }
+}
+
+.drill-down-content {
+  ::ng-deep .mat-mdc-tab-header {
+    background: rgba(10, 14, 31, 0.3);
+    border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+  }
+  
+  ::ng-deep .mat-mdc-tab-label-active {
+    color: #00f3ff;
+  }
+  
+  ::ng-deep .mat-mdc-tab-label {
+    color: #e1e1e6;
+  }
+  
+  ::ng-deep .mat-mdc-tab-body-content {
+    overflow: hidden;
+  }
+  
+  .tab-content {
+    padding: 1.5rem;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .detail-section {
+    margin-bottom: 2rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(0, 243, 255, 0.1);
+      padding-bottom: 0.5rem;
+    }
+    
+    p {
+      color: #e1e1e6;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+  
+  // Vulnerability details specific styles
+  .asset-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    
+    .asset-chip {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      background: rgba(0, 243, 255, 0.1);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: #e1e1e6;
+      
+      mat-icon {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        margin-right: 0.5rem;
+        color: #00f3ff;
+      }
+    }
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    
+    .info-item {
+      .info-label {
+        font-size: 0.8rem;
+        color: #a8a3a3;
+        margin-bottom: 0.25rem;
+      }
+      
+      .info-value {
+        font-size: 1rem;
+        color: #e1e1e6;
+        font-weight: 500;
+        
+        &.open {
+          color: #ff4757;
+        }
+        
+        &.in-progress {
+          color: #ffa502;
+        }
+        
+        &.resolved {
+          color: #2ed573;
+        }
+      }
+    }
+  }
+  
+  .action-steps, .response-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    .action-step, .response-step {
+      display: flex;
+      background: rgba(16, 18, 27, 0.5);
+      border-radius: 8px;
+      overflow: hidden;
+      
+      .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        background: rgba(0, 243, 255, 0.2);
+        color: #00f3ff;
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
+      
+      .step-content {
+        flex: 1;
+        padding: 1rem;
+        
+        h4 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1rem;
+          color: #ffffff;
+        }
+        
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+          color: #e1e1e6;
+        }
+      }
+    }
+  }
+  
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    padding-left: 30px;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 15px;
+      width: 2px;
+      background: rgba(0, 243, 255, 0.2);
+    }
+    
+    .timeline-item {
+      display: flex;
+      position: relative;
+      
+      .timeline-icon {
+        position: absolute;
+        left: -30px;
+        width: 30px;
+        height: 30px;
+        background: rgba(0, 243, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        mat-icon {
+          font-size: 16px;
+          color: #00f3ff;
+        }
+      }
+      
+      .timeline-content {
+        .timeline-date {
+          font-size: 0.8rem;
+          color: #a8a3a3;
+          margin-bottom: 0.25rem;
+        }
+        
+        .timeline-title {
+          font-size: 1rem;
+          color: #e1e1e6;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  // Security domain details specific styles
+  .score-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(188, 19, 254, 0.1) 100%);
+      border: 2px solid rgba(0, 243, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        border-radius: 50%;
+        border: 1px dashed rgba(0, 243, 255, 0.5);
+      }
+      
+      .score-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #00f3ff;
+        line-height: 1;
+      }
+      
+      .score-label {
+        font-size: 0.8rem;
+        color: #a8a3a3;
+        margin-top: 0.25rem;
+      }
+    }
+    
+    .score-trend {
+      flex: 1;
+      
+      .trend-label {
+        font-size: 0.9rem;
+        color: #a8a3a3;
+        margin-bottom: 0.5rem;
+      }
+      
+      .trend-value {
+        display: flex;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        
+        &.positive {
+          color: #2ed573;
+        }
+        
+        &.negative {
+          color: #ff4757;
+        }
+        
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+      
+      .trend-description {
+        font-size: 0.9rem;
+        color: #e1e1e6;
+      }
+    }
+  }
+  
+  .issues-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    .issue-category {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      .category-name {
+        width: 80px;
+        font-size: 0.9rem;
+        color: #e1e1e6;
+      }
+      
+      .category-bar {
+        flex: 1;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        
+        .bar-fill {
+          height: 100%;
+          border-radius: 4px;
+          
+          &.critical {
+            background: linear-gradient(to right, #ff4757, #ff6b81);
+          }
+          
+          &.high {
+            background: linear-gradient(to right, #ffa502, #ffc048);
+          }
+          
+          &.medium {
+            background: linear-gradient(to right, #ffdb58, #ffe58f);
+          }
+          
+          &.low {
+            background: linear-gradient(to right, #2ed573, #7bed9f);
+          }
+        }
+      }
+      
+      .category-count {
+        width: 30px;
+        text-align: right;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #e1e1e6;
+      }
+    }
+  }
+  
+  .recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    .recommendation-item {
+      background: rgba(16, 18, 27, 0.5);
+      border-radius: 8px;
+      padding: 1rem;
+      border-left: 3px solid rgba(0, 243, 255, 0.5);
+      
+      .recommendation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        
+        .recommendation-title {
+          font-weight: 500;
+          color: #ffffff;
+        }
+        
+        .recommendation-badges {
+          display: flex;
+          gap: 0.5rem;
+          
+          .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            
+            &.high {
+              background: rgba(255, 71, 87, 0.2);
+              color: #ff4757;
+            }
+            
+            &.medium {
+              background: rgba(255, 165, 2, 0.2);
+              color: #ffa502;
+            }
+            
+            &.low {
+              background: rgba(46, 213, 115, 0.2);
+              color: #2ed573;
+            }
+          }
+        }
+      }
+      
+      .recommendation-description {
+        font-size: 0.9rem;
+        color: #e1e1e6;
+        line-height: 1.5;
+      }
+    }
+  }
+  
+  // Threat details specific styles
+  .ioc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    .ioc-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem;
+      background: rgba(16, 18, 27, 0.5);
+      border-radius: 8px;
+      
+      mat-icon {
+        color: #ff4757;
+        margin-right: 0.75rem;
+      }
+      
+      span {
+        color: #e1e1e6;
+      }
+    }
+  }
+  
+  .related-alerts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    
+    .related-alert {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: rgba(16, 18, 27, 0.5);
+      border-radius: 8px;
+      
+      .alert-id {
+        font-weight: 500;
+        color: #e1e1e6;
+      }
+      
+      .alert-action {
+        button {
+          color: #00f3ff;
+        }
+      }
+    }
+  }
+  
+  .no-related-alerts {
+    padding: 1rem;
+    background: rgba(16, 18, 27, 0.5);
+    border-radius: 8px;
+    text-align: center;
+    color: #a8a3a3;
+    font-style: italic;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .drill-down-header {
+    flex-direction: column;
+    
+    .header-content {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    .close-button {
+      align-self: flex-end;
+    }
+  }
+  
+  .score-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    
+    .score-trend {
+      width: 100%;
+      text-align: center;
+    }
+  }
+  
+  .recommendation-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .recommendation-badges {
+      align-self: flex-start;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2>Security Analytics Dashboard</h2>
+    <div class="time-selector">
+      <span>Last 7 days</span>
+      <button class="refresh-button">
+        <i class="material-icons">refresh</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-item chart-item-medium">
+      <app-revenue-bar-chart></app-revenue-bar-chart>
+    </div>
+    <div class="chart-item chart-item-medium">
+      <app-satisfaction-line-chart></app-satisfaction-line-chart>
+    </div>
+    <div class="chart-item chart-item-medium">
+      <app-target-reality-chart></app-target-reality-chart>
+    </div>
+    <div class="chart-item chart-item-medium">
+      <app-volume-service-chart></app-volume-service-chart>
+    </div>
+    <div class="chart-item chart-item-large">
+      <app-country-map></app-country-map>
+    </div>
+    <div class="chart-item chart-item-large">
+      <app-top-products-chart></app-top-products-chart>
+    </div>
+  </div>
+</div>

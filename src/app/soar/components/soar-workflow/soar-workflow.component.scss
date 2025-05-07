@@ -1,0 +1,284 @@
+@use '../../../../assets/scss/variables' as vars;
+@use '../../../../assets/scss/mixins' as mx;
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(16, 18, 27, 0.4);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #f7f7f7;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: linear-gradient(45deg, #00f3ff, #bc13fe);
+      border-radius: 50%;
+    }
+  }
+
+  .chart-actions {
+    display: flex;
+    gap: 4px;
+
+    button {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      mat-icon {
+        color: #a8a3a3;
+      }
+    }
+  }
+}
+
+.workflow-info {
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  .workflow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .workflow-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #f7f7f7;
+      }
+
+      .workflow-status {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+
+        &.status-active {
+          background: rgba(46, 213, 115, 0.2);
+          color: #2ed573;
+          border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        &.status-draft {
+          background: rgba(30, 144, 255, 0.2);
+          color: #1e90ff;
+          border: 1px solid rgba(30, 144, 255, 0.3);
+        }
+
+        &.status-inactive {
+          background: rgba(255, 71, 87, 0.2);
+          color: #ff4757;
+          border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+      }
+    }
+
+    .workflow-meta {
+      font-size: 0.8rem;
+      color: #a8a3a3;
+    }
+  }
+
+  .workflow-description {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #e0e0e0;
+    line-height: 1.4;
+  }
+}
+
+.chart-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+
+  .graph-container {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background: rgba(0, 0, 0, 0.2);
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #a8a3a3;
+
+    .loading-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      animation: spin 2s infinite linear;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+}
+
+.chart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+
+  .workflow-legend {
+    display: flex;
+    gap: 24px;
+
+    .legend-section {
+      h5 {
+        margin: 0 0 8px 0;
+        font-size: 0.8rem;
+        color: #a8a3a3;
+        font-weight: normal;
+      }
+
+      .legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+          }
+
+          &.trigger .legend-color { background: #4361EE; }
+          &.condition .legend-color { background: #F72585; }
+          &.action .legend-color { background: #7209B7; }
+          &.enrichment .legend-color { background: #4CC9F0; }
+          &.notification .legend-color { background: #F9C80E; }
+
+          .legend-label {
+            font-size: 0.8rem;
+            color: #a8a3a3;
+          }
+        }
+      }
+    }
+  }
+
+  .chart-info {
+    font-size: 0.8rem;
+    color: #a8a3a3;
+    font-style: italic;
+  }
+}
+
+// Workflow menu styling
+::ng-deep .workflow-menu {
+  .workflow-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .workflow-name {
+      font-size: 0.9rem;
+    }
+
+    .workflow-status {
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+
+      &.status-active {
+        background: rgba(46, 213, 115, 0.2);
+        color: #2ed573;
+      }
+
+      &.status-draft {
+        background: rgba(30, 144, 255, 0.2);
+        color: #1e90ff;
+      }
+
+      &.status-inactive {
+        background: rgba(255, 71, 87, 0.2);
+        color: #ff4757;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .workflow-info {
+    .workflow-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  .chart-footer {
+    flex-direction: column;
+    gap: 12px;
+    
+    .workflow-legend {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+}

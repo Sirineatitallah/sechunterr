@@ -1,0 +1,467 @@
+<div class="admin-dashboard">
+  <!-- Header with stats -->
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+
+    <div class="stats-cards">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ totalInstances }}</div>
+          <div class="stat-label">Total Instances</div>
+          <div class="stat-breakdown">
+            <span class="status-healthy">{{ healthyInstances }} Healthy</span> |
+            <span class="status-warning">{{ warningInstances }} Warning</span> |
+            <span class="status-critical">{{ criticalInstances }} Critical</span> |
+            <span class="status-offline">{{ offlineInstances }} Offline</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ totalVulnerabilities.critical + totalVulnerabilities.high + totalVulnerabilities.medium + totalVulnerabilities.low }}</div>
+          <div class="stat-label">Total Vulnerabilities</div>
+          <div class="stat-breakdown">
+            <span class="vuln-critical">{{ totalVulnerabilities.critical }} Critical</span> |
+            <span class="vuln-high">{{ totalVulnerabilities.high }} High</span> |
+            <span class="vuln-medium">{{ totalVulnerabilities.medium }} Medium</span> |
+            <span class="vuln-low">{{ totalVulnerabilities.low }} Low</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ scanRequests.length }}</div>
+          <div class="stat-label">Scan Requests</div>
+          <div class="stat-breakdown">
+            <span>{{ getPendingRequestsCount() }} Pending</span> |
+            <span>{{ getInProgressRequestsCount() }} In Progress</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-value">{{ getUnreadMessagesCount() }}</div>
+          <div class="stat-label">Unread Messages</div>
+          <div class="stat-breakdown">
+            <span class="priority-critical">{{ getCriticalUnreadMessagesCount() }} Critical</span> |
+            <span class="priority-high">{{ getHighUnreadMessagesCount() }} High</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Main content with tabs -->
+  <mat-tab-group class="dashboard-tabs">
+    <!-- Instances Tab -->
+    <mat-tab label="Instances">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>Managed Instances</h2>
+          <button mat-raised-button color="primary" (click)="createInstance()">
+            <mat-icon>add</mat-icon> Create Instance
+          </button>
+        </div>
+
+        <table mat-table [dataSource]="instances" class="mat-elevation-z2">
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let instance">
+              <span [class]="getStatusClass(instance.status)">{{ getStatusIcon(instance.status) }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let instance">{{ instance.name }}</td>
+          </ng-container>
+
+          <!-- Client Column -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef>Client</th>
+            <td mat-cell *matCellDef="let instance">{{ instance.clientName }}</td>
+          </ng-container>
+
+          <!-- Metrics Column -->
+          <ng-container matColumnDef="metrics">
+            <th mat-header-cell *matHeaderCellDef>Metrics</th>
+            <td mat-cell *matCellDef="let instance">
+              <div *ngIf="instance.metrics">
+                <div class="metric-row">
+                  <span>CPU: {{ instance.metrics.cpu }}%</span>
+                  <mat-progress-bar mode="determinate" [value]="instance.metrics.cpu"></mat-progress-bar>
+                </div>
+                <div class="metric-row">
+                  <span>Memory: {{ instance.metrics.memory }}%</span>
+                  <mat-progress-bar mode="determinate" [value]="instance.metrics.memory"></mat-progress-bar>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Last Scan Column -->
+          <ng-container matColumnDef="lastScan">
+            <th mat-header-cell *matHeaderCellDef>Last Scan</th>
+            <td mat-cell *matCellDef="let instance">
+              {{ instance.lastScan ? (instance.lastScan | date:'short') : 'Never' }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let instance">
+              <button mat-icon-button color="primary" matTooltip="Request scan"
+                      (click)="requestScan(instance.id)">
+                <mat-icon>search</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" matTooltip="Delete instance"
+                      (click)="deleteInstance(instance.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="instanceColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: instanceColumns;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Communications Tab -->
+    <mat-tab label="Communications">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>SecureUser Communications</h2>
+          <button mat-raised-button color="primary" routerLink="/dashboard/admin/communications/new">
+            <mat-icon>add</mat-icon> New Message
+          </button>
+        </div>
+
+        <table mat-table [dataSource]="communications" class="mat-elevation-z2">
+          <!-- Priority Column -->
+          <ng-container matColumnDef="priority">
+            <th mat-header-cell *matHeaderCellDef>Priority</th>
+            <td mat-cell *matCellDef="let comm">
+              <span [class]="getPriorityClass(comm.priority)">
+                {{ comm.priority.charAt(0).toUpperCase() + comm.priority.slice(1) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Title Column -->
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Title</th>
+            <td mat-cell *matCellDef="let comm" [class.unread]="!comm.read">
+              {{ comm.title }}
+            </td>
+          </ng-container>
+
+          <!-- Sender Column -->
+          <ng-container matColumnDef="sender">
+            <th mat-header-cell *matHeaderCellDef>From/To</th>
+            <td mat-cell *matCellDef="let comm">
+              <div *ngIf="comm.sender.id === currentUser?.id">
+                To: {{ comm.recipients[0]?.name || 'All Clients' }}
+                <span *ngIf="comm.recipients.length > 1">+{{ comm.recipients.length - 1 }} more</span>
+              </div>
+              <div *ngIf="comm.sender.id !== currentUser?.id">
+                From: {{ comm.sender.name }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let comm">
+              {{ comm.createdAt | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let comm">
+              <button mat-icon-button color="primary" matTooltip="View message"
+                      routerLink="/dashboard/admin/communications/{{ comm.id }}">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" matTooltip="Mark as read"
+                      (click)="markCommunicationAsRead(comm.id)" *ngIf="!comm.read">
+                <mat-icon>mark_email_read</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="communicationColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: communicationColumns;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Scan Requests Tab -->
+    <mat-tab label="Scan Requests">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>Scan Requests</h2>
+        </div>
+
+        <table mat-table [dataSource]="scanRequests" class="mat-elevation-z2">
+          <!-- Instance Column -->
+          <ng-container matColumnDef="instance">
+            <th mat-header-cell *matHeaderCellDef>Instance</th>
+            <td mat-cell *matCellDef="let request">
+              {{ getInstanceName(request.instanceId) }}
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let request">
+              {{ request.scanType.charAt(0).toUpperCase() + request.scanType.slice(1) }}
+            </td>
+          </ng-container>
+
+          <!-- Requested By Column -->
+          <ng-container matColumnDef="requestedBy">
+            <th mat-header-cell *matHeaderCellDef>Requested By</th>
+            <td mat-cell *matCellDef="let request">
+              {{ request.requestedBy }}
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let request">
+              {{ request.requestedAt | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let request">
+              <span [class]="'scan-status-' + request.status">
+                {{ request.status.charAt(0).toUpperCase() + request.status.slice(1).replace('_', ' ') }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let request">
+              <button mat-icon-button color="primary" matTooltip="Approve request"
+                      (click)="approveScanRequest(request.instanceId)"
+                      *ngIf="request.status === 'pending'">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" matTooltip="View details"
+                      routerLink="/dashboard/admin/scan-requests/{{ request.instanceId }}">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="scanRequestColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: scanRequestColumns;"></tr>
+        </table>
+      </div>
+    </mat-tab>
+
+    <!-- Compliance Dashboard Tab -->
+    <mat-tab label="Compliance">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>Compliance Dashboard</h2>
+        </div>
+
+        <div class="compliance-grid">
+          <mat-card class="compliance-card">
+            <mat-card-header>
+              <mat-card-title>NIST Compliance</mat-card-title>
+              <mat-card-subtitle>Framework v1.1</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="compliance-chart">
+                <!-- Placeholder for chart -->
+                <div class="placeholder-chart">NIST Compliance Chart</div>
+              </div>
+              <div class="compliance-stats">
+                <div class="compliance-stat">
+                  <div class="stat-label">Client A</div>
+                  <div class="stat-value">87%</div>
+                  <mat-progress-bar mode="determinate" value="87" color="primary"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client B</div>
+                  <div class="stat-value">62%</div>
+                  <mat-progress-bar mode="determinate" value="62" color="accent"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client C</div>
+                  <div class="stat-value">91%</div>
+                  <mat-progress-bar mode="determinate" value="91" color="primary"></mat-progress-bar>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="compliance-card">
+            <mat-card-header>
+              <mat-card-title>ISO 27001</mat-card-title>
+              <mat-card-subtitle>Information Security Standard</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="compliance-chart">
+                <!-- Placeholder for chart -->
+                <div class="placeholder-chart">ISO 27001 Compliance Chart</div>
+              </div>
+              <div class="compliance-stats">
+                <div class="compliance-stat">
+                  <div class="stat-label">Client A</div>
+                  <div class="stat-value">79%</div>
+                  <mat-progress-bar mode="determinate" value="79" color="primary"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client B</div>
+                  <div class="stat-value">58%</div>
+                  <mat-progress-bar mode="determinate" value="58" color="warn"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client C</div>
+                  <div class="stat-value">84%</div>
+                  <mat-progress-bar mode="determinate" value="84" color="primary"></mat-progress-bar>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="compliance-card">
+            <mat-card-header>
+              <mat-card-title>GDPR</mat-card-title>
+              <mat-card-subtitle>Data Protection Regulation</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="compliance-chart">
+                <!-- Placeholder for chart -->
+                <div class="placeholder-chart">GDPR Compliance Chart</div>
+              </div>
+              <div class="compliance-stats">
+                <div class="compliance-stat">
+                  <div class="stat-label">Client A</div>
+                  <div class="stat-value">92%</div>
+                  <mat-progress-bar mode="determinate" value="92" color="primary"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client B</div>
+                  <div class="stat-value">75%</div>
+                  <mat-progress-bar mode="determinate" value="75" color="accent"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client C</div>
+                  <div class="stat-value">88%</div>
+                  <mat-progress-bar mode="determinate" value="88" color="primary"></mat-progress-bar>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="compliance-card">
+            <mat-card-header>
+              <mat-card-title>PCI DSS</mat-card-title>
+              <mat-card-subtitle>Payment Card Industry Standard</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="compliance-chart">
+                <!-- Placeholder for chart -->
+                <div class="placeholder-chart">PCI DSS Compliance Chart</div>
+              </div>
+              <div class="compliance-stats">
+                <div class="compliance-stat">
+                  <div class="stat-label">Client A</div>
+                  <div class="stat-value">95%</div>
+                  <mat-progress-bar mode="determinate" value="95" color="primary"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client B</div>
+                  <div class="stat-value">N/A</div>
+                  <mat-progress-bar mode="determinate" value="0" color="accent"></mat-progress-bar>
+                </div>
+                <div class="compliance-stat">
+                  <div class="stat-label">Client C</div>
+                  <div class="stat-value">82%</div>
+                  <mat-progress-bar mode="determinate" value="82" color="primary"></mat-progress-bar>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- SOC Activity Logs Tab -->
+    <mat-tab label="SOC Activity">
+      <div class="tab-content">
+        <div class="tab-header">
+          <h2>SOC Activity Logs</h2>
+        </div>
+
+        <div class="activity-timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">2024-06-03 14:32</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Patch Deployment</div>
+              <div class="timeline-description">Deployed critical security patch for CVE-2024-1234 on Client B infrastructure.</div>
+              <div class="timeline-meta">By: Security Analyst</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">2024-06-03 11:15</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Incident Response</div>
+              <div class="timeline-description">Responded to suspicious login attempt on Client A database server. Blocked IP and escalated to client security team.</div>
+              <div class="timeline-meta">By: Incident Response Team</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">2024-06-02 16:45</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Vulnerability Assessment</div>
+              <div class="timeline-description">Completed full vulnerability assessment for Client C. Identified 3 critical and 7 high vulnerabilities.</div>
+              <div class="timeline-meta">By: Vulnerability Management Team</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">2024-06-02 09:30</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Firewall Rule Update</div>
+              <div class="timeline-description">Updated firewall rules for Client B to block emerging threat actor IP ranges.</div>
+              <div class="timeline-meta">By: Network Security Team</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-date">2024-06-01 13:20</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Compliance Audit</div>
+              <div class="timeline-description">Conducted ISO 27001 compliance audit for Client A. Overall compliance score: 87%.</div>
+              <div class="timeline-meta">By: Compliance Team</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

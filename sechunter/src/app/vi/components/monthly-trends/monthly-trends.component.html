@@ -1,0 +1,54 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Tendances Mensuelles</h3>
+    <div class="chart-actions">
+      <mat-button-toggle-group [value]="selectedTimeRange?.id">
+        <mat-button-toggle *ngFor="let range of timeRanges" [value]="range.id" (click)="setTimeRange(range.id)">
+          {{ range.label }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <ngx-charts-area-chart
+      [view]="view"
+      [scheme]="colorScheme"
+      [results]="chartData"
+      [gradient]="gradient"
+      [xAxis]="showXAxis"
+      [yAxis]="showYAxis"
+      [legend]="showLegend"
+      [showXAxisLabel]="showXAxisLabel"
+      [showYAxisLabel]="showYAxisLabel"
+      [xAxisLabel]="xAxisLabel"
+      [yAxisLabel]="yAxisLabel"
+      [timeline]="timeline"
+      [xAxisTickFormatting]="formatDate">
+    </ngx-charts-area-chart>
+  </div>
+  <div class="chart-footer">
+    <div class="trend-summary">
+      <div class="trend-item">
+        <div class="trend-label">Total Découvertes</div>
+        <div class="trend-value">{{ 241 }}</div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-label">Moyenne / Jour</div>
+        <div class="trend-value">{{ 8 }}</div>
+      </div>
+      <div class="trend-item">
+        <div class="trend-label">Tendance</div>
+        <div class="trend-value positive">
+          <mat-icon>trending_down</mat-icon>
+          <span>-12%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

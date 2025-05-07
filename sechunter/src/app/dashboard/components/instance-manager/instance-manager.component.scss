@@ -1,4 +1,205 @@
 .instance-manager {
   height: 100%;
-  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-color, #f9fafb);
+  border-radius: 8px;
+  overflow: hidden;
+
+  .instance-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-color, #111827);
+    }
+
+    .admin-controls, .client-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      button {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  .loading-container {
+    padding: 16px;
+    text-align: center;
+
+    p {
+      margin-top: 8px;
+      color: var(--text-secondary, #6b7280);
+    }
+  }
+
+  .instances-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+
+    .instance-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      background-color: var(--card-background, white);
+      border: 1px solid var(--border-color, #e5e7eb);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: var(--hover-color, #f3f4f6);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      &.selected {
+        background-color: var(--selected-color, #e0f2fe);
+        border-color: var(--selected-border, #38bdf8);
+      }
+
+      .instance-status {
+        margin-right: 12px;
+        font-size: 1.25rem;
+
+        .status-healthy {
+          color: var(--status-healthy, #10b981);
+        }
+
+        .status-warning {
+          color: var(--status-warning, #f59e0b);
+        }
+
+        .status-critical {
+          color: var(--status-critical, #ef4444);
+        }
+
+        .status-offline {
+          color: var(--status-offline, #6b7280);
+        }
+      }
+
+      .instance-info {
+        flex: 1;
+
+        .instance-name {
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+
+        .instance-client {
+          font-size: 0.875rem;
+          color: var(--text-secondary, #6b7280);
+          margin-bottom: 8px;
+        }
+
+        .instance-metrics {
+          margin-top: 8px;
+
+          .metric {
+            margin-bottom: 8px;
+
+            span {
+              display: block;
+              font-size: 0.75rem;
+              margin-bottom: 4px;
+            }
+
+            .vuln {
+              display: inline-block;
+              font-weight: 600;
+
+              &.critical {
+                color: var(--vuln-critical, #ef4444);
+              }
+
+              &.high {
+                color: var(--vuln-high, #f59e0b);
+              }
+
+              &.medium {
+                color: var(--vuln-medium, #3b82f6);
+              }
+
+              &.low {
+                color: var(--vuln-low, #10b981);
+              }
+            }
+          }
+        }
+
+        .instance-metrics-simple {
+          margin-top: 8px;
+          font-size: 0.875rem;
+          color: var(--text-secondary, #6b7280);
+        }
+      }
+
+      .instance-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-secondary, #6b7280);
+
+      p {
+        margin-bottom: 16px;
+      }
+    }
+  }
+}
+
+// Admin theme
+:host-context(.admin-theme) {
+  .instance-manager {
+    --background-color: #1a1a2e;
+    --border-color: #2a2a3e;
+    --text-color: #e1e1e6;
+    --text-secondary: #a1a1aa;
+    --card-background: #16213e;
+    --hover-color: #0f3460;
+    --selected-color: #1e3a8a;
+    --selected-border: #3b82f6;
+
+    --status-healthy: #10b981;
+    --status-warning: #f59e0b;
+    --status-critical: #ef4444;
+    --status-offline: #6b7280;
+
+    --vuln-critical: #ef4444;
+    --vuln-high: #f59e0b;
+    --vuln-medium: #3b82f6;
+    --vuln-low: #10b981;
+  }
+}
+
+// Client theme
+:host-context(.client-theme) {
+  .instance-manager {
+    --background-color: #f0f9ff;
+    --border-color: #bae6fd;
+    --text-color: #0c4a6e;
+    --text-secondary: #0369a1;
+    --card-background: white;
+    --hover-color: #e0f2fe;
+    --selected-color: #bae6fd;
+    --selected-border: #38bdf8;
+
+    --status-healthy: #10b981;
+    --status-warning: #f59e0b;
+    --status-critical: #ef4444;
+    --status-offline: #6b7280;
+  }
 }

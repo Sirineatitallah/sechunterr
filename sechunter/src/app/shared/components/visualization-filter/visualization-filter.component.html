@@ -1,0 +1,61 @@
+<div class="filter-container" [formGroup]="filterForm">
+  <div class="filter-row">
+    <!-- Search -->
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Rechercher</mat-label>
+      <input matInput formControlName="searchTerm" placeholder="Rechercher par nom ou CVE">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!-- Severity Filter -->
+    <mat-form-field appearance="outline">
+      <mat-label>Sévérité</mat-label>
+      <mat-select formControlName="severities" multiple>
+        <mat-option *ngFor="let severity of availableSeverities" [value]="severity">
+          {{ severity }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Date Range -->
+    <div formGroupName="dateRange" class="date-range">
+      <mat-form-field appearance="outline">
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="start">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date fin</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="end">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="filter-row actions-row">
+    <!-- Sort Options -->
+    <div class="sort-options">
+      <mat-form-field appearance="outline">
+        <mat-label>Trier par</mat-label>
+        <mat-select formControlName="sortBy">
+          <mat-option *ngFor="let option of availableSortOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-icon-button (click)="toggleSortDirection()" [attr.aria-label]="'Trier ' + (filterForm.get('sortDirection')?.value === 'asc' ? 'ascendant' : 'descendant')">
+        <mat-icon>{{ filterForm.get('sortDirection')?.value === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+      </button>
+    </div>
+
+    <!-- Clear Filters -->
+    <button mat-button color="accent" (click)="clearFilters()">
+      <mat-icon>filter_alt_off</mat-icon>
+      Réinitialiser les filtres
+    </button>
+  </div>
+</div>

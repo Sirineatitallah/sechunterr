@@ -1,0 +1,31 @@
+{
+  "title": "Score de Risque",
+  "data": {
+    "current": 72,
+    "previous": 68,
+    "change": "+5.9%",
+    "trend": "increasing",
+    "riskLevel": "Élevé",
+    "components": {
+      "vulnerabilities": 75,
+      "threats": 65,
+      "exposures": 80,
+      "compliance": 60
+    },
+    "history": [
+      { "date": "2023-01-01", "score": 60 },
+      { "date": "2023-02-01", "score": 62 },
+      { "date": "2023-03-01", "score": 65 },
+      { "date": "2023-04-01", "score": 63 },
+      { "date": "2023-05-01", "score": 67 },
+      { "date": "2023-06-01", "score": 68 },
+      { "date": "2023-07-01", "score": 70 },
+      { "date": "2023-08-01", "score": 72 }
+    ],
+    "recommendations": [
+      "Corriger les vulnérabilités critiques",
+      "Mettre à jour les systèmes d'exploitation",
+      "Renforcer l'authentification"
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+<div class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <img src="assets/logo.png" alt="Project Logo" class="logo-icon" />
+      <h3 *ngIf="!collapsed">VOC Ecosystem</h3>
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of menuItems" class="nav-item" [class.active]="false">
+        <a *ngIf="showMenuItem(item)" [routerLink]="item.path" routerLinkActive="active" class="nav-link" (click)="menuSelection.emit(item.title)">
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          <span class="nav-text" *ngIf="!collapsed">{{ item.title }}</span>
+          <span *ngIf="item.notificationCount && item.notificationCount > 0" class="notification-badge">
+            {{ item.notificationCount }}
+          </span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Instance Manager -->
+  <div class="sidebar-section" *ngIf="!collapsed">
+    <h4 class="section-title">INSTANCE MANAGER</h4>
+    <ul class="instance-list">
+      <li *ngFor="let instance of instances" class="instance-item">
+        <span class="status-indicator" [ngClass]="instance.status"></span>
+        <span class="instance-name">{{ instance.name }}</span>
+      </li>
+    </ul>
+    <button class="add-instance-btn" (click)="addInstance()">
+      <mat-icon>add</mat-icon>
+      <span>Ajouter une Instance</span>
+    </button>
+  </div>
+
+  <!-- Quick Widgets -->
+  <div class="sidebar-section" *ngIf="!collapsed">
+    <h4 class="section-title">FAVORIS / WIDGETS RAPIDES</h4>
+    <ul class="widget-list">
+      <li *ngFor="let widget of widgets" class="widget-item" [class.pinned]="widget.pinned" (click)="toggleWidgetPin(widget)">
+        <span class="widget-title">{{ widget.title }}</span>
+        <mat-icon class="pin-icon" *ngIf="widget.pinned">star</mat-icon>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Recent Actions -->
+  <div class="sidebar-section" *ngIf="!collapsed">
+    <h4 class="section-title">HISTORIQUE DES ACTIONS</h4>
+    <ul class="action-list">
+      <li *ngFor="let action of recentActions" class="action-item">
+        <span class="action-description">{{ action.description }}</span>
+        <span class="action-time">{{ formatTimestamp(action.timestamp) }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- User Actions -->
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" (click)="signOut()">
+      <mat-icon>logout</mat-icon>
+      <span *ngIf="!collapsed">Secure Sign Out</span>
+    </button>
+  </div>
+</div>

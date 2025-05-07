@@ -1,0 +1,68 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Score de Risque</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Rafraîchir">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Plein écran">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="gauge-wrapper">
+      <div #gaugeContainer class="gauge-container"></div>
+      <div class="score-info">
+        <div class="score-zone" [ngClass]="getScoreZoneClass()">
+          {{ getScoreZone() }}
+        </div>
+        <div class="score-change" [ngClass]="scoreChange >= 0 ? 'positive' : 'negative'">
+          <mat-icon>{{ scoreChange >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+          <span>{{ scoreChange >= 0 ? '+' : '' }}{{ scoreChange }}%</span>
+        </div>
+        <div class="score-date">
+          Dernière mise à jour: {{ formatDate(scoreDate) }}
+        </div>
+      </div>
+    </div>
+    <div class="risk-factors">
+      <h4>Facteurs de Risque</h4>
+      <div class="factors-list">
+        <div *ngFor="let factor of riskFactors" class="factor-item">
+          <div class="factor-info">
+            <div class="factor-name">{{ factor.name }}</div>
+            <div class="factor-weight">{{ (factor.weight * 100) }}%</div>
+          </div>
+          <div class="factor-score-bar">
+            <div class="score-track">
+              <div class="score-fill" [style.width]="factor.score + '%'" [ngClass]="getScoreZoneClass()"></div>
+            </div>
+          </div>
+          <div class="factor-score">
+            <div class="score-value">{{ factor.score }}</div>
+            <div class="score-trend" [ngClass]="getTrendClass(factor.trend)">
+              <mat-icon>{{ getTrendIcon(factor.trend) }}</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="score-legend">
+      <div class="legend-item good">
+        <div class="legend-color"></div>
+        <div class="legend-label">Bon (70-100)</div>
+      </div>
+      <div class="legend-item medium">
+        <div class="legend-color"></div>
+        <div class="legend-label">Moyen (40-69)</div>
+      </div>
+      <div class="legend-item bad">
+        <div class="legend-color"></div>
+        <div class="legend-label">Critique (0-39)</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="filter-container">
+  <div class="filter-header">
+    <h3>
+      <mat-icon>filter_list</mat-icon>
+      Dashboard Filters
+    </h3>
+    <div class="filter-actions">
+      <button mat-button color="accent" class="reset-button" [disabled]="!isFilterActive" (click)="resetFilters()">
+        <mat-icon>refresh</mat-icon>
+        Reset
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-content">
+    <!-- Time Range Filter -->
+    <div class="filter-section">
+      <h4 class="filter-title">Time Range</h4>
+      <mat-button-toggle-group [value]="selectedFilters.timeRange" class="time-range-toggle">
+        <mat-button-toggle *ngFor="let option of timeRangeOptions" [value]="option.value" (click)="setTimeRange(option.value)">
+          {{ option.label }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <!-- Severity Filter -->
+    <div class="filter-section">
+      <h4 class="filter-title">Severity</h4>
+      <div class="filter-chips">
+        <div *ngFor="let severity of severityOptions"
+             class="filter-chip"
+             [class.selected]="isSeveritySelected(severity)"
+             [class]="getSeverityClass(severity)"
+             (click)="toggleSeverityFilter(severity)">
+          {{ severity }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Domain Filter -->
+    <div class="filter-section">
+      <h4 class="filter-title">Security Domains</h4>
+      <div class="filter-chips">
+        <div *ngFor="let domain of domainOptions"
+             class="filter-chip"
+             [class.selected]="isDomainSelected(domain)"
+             (click)="toggleDomainFilter(domain)">
+          {{ domain }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="filter-section">
+      <h4 class="filter-title">Status</h4>
+      <div class="filter-chips">
+        <div *ngFor="let status of statusOptions"
+             class="filter-chip"
+             [class.selected]="isStatusSelected(status)"
+             [class]="getStatusClass(status)"
+             (click)="toggleStatusFilter(status)">
+          {{ status.replace('_', ' ') | titlecase }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Region Filter -->
+    <div class="filter-section">
+      <h4 class="filter-title">Regions</h4>
+      <div class="filter-chips">
+        <div *ngFor="let region of regionOptions"
+             class="filter-chip"
+             [class.selected]="isRegionSelected(region)"
+             (click)="toggleRegionFilter(region)">
+          {{ region }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-footer" *ngIf="isFilterActive">
+    <div class="active-filters">
+      <span class="active-filter-label">Active Filters:</span>
+      <div class="active-filter-chips">
+        <div *ngFor="let severity of selectedFilters.severity" class="active-chip" [class]="getSeverityClass(severity)">
+          {{ severity }}
+          <mat-icon (click)="toggleSeverityFilter(severity)">close</mat-icon>
+        </div>
+        <div *ngFor="let domain of selectedFilters.domains" class="active-chip">
+          {{ domain }}
+          <mat-icon (click)="toggleDomainFilter(domain)">close</mat-icon>
+        </div>
+        <div *ngFor="let status of selectedFilters.status" class="active-chip" [class]="getStatusClass(status)">
+          {{ status.replace('_', ' ') | titlecase }}
+          <mat-icon (click)="toggleStatusFilter(status)">close</mat-icon>
+        </div>
+        <div *ngFor="let region of selectedFilters.regions" class="active-chip">
+          {{ region }}
+          <mat-icon (click)="toggleRegionFilter(region)">close</mat-icon>
+        </div>
+        <div *ngIf="selectedFilters.timeRange !== 'week'" class="active-chip time-range">
+          {{ getTimeRangeLabel(selectedFilters.timeRange) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

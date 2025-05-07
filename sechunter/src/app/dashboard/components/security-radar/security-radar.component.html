@@ -1,0 +1,47 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <h3>Security Posture Assessment</h3>
+    <div class="chart-actions">
+      <button mat-icon-button (click)="refreshData()" matTooltip="Refresh data">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Expand">
+        <mat-icon>fullscreen</mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="chart-content">
+    <div class="chart-wrapper">
+      <canvas #chartCanvas></canvas>
+    </div>
+    <div class="recommendations">
+      <h4>Security Recommendations</h4>
+      <div class="recommendation-list">
+        <div *ngFor="let rec of recommendations" class="recommendation-item" [ngClass]="getImpactClass(rec.impact)">
+          <div class="recommendation-category">{{ rec.category }}</div>
+          <div class="recommendation-action">{{ rec.action }}</div>
+          <div class="recommendation-impact">
+            <span class="impact-label">Impact:</span>
+            <span class="impact-value">{{ rec.impact }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-footer">
+    <div class="overall-score">
+      <div class="score-value">78</div>
+      <div class="score-label">Overall Security Score</div>
+    </div>
+    <div class="score-comparison">
+      <div class="comparison-item">
+        <span class="comparison-value">+8%</span>
+        <span class="comparison-label">Above Industry Average</span>
+      </div>
+      <div class="comparison-item">
+        <span class="comparison-value">+5%</span>
+        <span class="comparison-label">Improvement from Last Month</span>
+      </div>
+    </div>
+  </div>
+</div>
