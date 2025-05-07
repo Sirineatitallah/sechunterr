@@ -1,32 +1,298 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
-    <h2>Security Analytics Dashboard</h2>
+    <h2>Cybersecurity Analytics Dashboard</h2>
     <div class="time-selector">
-      <span>Last 7 days</span>
-      <button class="refresh-button">
+      <div class="time-range-buttons">
+        <button [class.active]="selectedTimeRange === '24h'" (click)="setTimeRange('24h')">24h</button>
+        <button [class.active]="selectedTimeRange === '7d'" (click)="setTimeRange('7d')">7d</button>
+        <button [class.active]="selectedTimeRange === '30d'" (click)="setTimeRange('30d')">30d</button>
+        <button [class.active]="selectedTimeRange === '90d'" (click)="setTimeRange('90d')">90d</button>
+      </div>
+      <button class="refresh-button" (click)="refreshData()">
         <i class="material-icons">refresh</i>
       </button>
     </div>
   </div>
 
   <div class="charts-grid">
-    <div class="chart-item chart-item-medium">
-      <app-revenue-bar-chart></app-revenue-bar-chart>
+    <!-- Threat Intelligence Charts -->
+    <div class="chart-section">
+      <h3>Threat Intelligence</h3>
+      <div class="chart-row">
+        <div class="chart-item chart-item-medium">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Threat Types Distribution</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder">
+                <div class="pie-chart-container">
+                  <!-- Placeholder for pie chart -->
+                  <div class="pie-segment" style="--percentage: 35%; --color: #ff4757; --start: 0;"></div>
+                  <div class="pie-segment" style="--percentage: 25%; --color: #ffa502; --start: 35%;"></div>
+                  <div class="pie-segment" style="--percentage: 20%; --color: #2ed573; --start: 60%;"></div>
+                  <div class="pie-segment" style="--percentage: 15%; --color: #1e90ff; --start: 80%;"></div>
+                  <div class="pie-segment" style="--percentage: 5%; --color: #a55eea; --start: 95%;"></div>
+                  <div class="pie-center"></div>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ff4757;"></span>Malware (35%)</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ffa502;"></span>Phishing (25%)</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #2ed573;"></span>DDoS (20%)</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #1e90ff;"></span>APT (15%)</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #a55eea;"></span>Other (5%)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-item chart-item-medium">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Threat Severity Trends</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder">
+                <div class="line-chart-container">
+                  <!-- Placeholder for line chart -->
+                  <div class="line-chart-grid">
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                  </div>
+                  <div class="line-chart-line critical" style="--points: '10,80 20,75 30,85 40,70 50,90 60,65 70,80 80,60 90,75'"></div>
+                  <div class="line-chart-line high" style="--points: '10,60 20,65 30,55 40,70 50,50 60,65 70,45 80,60 90,55'"></div>
+                  <div class="line-chart-line medium" style="--points: '10,40 20,45 30,35 40,50 50,30 60,45 70,25 80,40 90,35'"></div>
+                  <div class="line-chart-line low" style="--points: '10,20 20,25 30,15 40,30 50,10 60,25 70,15 80,20 90,15'"></div>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ff4757;"></span>Critical</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ffa502;"></span>High</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ffdb58;"></span>Medium</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #2ed573;"></span>Low</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="chart-item chart-item-medium">
-      <app-satisfaction-line-chart></app-satisfaction-line-chart>
+
+    <!-- Vulnerability Intelligence Charts -->
+    <div class="chart-section">
+      <h3>Vulnerability Intelligence</h3>
+      <div class="chart-row">
+        <div class="chart-item chart-item-medium">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Top Vulnerabilities by CVSS</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder">
+                <div class="horizontal-bar-chart">
+                  <div class="bar-item">
+                    <div class="bar-label">CVE-2023-23397</div>
+                    <div class="bar-container">
+                      <div class="bar-value" style="width: 98%; background-color: #ff4757;">9.8</div>
+                    </div>
+                  </div>
+                  <div class="bar-item">
+                    <div class="bar-label">CVE-2021-44228</div>
+                    <div class="bar-container">
+                      <div class="bar-value" style="width: 100%; background-color: #ff4757;">10.0</div>
+                    </div>
+                  </div>
+                  <div class="bar-item">
+                    <div class="bar-label">CVE-2023-20887</div>
+                    <div class="bar-container">
+                      <div class="bar-value" style="width: 91%; background-color: #ff4757;">9.1</div>
+                    </div>
+                  </div>
+                  <div class="bar-item">
+                    <div class="bar-label">CVE-2023-0386</div>
+                    <div class="bar-container">
+                      <div class="bar-value" style="width: 84%; background-color: #ffa502;">8.4</div>
+                    </div>
+                  </div>
+                  <div class="bar-item">
+                    <div class="bar-label">CVE-2022-3786</div>
+                    <div class="bar-container">
+                      <div class="bar-value" style="width: 75%; background-color: #ffa502;">7.5</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-item chart-item-medium">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Vulnerability Status</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder">
+                <div class="donut-chart-container">
+                  <!-- Placeholder for donut chart -->
+                  <div class="donut-segment" style="--percentage: 45%; --color: #ff4757; --start: 0;"></div>
+                  <div class="donut-segment" style="--percentage: 35%; --color: #ffa502; --start: 45%;"></div>
+                  <div class="donut-segment" style="--percentage: 20%; --color: #2ed573; --start: 80%;"></div>
+                  <div class="donut-center"></div>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ff4757;"></span>Open (45%)</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ffa502;"></span>In Progress (35%)</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #2ed573;"></span>Resolved (20%)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="chart-item chart-item-medium">
-      <app-target-reality-chart></app-target-reality-chart>
-    </div>
-    <div class="chart-item chart-item-medium">
-      <app-volume-service-chart></app-volume-service-chart>
-    </div>
-    <div class="chart-item chart-item-large">
-      <app-country-map></app-country-map>
-    </div>
-    <div class="chart-item chart-item-large">
-      <app-top-products-chart></app-top-products-chart>
+
+    <!-- Attack Surface Management Charts -->
+    <div class="chart-section">
+      <h3>Attack Surface Management</h3>
+      <div class="chart-row">
+        <div class="chart-item chart-item-large">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Global Threat Map</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder world-map">
+                <!-- Placeholder for world map -->
+                <div class="map-container">
+                  <div class="map-hotspot" style="top: 30%; left: 20%;" data-country="United States" data-count="1245"></div>
+                  <div class="map-hotspot" style="top: 25%; left: 48%;" data-country="Russia" data-count="876"></div>
+                  <div class="map-hotspot" style="top: 35%; left: 75%;" data-country="China" data-count="1032"></div>
+                  <div class="map-hotspot" style="top: 45%; left: 52%;" data-country="Iran" data-count="654"></div>
+                  <div class="map-hotspot" style="top: 60%; left: 70%;" data-country="North Korea" data-count="432"></div>
+                  <div class="map-hotspot" style="top: 38%; left: 45%;" data-country="Eastern Europe" data-count="567"></div>
+                  <div class="map-hotspot" style="top: 65%; left: 25%;" data-country="Brazil" data-count="321"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-item chart-item-medium">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Asset Security Status</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder">
+                <div class="stacked-bar-chart">
+                  <div class="stacked-bar-item">
+                    <div class="bar-label">Servers</div>
+                    <div class="bar-container">
+                      <div class="bar-segment" style="width: 20%; background-color: #ff4757;"></div>
+                      <div class="bar-segment" style="width: 15%; background-color: #ffa502;"></div>
+                      <div class="bar-segment" style="width: 65%; background-color: #2ed573;"></div>
+                    </div>
+                  </div>
+                  <div class="stacked-bar-item">
+                    <div class="bar-label">Applications</div>
+                    <div class="bar-container">
+                      <div class="bar-segment" style="width: 30%; background-color: #ff4757;"></div>
+                      <div class="bar-segment" style="width: 25%; background-color: #ffa502;"></div>
+                      <div class="bar-segment" style="width: 45%; background-color: #2ed573;"></div>
+                    </div>
+                  </div>
+                  <div class="stacked-bar-item">
+                    <div class="bar-label">Endpoints</div>
+                    <div class="bar-container">
+                      <div class="bar-segment" style="width: 15%; background-color: #ff4757;"></div>
+                      <div class="bar-segment" style="width: 20%; background-color: #ffa502;"></div>
+                      <div class="bar-segment" style="width: 65%; background-color: #2ed573;"></div>
+                    </div>
+                  </div>
+                  <div class="stacked-bar-item">
+                    <div class="bar-label">Cloud</div>
+                    <div class="bar-container">
+                      <div class="bar-segment" style="width: 10%; background-color: #ff4757;"></div>
+                      <div class="bar-segment" style="width: 15%; background-color: #ffa502;"></div>
+                      <div class="bar-segment" style="width: 75%; background-color: #2ed573;"></div>
+                    </div>
+                  </div>
+                  <div class="stacked-bar-item">
+                    <div class="bar-label">Network</div>
+                    <div class="bar-container">
+                      <div class="bar-segment" style="width: 5%; background-color: #ff4757;"></div>
+                      <div class="bar-segment" style="width: 10%; background-color: #ffa502;"></div>
+                      <div class="bar-segment" style="width: 85%; background-color: #2ed573;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ff4757;"></span>Vulnerable</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #ffa502;"></span>At Risk</div>
+                  <div class="legend-item"><span class="legend-color" style="background-color: #2ed573;"></span>Secure</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-item chart-item-medium">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Security Incidents by Type</h4>
+              <button class="chart-action" title="Download Data">
+                <i class="material-icons">download</i>
+              </button>
+            </div>
+            <div class="chart-content">
+              <div class="chart-placeholder">
+                <div class="radar-chart-container">
+                  <!-- Placeholder for radar chart -->
+                  <div class="radar-grid">
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                    <div class="radar-axis"></div>
+                    <div class="radar-axis" style="transform: rotate(60deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(120deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(180deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(240deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(300deg);"></div>
+                  </div>
+                  <div class="radar-data" style="--points: '50,10 80,30 65,60 30,70 20,40 35,20'"></div>
+                  <div class="radar-labels">
+                    <div class="radar-label" style="top: 5%; left: 50%;">Malware</div>
+                    <div class="radar-label" style="top: 25%; left: 85%;">Phishing</div>
+                    <div class="radar-label" style="top: 65%; left: 85%;">Unauthorized Access</div>
+                    <div class="radar-label" style="top: 85%; left: 50%;">Data Breach</div>
+                    <div class="radar-label" style="top: 65%; left: 15%;">DDoS</div>
+                    <div class="radar-label" style="top: 25%; left: 15%;">Insider Threat</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

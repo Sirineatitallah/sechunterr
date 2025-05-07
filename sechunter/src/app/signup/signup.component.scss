@@ -33,6 +33,19 @@
   }
 }
 
+// Fullscreen control
+.fullscreen-control {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
 .auth-card {
   position: relative;
   width: 100%;

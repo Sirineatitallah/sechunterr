@@ -1,6 +1,12 @@
 <div class="asm-dashboard">
   <div class="dashboard-header">
-    <h2>Attack Surface Management</h2>
+    <div class="header-left">
+      <a [routerLink]="['/dashboard/main']" [queryParams]="{from: 'asm'}" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Retour au Dashboard</span>
+      </a>
+      <h2>Attack Surface Management</h2>
+    </div>
     <div class="dashboard-controls">
       <div class="time-range-selector">
         <span class="control-label">Période:</span>

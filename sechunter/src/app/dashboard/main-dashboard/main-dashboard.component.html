@@ -5,21 +5,14 @@
   </aside>
 
   <!-- Main Content (Right) -->
-  <main class="dashboard-main">
-    <!-- Dashboard Header -->
-    <header class="dashboard-header">
-      <h1>Security Operations</h1>
-      <div class="header-actions">
-        <button mat-button color="primary" class="cyber-button">
-          <mat-icon>refresh</mat-icon>
-          Refresh Data
-        </button>
-        <button mat-button color="accent" class="cyber-button">
-          <mat-icon>add</mat-icon>
-          Nouveau Rapport
-        </button>
-      </div>
-    </header>
+  <main class="dashboard-main no-header">
+    <!-- Back button - shown conditionally based on source -->
+    <div class="back-button-container" *ngIf="showBackButton">
+      <a [routerLink]="['/dashboard/' + sourceModule]" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Retour à {{ getModuleDisplayName() }}</span>
+      </a>
+    </div>
 
     <!-- Instance Manager Section -->
     <section class="instance-manager">

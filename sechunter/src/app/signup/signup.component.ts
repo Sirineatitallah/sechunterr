@@ -2,13 +2,15 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FullscreenService } from '../core/services/fullscreen.service';
+import { FullscreenButtonComponent } from '../shared/components/fullscreen-button/fullscreen-button.component';
 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, FullscreenButtonComponent]
 })
 export class SignupComponent {
   signupForm: FormGroup;
@@ -29,7 +31,8 @@ export class SignupComponent {
   hasSpecialChar = false;
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private fullscreenService: FullscreenService
   ) {
     this.signupForm = this.fb.group({
       id: ['', [Validators.required, Validators.email]],

@@ -3,6 +3,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
+import { GlobalDataService, SecurityThreat, SecurityVulnerability } from '../../../../core/services/global-data.service';
 
 // Import CTI visualization components
 import { ThreatMapComponent } from '../../../../cti/components/threat-map/threat-map.component';
@@ -56,6 +58,7 @@ interface IocStats {
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    RouterModule,
     DatePipe,
     ThreatMapComponent,
     MitreHeatmapComponent,
@@ -75,10 +78,10 @@ export class CtiComponent implements OnInit {
   selectedTimeRange: string = '7d';
 
   // Recent threats
-  recentThreats: Threat[] = [];
+  recentThreats: SecurityThreat[] = [];
 
   // Top vulnerabilities
-  topVulnerabilities: Vulnerability[] = [];
+  topVulnerabilities: SecurityVulnerability[] = [];
 
   // Threat actors
   threatActors: ThreatActor[] = [];
@@ -91,10 +94,19 @@ export class CtiComponent implements OnInit {
     urls: 0
   };
 
-  constructor() { }
+  constructor(private globalDataService: GlobalDataService) { }
 
   ngOnInit(): void {
-    // Initialize mock data
+    // Subscribe to global data service
+    this.globalDataService.threats$.subscribe(threats => {
+      this.recentThreats = threats;
+    });
+
+    this.globalDataService.vulnerabilities$.subscribe(vulnerabilities => {
+      this.topVulnerabilities = vulnerabilities;
+    });
+
+    // Initialize other data
     this.initMockData();
   }
 
@@ -107,9 +119,12 @@ export class CtiComponent implements OnInit {
 
   // Refresh all data
   refreshAll(): void {
-    // In a real application, this would call APIs to refresh data
+    // Refresh global data
+    this.globalDataService.refreshAllData();
+
+    // Refresh local data
     console.log('Refreshing all data for time range:', this.selectedTimeRange);
-    this.initMockData(); // For demo, just reinitialize mock data
+    this.initMockData(); // For demo, just reinitialize mock data for non-global data
   }
 
   // Get icon for threat type
@@ -128,88 +143,8 @@ export class CtiComponent implements OnInit {
 
   // Initialize mock data for demo
   private initMockData(): void {
-    // Mock recent threats
-    this.recentThreats = [
-      {
-        id: 't1',
-        title: 'Campagne de phishing ciblant le secteur financier',
-        type: 'phishing',
-        severity: 'high',
-        source: 'OSINT',
-        timestamp: new Date(2023, 4, 15, 9, 30)
-      },
-      {
-        id: 't2',
-        title: 'Nouvelle variante de ransomware détectée',
-        type: 'ransomware',
-        severity: 'critical',
-        source: 'Darkweb',
-        timestamp: new Date(2023, 4, 14, 14, 45)
-      },
-      {
-        id: 't3',
-        title: 'Attaque DDoS contre infrastructure cloud',
-        type: 'ddos',
-        severity: 'medium',
-        source: 'Partenaire',
-        timestamp: new Date(2023, 4, 13, 11, 20)
-      },
-      {
-        id: 't4',
-        title: 'Malware ciblant les systèmes industriels',
-        type: 'malware',
-        severity: 'high',
-        source: 'Analyse interne',
-        timestamp: new Date(2023, 4, 12, 16, 10)
-      },
-      {
-        id: 't5',
-        title: 'Activité APT détectée dans le secteur énergétique',
-        type: 'apt',
-        severity: 'critical',
-        source: 'Renseignement',
-        timestamp: new Date(2023, 4, 11, 8, 15)
-      }
-    ];
-
-    // Mock top vulnerabilities
-    this.topVulnerabilities = [
-      {
-        id: 'v1',
-        title: 'Exécution de code à distance dans Microsoft Exchange',
-        cve: 'CVE-2023-23397',
-        cvss: 9.8,
-        severity: 'critical'
-      },
-      {
-        id: 'v2',
-        title: 'Vulnérabilité d\'élévation de privilèges dans Linux Kernel',
-        cve: 'CVE-2023-0386',
-        cvss: 8.4,
-        severity: 'high'
-      },
-      {
-        id: 'v3',
-        title: 'Faille de sécurité dans Apache Log4j',
-        cve: 'CVE-2021-44228',
-        cvss: 10.0,
-        severity: 'critical'
-      },
-      {
-        id: 'v4',
-        title: 'Vulnérabilité dans OpenSSL',
-        cve: 'CVE-2022-3786',
-        cvss: 7.5,
-        severity: 'high'
-      },
-      {
-        id: 'v5',
-        title: 'Faille dans VMware vCenter Server',
-        cve: 'CVE-2023-20887',
-        cvss: 9.1,
-        severity: 'critical'
-      }
-    ];
+    // We no longer need to mock threats and vulnerabilities as they come from the global service
+    // Only initialize data that's specific to this component
 
     // Mock threat actors
     this.threatActors = [

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { RouterModule } from '@angular/router';
+import { FullscreenService } from '../core/services/fullscreen.service';
+import { FullscreenButtonComponent } from '../shared/components/fullscreen-button/fullscreen-button.component';
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
@@ -12,7 +14,8 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    RouterModule
+    RouterModule,
+    FullscreenButtonComponent
   ],
   animations: [
     trigger('fadeIn', [
@@ -41,7 +44,8 @@ export class AuthComponent implements OnInit {
   hasSpecialChar = false;
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private fullscreenService: FullscreenService
   ) {
     this.loginForm = this.fb.group({
       id: ['', [Validators.required]],

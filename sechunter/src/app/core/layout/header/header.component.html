@@ -1,0 +1,97 @@
+<header class="app-header">
+  <div class="header-container">
+    <div class="branding">
+      <img src="/./../src/assets/logo.png" alt="SecHunter Logo" class="logo">
+      <h1 class="app-name">SecHunter</h1>
+    </div>
+
+    <div class="search-container">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Rechercher des vulnérabilités, menaces, actifs..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()">
+
+        <div class="search-predictions" *ngIf="searchPredictions.length > 0">
+          <div
+            class="prediction-item"
+            *ngFor="let prediction of searchPredictions"
+            (click)="selectPrediction(prediction)">
+            {{ prediction }}
+          </div>
+        </div>
+      </div>
+
+      <div class="search-filters">
+        <mat-checkbox [(ngModel)]="filters.asm">ASM</mat-checkbox>
+        <mat-checkbox [(ngModel)]="filters.vi">VI</mat-checkbox>
+        <mat-checkbox [(ngModel)]="filters.cti">CTI</mat-checkbox>
+        <mat-checkbox [(ngModel)]="filters.soar">SOAR</mat-checkbox>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="instance-selector">
+        <mat-form-field appearance="outline">
+          <mat-select placeholder="Sélectionner une instance" [(ngModel)]="selectedInstance">
+            <mat-option *ngFor="let instance of instances" [value]="instance.id">
+              {{ instance.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="system-status">
+        <div class="status-label">Statut Système</div>
+        <mat-progress-bar mode="determinate" [value]="systemStatus"></mat-progress-bar>
+        <div class="status-value">{{ systemStatus }}%</div>
+      </div>
+
+      <div class="quick-actions">
+        <button mat-button class="new-report-btn" [class.hover]="hoverNewReport" (mouseenter)="hoverNewReport = true" (mouseleave)="hoverNewReport = false">
+          <mat-icon>add</mat-icon>
+          Nouveau Rapport
+        </button>
+
+        <button mat-icon-button class="alerts-btn" (click)="openAlerts()">
+          <mat-icon class="rotating-icon">notifications</mat-icon>
+          <span class="badge" *ngIf="alertCount > 0">{{ alertCount }}</span>
+        </button>
+
+        <button mat-icon-button class="info-btn">
+          <mat-icon>info</mat-icon>
+        </button>
+      </div>
+
+      <div class="user-menu">
+        <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+          <img [src]="userAvatar" alt="User Avatar" class="user-avatar">
+          <span class="user-name">Admin</span>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu" class="user-dropdown">
+          <button mat-menu-item>
+            <mat-icon>person</mat-icon>
+            <span>Mon Profil</span>
+          </button>
+          <button mat-menu-item (click)="openSettings()">
+            <mat-icon>settings</mat-icon>
+            <span>Paramètres</span>
+          </button>
+          <button mat-menu-item (click)="toggleDarkMode()">
+            <mat-icon>{{ darkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            <span>{{ darkMode ? 'Mode Clair' : 'Mode Sombre' }}</span>
+          </button>
+          <mat-divider ></mat-divider>
+          <button mat-menu-item (click)="logout()" routerLink="/auth">
+            <mat-icon>exit_to_app</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </div>
+</header>

@@ -15,21 +15,52 @@
   padding: 1rem 1.5rem;
   background: rgba(10, 14, 31, 0.5);
   border-bottom: 1px solid rgba(0, 243, 255, 0.1);
-  
+
   h3 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
     color: #ffffff;
   }
-  
+
   .chart-actions {
     display: flex;
     gap: 0.5rem;
-    
+    align-items: center;
+
+    .filter-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-right: 0.5rem;
+
+      .filter-field {
+        width: 120px;
+        font-size: 0.8rem;
+
+        ::ng-deep {
+          .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+          }
+
+          .mat-mdc-text-field-wrapper {
+            background-color: rgba(16, 18, 27, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+          }
+
+          .mat-mdc-form-field-flex {
+            padding: 0 8px;
+          }
+
+          .mat-mdc-select-value, .mat-mdc-select-arrow, .mat-mdc-form-field-label {
+            color: #e1e1e6;
+          }
+        }
+      }
+    }
+
     button {
       color: #e1e1e6;
-      
+
       &:hover {
         color: #00f3ff;
       }
@@ -40,64 +71,64 @@
 .chart-content {
   flex: 1;
   display: flex;
-  
+
   .map-container {
     flex: 1;
     height: 100%;
     min-height: 300px;
-    
+
     ::ng-deep {
       .leaflet-container {
         background-color: #10121b;
       }
-      
+
       .leaflet-control-zoom {
         border: none;
         margin: 15px 15px 0 0;
-        
+
         a {
           background-color: rgba(16, 18, 27, 0.8);
           color: #e1e1e6;
           border: 1px solid rgba(0, 243, 255, 0.3);
-          
+
           &:hover {
             background-color: rgba(0, 243, 255, 0.2);
           }
         }
       }
-      
+
       .custom-tooltip {
         background: rgba(16, 18, 27, 0.9);
         border: 1px solid rgba(0, 243, 255, 0.3);
         border-radius: 4px;
         padding: 0;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        
+
         .leaflet-tooltip-content {
           padding: 0;
         }
-        
+
         .map-tooltip {
           padding: 0.75rem;
-          
+
           .tooltip-country {
             font-weight: 600;
             color: #ffffff;
             margin-bottom: 0.25rem;
           }
-          
+
           .tooltip-count {
             color: #00f3ff;
             margin-bottom: 0.25rem;
           }
-          
+
           .tooltip-percentage {
             font-size: 0.8rem;
             color: #a8a3a3;
           }
         }
       }
-      
+
       .threat-marker-container {
         .threat-marker {
           width: 10px;
@@ -110,28 +141,28 @@
       }
     }
   }
-  
+
   .threat-sources {
     width: 250px;
     padding: 1rem;
     border-left: 1px solid rgba(0, 243, 255, 0.1);
     display: flex;
     flex-direction: column;
-    
+
     h4 {
       margin: 0 0 1rem 0;
       font-size: 1rem;
       font-weight: 500;
       color: #ffffff;
     }
-    
+
     .source-list {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       overflow-y: auto;
-      
+
       .source-item {
         display: flex;
         align-items: center;
@@ -139,33 +170,75 @@
         background: rgba(16, 18, 27, 0.5);
         border-radius: 8px;
         border-left: 3px solid;
-        
+
         .source-info {
           flex: 1;
-          
+
           .source-country {
             font-weight: 500;
             color: #ffffff;
             margin-bottom: 0.25rem;
           }
-          
+
           .source-count {
             font-size: 0.8rem;
             color: #a8a3a3;
           }
+
+          .source-risk {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+
+            .risk-label {
+              color: #a8a3a3;
+              margin-right: 0.25rem;
+            }
+
+            .risk-value {
+              color: #ffffff;
+              margin-right: 0.5rem;
+            }
+
+            .risk-trend {
+              display: flex;
+              align-items: center;
+
+              &.trend-up {
+                color: #ff4757;
+              }
+
+              &.trend-down {
+                color: #2ed573;
+              }
+
+              mat-icon {
+                font-size: 14px;
+                width: 14px;
+                height: 14px;
+                margin-right: 0.1rem;
+              }
+            }
+          }
         }
-        
+
         .source-percentage {
           font-weight: 600;
           color: #00f3ff;
           margin-right: 0.5rem;
         }
-        
+
+        &:hover {
+          background: rgba(16, 18, 27, 0.7);
+          cursor: pointer;
+        }
+
         .source-toggle {
           width: 30px;
           height: 30px;
           line-height: 30px;
-          
+
           mat-icon {
             font-size: 18px;
             width: 18px;
@@ -185,32 +258,32 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .total-threats {
     display: flex;
     flex-direction: column;
-    
+
     .total-value {
       font-size: 1.5rem;
       font-weight: 700;
       color: #00f3ff;
       line-height: 1;
     }
-    
+
     .total-label {
       font-size: 0.8rem;
       color: #a8a3a3;
       margin-top: 0.25rem;
     }
   }
-  
+
   .map-controls {
     .control-hint {
       display: flex;
       align-items: center;
       font-size: 0.8rem;
       color: #a8a3a3;
-      
+
       mat-icon {
         font-size: 16px;
         height: 16px;
@@ -236,15 +309,167 @@
   }
 }
 
+// Loading overlay
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 14, 31, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+
+  span {
+    margin-top: 1rem;
+    color: #ffffff;
+    font-size: 0.9rem;
+  }
+}
+
+// Drill-down overlay
+.drill-down-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(10, 14, 31, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+
+  .drill-down-container {
+    width: 90%;
+    max-width: 1200px;
+    height: 90%;
+    max-height: 800px;
+    animation: slideUp 0.3s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Severity-specific marker styles
+::ng-deep {
+  .threat-marker {
+    &.critical {
+      background-color: rgba(255, 71, 87, 0.9);
+      box-shadow: 0 0 15px rgba(255, 71, 87, 0.7);
+      animation: pulse 1s infinite;
+    }
+
+    &.high {
+      background-color: rgba(255, 107, 107, 0.9);
+      box-shadow: 0 0 12px rgba(255, 107, 107, 0.6);
+      animation: pulse 1.5s infinite;
+    }
+
+    &.medium {
+      background-color: rgba(255, 165, 2, 0.9);
+      box-shadow: 0 0 10px rgba(255, 165, 2, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    &.low {
+      background-color: rgba(46, 213, 115, 0.9);
+      box-shadow: 0 0 8px rgba(46, 213, 115, 0.4);
+      animation: pulse 2.5s infinite;
+    }
+  }
+
+  .event-tooltip {
+    padding: 0.75rem;
+
+    .event-severity {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+
+      &.critical {
+        color: #ff4757;
+      }
+
+      &.high {
+        color: #ff6b6b;
+      }
+
+      &.medium {
+        color: #ffa502;
+      }
+
+      &.low {
+        color: #2ed573;
+      }
+    }
+
+    .event-type {
+      font-weight: 500;
+      color: #ffffff;
+      margin-bottom: 0.25rem;
+    }
+
+    .event-description {
+      font-size: 0.8rem;
+      color: #e1e1e6;
+      margin-bottom: 0.25rem;
+    }
+
+    .event-time {
+      font-size: 0.7rem;
+      color: #a8a3a3;
+    }
+  }
+}
+
 // Responsive adjustments
 @media (max-width: 768px) {
   .chart-content {
     flex-direction: column;
-    
+
     .threat-sources {
       width: auto;
       border-left: none;
       border-top: 1px solid rgba(0, 243, 255, 0.1);
+    }
+  }
+
+  .chart-header {
+    .chart-actions {
+      .filter-controls {
+        display: none;
+      }
+    }
+  }
+
+  .drill-down-overlay {
+    .drill-down-container {
+      width: 95%;
+      height: 95%;
     }
   }
 }

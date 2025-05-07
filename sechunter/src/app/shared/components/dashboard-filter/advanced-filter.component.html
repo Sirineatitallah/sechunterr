@@ -1,0 +1,192 @@
+<div class="advanced-filter-container">
+  <!-- Top Filter Bar -->
+  <div class="filter-bar">
+    <!-- Search Input -->
+    <div class="search-container" *ngIf="showSearch">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" placeholder="Rechercher...">
+        <button *ngIf="searchQuery" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- Time Range Selector -->
+    <div class="time-range-container" *ngIf="showTimeRange">
+      <span class="time-range-label">Période:</span>
+      <div class="time-range-buttons">
+        <button 
+          *ngFor="let range of timeRanges"
+          [class.active]="selectedTimeRange.id === range.id"
+          (click)="setTimeRange(range)"
+          [matTooltip]="range.id === 'custom' ? 'Sélectionner une période personnalisée' : ''"
+          class="time-range-button">
+          {{ range.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Advanced Filters Toggle -->
+    <div class="advanced-filters-toggle" *ngIf="showAdvancedFilters">
+      <button mat-button color="primary" (click)="toggleAdvancedFilters()">
+        <mat-icon>{{ advancedFiltersExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+        Filtres avancés
+      </button>
+    </div>
+
+    <!-- Reset Filters Button -->
+    <div class="reset-filters">
+      <button mat-button color="warn" (click)="resetAllFilters()" [disabled]="activeFilters.length === 0 && !searchQuery">
+        <mat-icon>refresh</mat-icon>
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Active Filters -->
+  <div class="active-filters" *ngIf="activeFilters.length > 0">
+    <span class="active-filters-label">Filtres actifs:</span>
+    <mat-chip-set>
+      <mat-chip *ngFor="let filter of activeFilters" (removed)="removeFilter(filter.key)">
+        <strong>{{ filter.label }}:</strong> {{ filter.value }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip>
+    </mat-chip-set>
+  </div>
+
+  <!-- Advanced Filters Panel -->
+  <div class="advanced-filters-panel" *ngIf="advancedFiltersExpanded && showAdvancedFilters">
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="filter-grid">
+        <ng-container *ngFor="let filter of filters">
+          <!-- Select Filter -->
+          <mat-form-field *ngIf="filter.type === 'select'" appearance="outline" class="filter-field">
+            <mat-label>{{ filter.label }}</mat-label>
+            <mat-select [formControlName]="filter.id" [placeholder]="filter.placeholder || ''">
+              <mat-option value="">Tous</mat-option>
+              
+              <!-- Grouped Options -->
+              <ng-container *ngIf="hasGroupedOptions(filter.options || [])">
+                <ng-container *ngFor="let group of getOptionGroups(filter.options || []) | keyvalue">
+                  <mat-optgroup [label]="group.key === 'default' ? '' : group.key">
+                    <mat-option *ngFor="let option of group.value" [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  </mat-optgroup>
+                </ng-container>
+              </ng-container>
+              
+              <!-- Ungrouped Options -->
+              <ng-container *ngIf="!hasGroupedOptions(filter.options || [])">
+                <mat-option *ngFor="let option of filter.options" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Multiselect Filter -->
+          <mat-form-field *ngIf="filter.type === 'multiselect'" appearance="outline" class="filter-field">
+            <mat-label>{{ filter.label }}</mat-label>
+            <mat-select [formControlName]="filter.id" [placeholder]="filter.placeholder || ''" multiple>
+              <!-- Grouped Options -->
+              <ng-container *ngIf="hasGroupedOptions(filter.options || [])">
+                <ng-container *ngFor="let group of getOptionGroups(filter.options || []) | keyvalue">
+                  <mat-optgroup [label]="group.key === 'default' ? '' : group.key">
+                    <mat-option *ngFor="let option of group.value" [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  </mat-optgroup>
+                </ng-container>
+              </ng-container>
+              
+              <!-- Ungrouped Options -->
+              <ng-container *ngIf="!hasGroupedOptions(filter.options || [])">
+                <mat-option *ngFor="let option of filter.options" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Text Filter -->
+          <mat-form-field *ngIf="filter.type === 'text'" appearance="outline" class="filter-field">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input matInput [formControlName]="filter.id" [placeholder]="filter.placeholder || ''">
+          </mat-form-field>
+
+          <!-- Number Filter -->
+          <mat-form-field *ngIf="filter.type === 'number'" appearance="outline" class="filter-field">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input matInput type="number" [formControlName]="filter.id" [placeholder]="filter.placeholder || ''">
+          </mat-form-field>
+
+          <!-- Date Filter -->
+          <mat-form-field *ngIf="filter.type === 'date'" appearance="outline" class="filter-field">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input matInput [matDatepicker]="picker" [formControlName]="filter.id" [placeholder]="filter.placeholder || ''">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Date Range Filter -->
+          <div *ngIf="filter.type === 'daterange'" class="date-range-field filter-field">
+            <span class="date-range-label">{{ filter.label }}</span>
+            <div class="date-range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Début</mat-label>
+                <input matInput [matDatepicker]="startPicker" [formControlName]="filter.id + 'Start'">
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+              </mat-form-field>
+              <span class="date-range-separator">-</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Fin</mat-label>
+                <input matInput [matDatepicker]="endPicker" [formControlName]="filter.id + 'End'">
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Range Filter -->
+          <div *ngIf="filter.type === 'range'" class="range-field filter-field">
+            <span class="range-label">{{ filter.label }}</span>
+            <mat-slider
+              [min]="filter.min || 0"
+              [max]="filter.max || 100"
+              [step]="filter.step || 1"
+              [discrete]="true">
+              <input matSliderStartThumb [formControlName]="filter.id + 'Min'">
+              <input matSliderEndThumb [formControlName]="filter.id + 'Max'">
+            </mat-slider>
+            <div class="range-values">
+              <span>{{ filterForm.get(filter.id + 'Min')?.value || filter.min || 0 }}</span>
+              <span>{{ filterForm.get(filter.id + 'Max')?.value || filter.max || 100 }}</span>
+            </div>
+          </div>
+
+          <!-- Boolean Filter -->
+          <div *ngIf="filter.type === 'boolean'" class="boolean-field filter-field">
+            <mat-checkbox [formControlName]="filter.id">{{ filter.label }}</mat-checkbox>
+          </div>
+
+          <!-- Autocomplete Filter -->
+          <mat-form-field *ngIf="filter.type === 'autocomplete'" appearance="outline" class="filter-field">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input type="text" matInput [formControlName]="filter.id" [matAutocomplete]="auto" [placeholder]="filter.placeholder || ''">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let option of filteredOptions[filter.id] | async" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </ng-container>
+      </div>
+    </form>
+  </div>
+</div>

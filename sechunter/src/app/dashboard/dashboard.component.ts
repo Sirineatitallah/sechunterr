@@ -7,6 +7,8 @@ import { WidgetPosition } from '../core/models/widget-position.model';
 import { MicroserviceConnectorService, MicroserviceType } from '../core/services/microservice-connector.service';
 import { DashboardService } from './services/dashboard.service';
 import { AuthService } from '../core/services/auth.service';
+import { FullscreenService } from '../core/services/fullscreen.service';
+import { FullscreenButtonComponent } from '../shared/components/fullscreen-button/fullscreen-button.component';
 import { Subscription, debounceTime } from 'rxjs';
 // These components are no longer used directly in the template
 // import { FavoritesQuickWidgetsComponent } from "./components/favorites-quick-widgets/favorites-quick-widgets.component";
@@ -29,7 +31,8 @@ interface DashboardItem extends GridsterItem, WidgetPosition {
   imports: [
     CommonModule,
     GridsterModule,
-    RouterModule
+    RouterModule,
+    FullscreenButtonComponent
     // These components are no longer used directly in the template
     // FavoritesQuickWidgetsComponent,
     // InstanceManagerComponent,
@@ -82,7 +85,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly microserviceConnector: MicroserviceConnectorService,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
+    private readonly fullscreenService: FullscreenService
   ) {}
 
   ngOnInit() {

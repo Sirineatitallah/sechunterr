@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
+import { GlobalDataService, SecurityIncident } from '../../../../core/services/global-data.service';
 
 // Interfaces
 interface TimeRange {
@@ -31,6 +33,29 @@ interface Incident {
   status: string;
   assignee: User;
   timeElapsed: string;
+}
+
+// Map from SecurityIncident to Incident
+function mapSecurityIncidentToIncident(incident: SecurityIncident, users: User[]): Incident {
+  // Assign a random user for demo purposes
+  const randomUser = users[Math.floor(Math.random() * users.length)];
+
+  // Calculate time elapsed
+  const now = new Date();
+  const incidentTime = new Date(incident.timestamp);
+  const diffMs = now.getTime() - incidentTime.getTime();
+  const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const timeElapsed = `${diffHrs}h ${diffMins}m`;
+
+  return {
+    id: incident.id,
+    title: incident.title,
+    severity: incident.severity,
+    status: incident.status,
+    assignee: randomUser,
+    timeElapsed: timeElapsed
+  };
 }
 
 interface Playbook {
@@ -70,7 +95,8 @@ interface Analytics {
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    RouterModule
   ],
   templateUrl: './soar.component.html',
   styleUrl: './soar.component.scss'
@@ -108,10 +134,24 @@ export class SoarComponent implements OnInit {
     incidentTypes: []
   };
 
-  constructor() { }
+  constructor(private globalDataService: GlobalDataService) { }
 
   ngOnInit(): void {
-    // Initialize mock data
+    // Subscribe to global data service for incidents
+    this.globalDataService.incidents$.subscribe(incidents => {
+      // Get mock users for assignees
+      const mockUsers = this.getMockUsers();
+
+      // Map security incidents to our incident format
+      this.activeIncidents = incidents
+        .filter(incident => incident.status !== 'resolved')
+        .map(incident => mapSecurityIncidentToIncident(incident, mockUsers));
+
+      // Update incident summary
+      this.updateIncidentSummary(incidents);
+    });
+
+    // Initialize other mock data
     this.initMockData();
   }
 
@@ -124,9 +164,38 @@ export class SoarComponent implements OnInit {
 
   // Refresh all data
   refreshAll(): void {
-    // In a real application, this would call APIs to refresh data
+    // Refresh global data
+    this.globalDataService.refreshAllData();
+
+    // Refresh local data
     console.log('Refreshing all data for time range:', this.selectedTimeRange);
-    this.initMockData(); // For demo, just reinitialize mock data
+    this.initMockData(); // For demo, just reinitialize mock data for non-global data
+  }
+
+  // Get mock users for assignees
+  private getMockUsers(): User[] {
+    return [
+      { id: 'u1', name: 'Thomas Dubois', color: '#4a90e2' },
+      { id: 'u2', name: 'Sophie Martin', color: '#50e3c2' },
+      { id: 'u3', name: 'Jean Dupont', color: '#f5a623' },
+      { id: 'u4', name: 'Marie Leroy', color: '#9013fe' }
+    ];
+  }
+
+  // Update incident summary based on incidents
+  private updateIncidentSummary(incidents: SecurityIncident[]): void {
+    const totalIncidents = incidents.length;
+    const criticalIncidents = incidents.filter(i => i.severity === 'critical').length;
+    const openIncidents = incidents.filter(i => i.status !== 'resolved').length;
+    const resolvedIncidents = incidents.filter(i => i.status === 'resolved').length;
+
+    this.incidentSummary = {
+      totalIncidents,
+      criticalIncidents,
+      openIncidents,
+      resolvedIncidents,
+      trend: -12 // Mock trend for demo
+    };
   }
 
   // Get max value from history array for charts
@@ -169,58 +238,8 @@ export class SoarComponent implements OnInit {
 
   // Initialize mock data for demo
   private initMockData(): void {
-    // Mock incident summary
-    this.incidentSummary = {
-      totalIncidents: 124,
-      criticalIncidents: 18,
-      openIncidents: 42,
-      resolvedIncidents: 82,
-      trend: -12
-    };
-
-    // Mock active incidents
-    this.activeIncidents = [
-      {
-        id: 'INC-1024',
-        title: 'Tentative d\'accès non autorisé au serveur de production',
-        severity: 'critical',
-        status: 'investigating',
-        assignee: { id: 'u1', name: 'Thomas Dubois', color: '#4a90e2' },
-        timeElapsed: '1h 24m'
-      },
-      {
-        id: 'INC-1023',
-        title: 'Alerte de malware détectée sur poste de travail',
-        severity: 'high',
-        status: 'in-progress',
-        assignee: { id: 'u2', name: 'Sophie Martin', color: '#50e3c2' },
-        timeElapsed: '2h 15m'
-      },
-      {
-        id: 'INC-1022',
-        title: 'Activité suspecte sur compte administrateur',
-        severity: 'medium',
-        status: 'pending',
-        assignee: { id: 'u3', name: 'Jean Dupont', color: '#f5a623' },
-        timeElapsed: '3h 42m'
-      },
-      {
-        id: 'INC-1021',
-        title: 'Tentative de phishing détectée',
-        severity: 'high',
-        status: 'in-progress',
-        assignee: { id: 'u4', name: 'Marie Leroy', color: '#9013fe' },
-        timeElapsed: '4h 10m'
-      },
-      {
-        id: 'INC-1020',
-        title: 'Anomalie de trafic réseau détectée',
-        severity: 'medium',
-        status: 'investigating',
-        assignee: { id: 'u1', name: 'Thomas Dubois', color: '#4a90e2' },
-        timeElapsed: '5h 35m'
-      }
-    ];
+    // We no longer need to mock incidents as they come from the global service
+    // Only initialize data that's specific to this component
 
     // Mock playbooks
     this.playbooks = [

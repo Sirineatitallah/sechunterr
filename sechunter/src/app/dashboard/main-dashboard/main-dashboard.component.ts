@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../components/sidebar/sidebar.component';
 import { DashboardFilterComponent } from '../components/dashboard-filter/dashboard-filter.component';
 import { DrillDownViewComponent } from '../components/drill-down-view/drill-down-view.component';
@@ -106,9 +106,27 @@ export class MainDashboardComponent implements OnInit {
   // Drill-down state
   isDrillDownActive = false;
 
-  constructor(private dashboardDataService: DashboardDataService) { }
+  // Flag to show back button
+  showBackButton = false;
+
+  // Source module (asm, cti, soar, vi)
+  sourceModule = '';
+
+  constructor(
+    private dashboardDataService: DashboardDataService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
+    // Check query parameters for source flag
+    this.route.queryParams.subscribe(params => {
+      // Get the source module
+      this.sourceModule = params['from'];
+
+      // Show back button if coming from a specific module
+      this.showBackButton = !!this.sourceModule;
+    });
+
     // Subscribe to dashboard data
     this.dashboardDataService.vulnerabilities$.subscribe(data => {
       this.vulnerabilities = data;
@@ -175,5 +193,17 @@ export class MainDashboardComponent implements OnInit {
 
   refreshData(): void {
     this.dashboardDataService.refreshData();
+  }
+
+  // Get display name for the source module
+  getModuleDisplayName(): string {
+    const moduleNames: { [key: string]: string } = {
+      'asm': 'ASM',
+      'cti': 'CTI',
+      'soar': 'SOAR',
+      'vi': 'VI'
+    };
+
+    return moduleNames[this.sourceModule] || this.sourceModule.toUpperCase();
   }
 }

@@ -123,132 +123,411 @@
 
   <!-- Visualizations Grid -->
   <div class="visualizations-grid">
-    <div class="grid-item severity-distribution">
-      <app-severity-distribution></app-severity-distribution>
-    </div>
-    <div class="grid-item monthly-trends">
-      <app-monthly-trends></app-monthly-trends>
-    </div>
-    <div class="grid-item top-vulnerabilities">
-      <app-top-vulnerabilities></app-top-vulnerabilities>
-    </div>
-    <div class="grid-item vulnerability-detail">
-      <app-vulnerability-detail></app-vulnerability-detail>
-    </div>
-  </div>
-
-  <!-- Vulnerability Categories Section -->
-  <div class="vulnerability-categories-section">
-    <h3>Catégories de Vulnérabilités</h3>
-    <div class="categories-chart">
-      <div class="chart-legend">
-        <div *ngFor="let category of vulnerabilityCategories" class="legend-item">
-          <div class="legend-color" [style.background-color]="category.color"></div>
-          <div class="legend-label">{{ category.name }}</div>
-          <div class="legend-value">{{ category.count }}</div>
-          <div class="legend-percentage">{{ (category.count / getTotalCategoryCount() * 100).toFixed(1) }}%</div>
-        </div>
-      </div>
-      <div class="chart-visual">
-        <div class="donut-chart">
-          <!-- Placeholder for actual chart implementation -->
-          <div class="donut-placeholder">
-            <div *ngFor="let category of vulnerabilityCategories; let i = index"
-                 class="donut-segment"
-                 [style.background-color]="category.color"
-                 [style.transform]="'rotate(' + getSegmentRotation(i) + 'deg)'"
-                 [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getSegmentPath(i) + ', 50% 0%)'">
-            </div>
-            <div class="donut-center">
-              <div class="center-value">{{ getTotalCategoryCount() }}</div>
-              <div class="center-label">Vulnérabilités</div>
-            </div>
+    <!-- 1. Bar Chart - Top CVEs détectées -->
+    <div class="grid-item top-cves">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Top CVEs détectées</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Remediation Progress Section -->
-  <div class="remediation-section">
-    <h3>Progression des Corrections</h3>
-    <div class="remediation-grid">
-      <div class="remediation-card">
-        <div class="card-header">
-          <h4>Taux de Correction</h4>
-          <div class="time-trend positive">
-            <mat-icon>trending_up</mat-icon>
-            <span>{{ remediationMetrics.patchRate.trend }}%</span>
-          </div>
-        </div>
-        <div class="card-value">{{ remediationMetrics.patchRate.value }}%</div>
-        <div class="card-chart">
-          <!-- Placeholder for chart -->
-          <div class="progress-chart">
-            <div class="progress-bar" [style.width]="remediationMetrics.patchRate.value + '%'"></div>
-          </div>
-        </div>
-      </div>
-      <div class="remediation-card">
-        <div class="card-header">
-          <h4>Temps Moyen de Correction</h4>
-          <div class="time-trend" [class.positive]="remediationMetrics.meanTimeToRemediate.trend < 0" [class.negative]="remediationMetrics.meanTimeToRemediate.trend > 0">
-            <mat-icon>{{ remediationMetrics.meanTimeToRemediate.trend < 0 ? 'trending_down' : 'trending_up' }}</mat-icon>
-            <span>{{ remediationMetrics.meanTimeToRemediate.trend }}%</span>
-          </div>
-        </div>
-        <div class="card-value">{{ remediationMetrics.meanTimeToRemediate.value }} jours</div>
-        <div class="card-chart">
-          <!-- Placeholder for chart -->
-          <div class="line-chart">
-            <div *ngFor="let point of remediationMetrics.meanTimeToRemediate.history; let i = index"
-                 class="chart-point"
-                 [style.left]="(i / (remediationMetrics.meanTimeToRemediate.history.length - 1) * 100) + '%'"
-                 [style.bottom]="(point / getMaxHistoryValue(remediationMetrics.meanTimeToRemediate.history) * 80) + '%'">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="remediation-card">
-        <div class="card-header">
-          <h4>Vulnérabilités par Système</h4>
-        </div>
-        <div class="card-chart">
-          <div class="systems-chart">
-            <div *ngFor="let system of remediationMetrics.vulnerabilitiesBySystem" class="system-item">
-              <div class="system-name">{{ system.name }}</div>
-              <div class="system-bar-container">
-                <div class="system-bar" [style.width]="(system.count / getMaxSystemCount() * 100) + '%'" [style.background-color]="system.color"></div>
+        <div class="chart-content">
+          <div class="bar-chart">
+            <div *ngFor="let cve of topCVEs" class="bar-item">
+              <div class="bar-label">{{ cve.id }}</div>
+              <div class="bar-container">
+                <div class="bar" [style.width]="(cve.count / getMaxCVECount() * 100) + '%'" [style.background-color]="getCVESeverityColor(cve.severity)"></div>
               </div>
-              <div class="system-count">{{ system.count }}</div>
+              <div class="bar-value">{{ cve.count }}</div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="remediation-card">
-        <div class="card-header">
-          <h4>Statut des Corrections</h4>
+        <div class="chart-footer">
+          <span class="chart-description">Les CVEs les plus fréquentes collectées (groupées par ID CVE)</span>
         </div>
-        <div class="card-chart">
-          <!-- Placeholder for chart -->
-          <div class="donut-chart">
-            <div class="donut-segments">
-              <div *ngFor="let status of remediationMetrics.remediationStatus; let i = index"
-                   class="donut-segment"
-                   [style.background-color]="status.color"
-                   [style.transform]="'rotate(' + getStatusRotation(i) + 'deg)'"
-                   [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getStatusPath(i) + ', 50% 0%)'">
+      </div>
+    </div>
+
+    <!-- 2. Pie Chart - Vulnérabilités par criticité -->
+    <div class="grid-item vulnerabilities-by-severity">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Vulnérabilités par criticité</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="pie-chart-container">
+            <div class="donut-chart">
+              <div class="donut-segments">
+                <div *ngFor="let severity of vulnerabilitiesBySeverity; let i = index"
+                     class="donut-segment"
+                     [style.background-color]="severity.color"
+                     [style.transform]="'rotate(' + getSeverityRotation(i) + 'deg)'"
+                     [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getSeverityPath(i) + ', 50% 0%)'">
+                </div>
+              </div>
+              <div class="donut-center">
+                <div class="center-value">{{ getTotalVulnerabilities() }}</div>
+                <div class="center-label">Total</div>
               </div>
             </div>
-            <div class="donut-center"></div>
-          </div>
-          <div class="donut-legend">
-            <div *ngFor="let status of remediationMetrics.remediationStatus" class="legend-item">
-              <div class="legend-color" [style.background-color]="status.color"></div>
-              <div class="legend-label">{{ status.name }}</div>
-              <div class="legend-value">{{ status.percentage }}%</div>
+            <div class="chart-legend">
+              <div *ngFor="let severity of vulnerabilitiesBySeverity" class="legend-item">
+                <div class="legend-color" [style.background-color]="severity.color"></div>
+                <div class="legend-label">{{ severity.name }}</div>
+                <div class="legend-value">{{ severity.count }}</div>
+                <div class="legend-percentage">{{ (severity.count / getTotalVulnerabilities() * 100).toFixed(1) }}%</div>
+              </div>
             </div>
           </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Répartition des vulnérabilités par niveau de sévérité</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Heatmap/Table - Source OSINT vs Volume de données -->
+    <div class="grid-item osint-sources">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Source OSINT vs Volume de données</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="heatmap-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th *ngFor="let day of lastSevenDays">{{ day }}</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let source of osintSources">
+                  <td class="source-name">{{ source.name }}</td>
+                  <td *ngFor="let volume of source.dailyVolume"
+                      [style.background-color]="getHeatmapColor(volume, getMaxDailyVolume())"
+                      class="volume-cell">
+                    {{ volume }}
+                  </td>
+                  <td class="total-volume">{{ source.totalVolume }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Volume d'items collectés par source (par jour/semaine)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Time Series - Vulnérabilités détectées / jour -->
+    <div class="grid-item daily-vulnerabilities">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Vulnérabilités détectées / jour</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="time-series-chart">
+            <div class="chart-grid">
+              <div *ngFor="let line of [1,2,3,4]" class="grid-line"></div>
+            </div>
+            <div class="chart-line">
+              <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <polyline [attr.points]="getTimeSeriesPoints(dailyVulnerabilities)"
+                          fill="none" stroke="#4a90e2" stroke-width="2"></polyline>
+              </svg>
+              <div *ngFor="let point of dailyVulnerabilities; let i = index"
+                   class="data-point"
+                   [style.left]="(i / (dailyVulnerabilities.length - 1) * 100) + '%'"
+                   [style.bottom]="(point.count / getMaxDailyVulnerabilityCount() * 80) + '%'">
+              </div>
+            </div>
+            <div class="chart-labels">
+              <div *ngFor="let point of dailyVulnerabilities; let i = index"
+                   class="date-label"
+                   [style.left]="(i / (dailyVulnerabilities.length - 1) * 100) + '%'">
+                {{ point.date }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Courbe d'évolution quotidienne des vulnérabilités détectées</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Pie Chart - Taux de vulnérabilités par famille -->
+    <div class="grid-item vulnerabilities-by-family">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Taux de vulnérabilités par famille</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="pie-chart-container">
+            <div class="donut-chart">
+              <div class="donut-segments">
+                <div *ngFor="let family of vulnerabilityCategories; let i = index"
+                     class="donut-segment"
+                     [style.background-color]="family.color"
+                     [style.transform]="'rotate(' + getSegmentRotation(i) + 'deg)'"
+                     [style.clip-path]="'polygon(50% 50%, 50% 0%, ' + getSegmentPath(i) + ', 50% 0%)'">
+                </div>
+              </div>
+              <div class="donut-center">
+                <div class="center-value">{{ getTotalCategoryCount() }}</div>
+                <div class="center-label">Total</div>
+              </div>
+            </div>
+            <div class="chart-legend">
+              <div *ngFor="let family of vulnerabilityCategories" class="legend-item">
+                <div class="legend-color" [style.background-color]="family.color"></div>
+                <div class="legend-label">{{ family.name }}</div>
+                <div class="legend-value">{{ family.count }}</div>
+                <div class="legend-percentage">{{ (family.count / getTotalCategoryCount() * 100).toFixed(1) }}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Répartition par famille (ex: XSS, SQLi, RCE, etc.)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Word Cloud - Mots-clés fréquents -->
+    <div class="grid-item frequent-keywords">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Mots-clés fréquents (tag cloud)</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="word-cloud">
+            <div *ngFor="let keyword of frequentKeywords"
+                 class="keyword"
+                 [style.font-size.px]="getKeywordSize(keyword.frequency)"
+                 [style.color]="getKeywordColor(keyword.frequency)">
+              {{ keyword.text }}
+            </div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Mots ou attributs détectés par le bot analyste</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Table - News par source -->
+    <div class="grid-item news-by-source">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>News par source (RSS/Twitter/etc.)</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="news-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Source</th>
+                  <th>Titre</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let news of latestNews">
+                  <td class="news-date">{{ news.date }}</td>
+                  <td class="news-source">
+                    <span class="source-icon" [ngClass]="'source-' + news.sourceType">
+                      <mat-icon>{{ getSourceIcon(news.sourceType) }}</mat-icon>
+                    </span>
+                    {{ news.source }}
+                  </td>
+                  <td class="news-title">{{ news.title }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Derniers items collectés avec leurs source, date et titre</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Bar Chart - Vulnérabilités par logiciel cible -->
+    <div class="grid-item vulnerabilities-by-software">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Vulnérabilités par logiciel cible</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="horizontal-bar-chart">
+            <div *ngFor="let software of vulnerabilitiesBySoftware" class="bar-item">
+              <div class="bar-label">{{ software.name }}</div>
+              <div class="bar-container">
+                <div class="bar" [style.width]="(software.count / getMaxSoftwareVulnerabilityCount() * 100) + '%'" [style.background-color]="software.color"></div>
+              </div>
+              <div class="bar-value">{{ software.count }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Histogrammes des vulnérabilités classées par logiciel ou produit affecté</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. World Map - Vulnérabilités par pays -->
+    <div class="grid-item vulnerabilities-by-country">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Vulnérabilités par pays</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="world-map">
+            <div class="map-placeholder">
+              <div class="map-container">
+                <!-- Simplified world map visualization -->
+                <div class="map-background"></div>
+                <div *ngFor="let country of vulnerabilitiesByCountry"
+                     class="map-marker"
+                     [style.left]="country.position.x + '%'"
+                     [style.top]="country.position.y + '%'"
+                     [style.width]="getMarkerSize(country.count) + 'px'"
+                     [style.height]="getMarkerSize(country.count) + 'px'"
+                     [style.background-color]="getMarkerColor(country.count)">
+                  <div class="marker-tooltip">
+                    <strong>{{ country.name }}</strong>: {{ country.count }} vulnérabilités
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="map-legend">
+              <div *ngFor="let level of countryLegendLevels" class="legend-item">
+                <div class="legend-marker" [style.background-color]="getMarkerColor(level.value)"></div>
+                <div class="legend-label">{{ level.label }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Géolocalisation des sources ou des impacts si l'info est collectée</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Stat/Gauge - État des bots -->
+    <div class="grid-item bot-status">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>État des bots (activité)</h3>
+          <div class="chart-controls">
+            <button mat-icon-button (click)="refreshAll()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="bot-status-grid">
+            <div *ngFor="let bot of botStatus" class="bot-status-card">
+              <div class="bot-icon">
+                <mat-icon>{{ getBotIcon(bot.type) }}</mat-icon>
+              </div>
+              <div class="bot-info">
+                <div class="bot-name">{{ bot.name }}</div>
+                <div class="bot-type">{{ bot.type }}</div>
+              </div>
+              <div class="bot-gauge">
+                <div class="gauge-container">
+                  <div class="gauge-fill" [style.width]="bot.activity + '%'" [ngClass]="getBotActivityClass(bot.activity)"></div>
+                </div>
+                <div class="gauge-value">{{ bot.activity }}%</div>
+              </div>
+              <div class="bot-status-indicator" [ngClass]="'status-' + bot.status">
+                <span class="status-dot"></span>
+                <span class="status-text">{{ bot.status }}</span>
+              </div>
+              <div class="bot-last-run">Dernière exécution: {{ bot.lastRun }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-footer">
+          <span class="chart-description">Affichage de l'état et fréquence des bots VI</span>
         </div>
       </div>
     </div>

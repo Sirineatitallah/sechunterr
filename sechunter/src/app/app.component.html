@@ -1,5 +1,5 @@
 <div class="app-container">
-  <app-header *ngIf="authService.isAuthenticated()"></app-header>
+  <!-- Header removed -->
   <div class="main-container" [class.blurred]="!authService.isAuthenticated()">
     <div class="content-container">
       <router-outlet></router-outlet>

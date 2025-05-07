@@ -1,0 +1,191 @@
+<div class="drill-down-container" [class.loading]="loading">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <div class="loading-message">Chargement des données...</div>
+  </div>
+
+  <!-- Header -->
+  <div class="drill-down-header">
+    <div class="header-left">
+      <div class="type-indicator" [style.background-color]="getTypeColor()">
+        <mat-icon>{{ getTypeIcon() }}</mat-icon>
+      </div>
+      <div class="header-titles">
+        <h2 class="title">{{ data.title }}</h2>
+        <p class="subtitle" *ngIf="data.subtitle">{{ data.subtitle }}</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-icon-button (click)="onClose()" matTooltip="Fermer">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards" *ngIf="data.summary">
+    <div class="summary-card" *ngFor="let item of data.summary | keyvalue">
+      <div class="card-icon" *ngIf="item.value.icon" [style.color]="item.value.color">
+        <mat-icon>{{ item.value.icon }}</mat-icon>
+      </div>
+      <div class="card-content">
+        <div class="card-value">{{ formatValue(item.value.value) }}</div>
+        <div class="card-label">{{ item.value.label }}</div>
+        <div class="card-trend" *ngIf="item.value.trend !== undefined" [ngClass]="getTrendClass(item.value.trend)">
+          <mat-icon>{{ getTrendIcon(item.value.trend) }}</mat-icon>
+          <span>{{ Math.abs(item.value.trend) }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons" *ngIf="data.actions && data.actions.length > 0">
+    <button
+      *ngFor="let action of data.actions"
+      mat-raised-button
+      [color]="action.color || 'primary'"
+      [disabled]="action.disabled"
+      (click)="onAction(action.action)">
+      <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+      {{ action.label }}
+    </button>
+  </div>
+
+  <!-- Content Tabs -->
+  <mat-tab-group (selectedIndexChange)="onTabChange($event)" [selectedIndex]="activeTab" animationDuration="300ms" class="content-tabs">
+    <!-- Details Tab -->
+    <mat-tab label="Détails">
+      <div class="tab-content details-tab">
+        <ng-container *ngIf="data.details">
+          <ng-container *ngTemplateOutlet="detailsTemplate"></ng-container>
+        </ng-container>
+        <div class="no-data" *ngIf="!data.details">
+          <mat-icon>info</mat-icon>
+          <p>Aucun détail disponible</p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Timeline Tab -->
+    <mat-tab label="Chronologie" *ngIf="data.timeline && data.timeline.length > 0">
+      <div class="tab-content timeline-tab">
+        <div class="timeline">
+          <div class="timeline-item" *ngFor="let event of data.timeline">
+            <div class="timeline-icon" [style.background-color]="event.color || '#3f51b5'">
+              <mat-icon>{{ event.icon || 'event' }}</mat-icon>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-date">{{ event.date | date:'medium' }}</div>
+              <div class="timeline-event">{{ event.event }}</div>
+              <div class="timeline-description" *ngIf="event.description">{{ event.description }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Charts Tab -->
+    <mat-tab label="Graphiques" *ngIf="data.charts && data.charts.length > 0">
+      <div class="tab-content charts-tab">
+        <div class="charts-grid">
+          <div class="chart-container" *ngFor="let chart of data.charts">
+            <div class="chart-header">
+              <h3>{{ chart.title }}</h3>
+            </div>
+            <div class="chart-content">
+              <!-- Chart content will be rendered by the parent component -->
+              <div class="chart-placeholder">
+                <p>Graphique {{ chart.type }} - {{ chart.id }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tables Tab -->
+    <mat-tab label="Données" *ngIf="data.tables && data.tables.length > 0">
+      <div class="tab-content tables-tab">
+        <div class="tables-container">
+          <div class="table-wrapper" *ngFor="let table of data.tables">
+            <div class="table-header">
+              <h3>{{ table.title }}</h3>
+            </div>
+            <div class="table-content">
+              <table mat-table [dataSource]="getSortedData(table.id, table.data)" matSort (matSortChange)="onSortChange($event, table.id)">
+                <ng-container *ngFor="let column of table.columns" [matColumnDef]="column.key">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.header }}</th>
+                  <td mat-cell *matCellDef="let element">{{ formatValue(element[column.key]) }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="getDisplayedColumns(table)"></tr>
+                <tr mat-row *matRowDef="let row; columns: getDisplayedColumns(table);"></tr>
+              </table>
+
+              <mat-paginator
+                [length]="table.data.length"
+                [pageSize]="getTablePaginationProperty(table.id, 'pageSize', 10)"
+                [pageSizeOptions]="[5, 10, 25, 50]"
+                [pageIndex]="getTablePaginationProperty(table.id, 'pageIndex', 0)"
+                (page)="onPageChange($event, table.id)">
+              </mat-paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Related Items Tab -->
+    <mat-tab label="Éléments liés" *ngIf="data.relatedItems && data.relatedItems.length > 0">
+      <div class="tab-content related-items-tab">
+        <div class="related-items-grid">
+          <div class="related-item-card" *ngFor="let item of data.relatedItems">
+            <div class="related-item-header">
+              <div class="related-item-type" [style.background-color]="item.color || '#9e9e9e'">
+                <mat-icon>{{ item.icon || 'link' }}</mat-icon>
+              </div>
+              <div class="related-item-title">{{ item.title }}</div>
+            </div>
+            <div class="related-item-content">
+              <p *ngIf="item.description">{{ item.description }}</p>
+              <div class="related-item-meta" *ngIf="item.meta">
+                <div class="meta-item" *ngFor="let meta of item.meta | keyvalue">
+                  <span class="meta-label">{{ meta.key }}:</span>
+                  <span class="meta-value">{{ meta.value }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="related-item-actions">
+              <button mat-button color="primary" (click)="onAction('view-related:' + item.id)">
+                <mat-icon>visibility</mat-icon>
+                Voir
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<!-- Details Template - This will be customized based on the data type -->
+<ng-template #detailsTemplate>
+  <div class="details-content">
+    <!-- Generic details display -->
+    <div class="details-section" *ngFor="let section of data.details | keyvalue">
+      <h3 class="section-title">{{ section.key }}</h3>
+      <mat-divider></mat-divider>
+
+      <div class="section-content">
+        <ng-container *ngIf="isObject(section.value)">
+          <div class="detail-item" *ngFor="let detail of objectToKeyValue(section.value)">
+            <div class="detail-label">{{ detail.key }}</div>
+            <div class="detail-value">{{ formatValue(detail.value) }}</div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template>

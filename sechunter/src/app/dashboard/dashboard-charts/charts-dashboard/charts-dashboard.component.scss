@@ -1,0 +1,306 @@
+// Variables
+$primary-color: #00f3ff;
+$secondary-color: #bc13fe;
+$background-dark: #0a0e1f;
+$text-light: #ffffff;
+$text-muted: #a8a3a3;
+$critical-color: #ff4757;
+$high-color: #ffa502;
+$medium-color: #ffdb58;
+$low-color: #2ed573;
+
+// Mixins
+@mixin glassmorphism {
+  background: rgba(10, 14, 31, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+@mixin neon-glow($color, $intensity: 0.5) {
+  box-shadow: 0 0 10px rgba($color, $intensity),
+              0 0 20px rgba($color, $intensity * 0.5),
+              inset 0 0 5px rgba($color, $intensity * 0.3);
+}
+
+@mixin cyber-gradient {
+  background: linear-gradient(135deg, rgba($primary-color, 0.15) 0%, rgba($secondary-color, 0.15) 100%);
+}
+
+// Dashboard container
+.dashboard-container {
+  padding: 1.5rem;
+  color: $text-light;
+}
+
+// Dashboard header
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($primary-color, 0.3);
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    background: linear-gradient(90deg, $primary-color, $secondary-color);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba($primary-color, 0.3);
+  }
+
+  .time-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .time-range-buttons {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        background: rgba($primary-color, 0.1);
+        border: 1px solid rgba($primary-color, 0.3);
+        color: $text-muted;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba($primary-color, 0.2);
+          color: $text-light;
+        }
+
+        &.active {
+          background: rgba($primary-color, 0.3);
+          color: $primary-color;
+          @include neon-glow($primary-color, 0.3);
+        }
+      }
+    }
+
+    .refresh-button {
+      background: rgba($primary-color, 0.1);
+      border: 1px solid rgba($primary-color, 0.3);
+      color: $primary-color;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba($primary-color, 0.2);
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+// Charts grid
+.charts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// Chart section
+.chart-section {
+  h3 {
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin: 0 0 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid $primary-color;
+  }
+
+  .chart-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 1200px) {
+      flex-direction: column;
+    }
+  }
+}
+
+// Chart item
+.chart-item {
+  flex: 1;
+  min-width: 0;
+
+  &.chart-item-medium {
+    min-height: 300px;
+  }
+
+  &.chart-item-large {
+    min-height: 400px;
+  }
+
+  .chart-card {
+    @include glassmorphism;
+    border-radius: 12px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      @include neon-glow($primary-color, 0.2);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: rgba($background-dark, 0.5);
+      border-bottom: 1px solid rgba($primary-color, 0.2);
+
+      h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+
+      .chart-action {
+        background: transparent;
+        border: none;
+        color: $text-muted;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+
+    .chart-content {
+      flex: 1;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .chart-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+// Chart legend
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: $text-muted;
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+  }
+}
+
+// Chart placeholders
+.pie-chart-container, .donut-chart-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.pie-segment, .donut-segment {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(calc(3.6deg * var(--start)));
+  clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
+  background: conic-gradient(var(--color) 0deg, var(--color) calc(3.6deg * var(--percentage)), transparent calc(3.6deg * var(--percentage)));
+}
+
+.pie-center, .donut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0%;
+  height: 0%;
+  background: $background-dark;
+  border-radius: 50%;
+}
+
+.donut-center {
+  width: 60%;
+  height: 60%;
+}
+
+// Other chart styles
+.world-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: url('/assets/images/world-map.svg') no-repeat center center;
+  background-size: contain;
+  opacity: 0.7;
+}
+
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-hotspot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: $primary-color;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px rgba($primary-color, 0.8);
+  animation: pulse 2s infinite;
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.8;
+  }
+}

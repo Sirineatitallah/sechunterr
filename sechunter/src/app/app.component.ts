@@ -1,8 +1,6 @@
 import { Component, Inject, PLATFORM_ID, TransferState, makeStateKey } from '@angular/core';
 import { isPlatformServer, CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
-import { HeaderComponent } from "./core/layout/header/header.component";
-import { SidebarComponent } from "./core/layout/sidebar/sidebar.component";
 import { filter } from 'rxjs/operators';
 // These components are loaded via routing, not directly in the template
 
@@ -13,8 +11,6 @@ const STATE_KEY = makeStateKey<string>('exampleState');
   standalone: true,
   imports: [
     RouterOutlet,
-    HeaderComponent,
-    SidebarComponent,
     CommonModule
   ],
   templateUrl: './app.component.html',

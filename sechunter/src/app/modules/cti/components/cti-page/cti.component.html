@@ -1,6 +1,12 @@
 <div class="cti-dashboard">
   <div class="dashboard-header">
-    <h2>Cyber Threat Intelligence</h2>
+    <div class="header-left">
+      <a [routerLink]="['/dashboard/main']" [queryParams]="{from: 'cti'}" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Retour au Dashboard</span>
+      </a>
+      <h2>Cyber Threat Intelligence</h2>
+    </div>
     <div class="dashboard-controls">
       <div class="time-range-selector">
         <span class="control-label">Période:</span>

@@ -3,6 +3,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
+import { GlobalDataService, SecurityAsset } from '../../../../core/services/global-data.service';
 
 // Import ASM visualization components
 import { AttackSurfaceComponent } from '../../../../asm/components/attack-surface/attack-surface.component';
@@ -59,6 +61,7 @@ interface ExposureMetrics {
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    RouterModule,
     DatePipe,
     AttackSurfaceComponent,
     RiskScoreComponent,
@@ -100,10 +103,19 @@ export class AsmComponent implements OnInit {
     expiredCertificates: { value: 0, trend: 0, history: [] }
   };
 
-  constructor() { }
+  constructor(private globalDataService: GlobalDataService) { }
 
   ngOnInit(): void {
-    // Initialize mock data
+    // Subscribe to global data service for assets
+    this.globalDataService.assets$.subscribe(assets => {
+      // Update asset categories based on asset types
+      this.updateAssetCategories(assets);
+
+      // Update asset summary
+      this.updateAssetSummary(assets);
+    });
+
+    // Initialize other mock data
     this.initMockData();
   }
 
@@ -116,9 +128,53 @@ export class AsmComponent implements OnInit {
 
   // Refresh all data
   refreshAll(): void {
-    // In a real application, this would call APIs to refresh data
+    // Refresh global data
+    this.globalDataService.refreshAllData();
+
+    // Refresh local data
     console.log('Refreshing all data for time range:', this.selectedTimeRange);
-    this.initMockData(); // For demo, just reinitialize mock data
+    this.initMockData(); // For demo, just reinitialize mock data for non-global data
+  }
+
+  // Update asset categories based on assets
+  private updateAssetCategories(assets: SecurityAsset[]): void {
+    // Count assets by type
+    const typeCounts: { [key: string]: number } = {};
+    const typeColors: { [key: string]: string } = {
+      'server': '#4a90e2',
+      'application': '#50e3c2',
+      'endpoint': '#f5a623',
+      'cloud': '#9013fe',
+      'network': '#b8e986'
+    };
+
+    assets.forEach(asset => {
+      typeCounts[asset.type] = (typeCounts[asset.type] || 0) + 1;
+    });
+
+    // Convert to asset categories
+    this.assetCategories = Object.keys(typeCounts).map((type, index) => ({
+      id: `c${index + 1}`,
+      name: type.charAt(0).toUpperCase() + type.slice(1) + 's',
+      count: typeCounts[type],
+      color: typeColors[type] || `hsl(${index * 60}, 70%, 60%)`
+    }));
+  }
+
+  // Update asset summary based on assets
+  private updateAssetSummary(assets: SecurityAsset[]): void {
+    const totalAssets = assets.length;
+    const criticalAssets = assets.filter(a => a.status === 'vulnerable').length;
+    const securedAssets = assets.filter(a => a.status === 'secure').length;
+    const shadowIT = assets.filter(a => a.status === 'at-risk').length;
+
+    this.assetSummary = {
+      totalAssets,
+      criticalAssets,
+      shadowIT,
+      securedAssets,
+      trend: 5.2 // Mock trend for demo
+    };
   }
 
   // Get icon for discovery type
@@ -180,14 +236,7 @@ export class AsmComponent implements OnInit {
 
   // Initialize mock data for demo
   private initMockData(): void {
-    // Mock asset summary
-    this.assetSummary = {
-      totalAssets: 1247,
-      criticalAssets: 186,
-      shadowIT: 93,
-      securedAssets: 968,
-      trend: 5.2
-    };
+    // We no longer need to mock asset summary and categories as they come from the global service
 
     // Mock recent discoveries
     this.recentDiscoveries = [
@@ -196,69 +245,35 @@ export class AsmComponent implements OnInit {
         title: 'Nouveau serveur non autorisé détecté',
         type: 'server',
         riskLevel: 'high',
-        timestamp: new Date(2023, 4, 15, 9, 30)
+        timestamp: new Date(Date.now() - 2 * 24 * 60 * 60000) // 2 days ago
       },
       {
         id: 'd2',
         title: 'Domaine expiré exposé',
         type: 'domain',
         riskLevel: 'critical',
-        timestamp: new Date(2023, 4, 14, 14, 45)
+        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60000) // 3 days ago
       },
       {
         id: 'd3',
         title: 'Application cloud non sécurisée',
         type: 'cloud',
         riskLevel: 'medium',
-        timestamp: new Date(2023, 4, 13, 11, 20)
+        timestamp: new Date(Date.now() - 4 * 24 * 60 * 60000) // 4 days ago
       },
       {
         id: 'd4',
         title: 'Ports ouverts sur serveur de production',
         type: 'network',
         riskLevel: 'high',
-        timestamp: new Date(2023, 4, 12, 16, 10)
+        timestamp: new Date(Date.now() - 5 * 24 * 60 * 60000) // 5 days ago
       },
       {
         id: 'd5',
         title: 'Application avec informations d\'identification exposées',
         type: 'application',
         riskLevel: 'critical',
-        timestamp: new Date(2023, 4, 11, 8, 15)
-      }
-    ];
-
-    // Mock asset categories
-    this.assetCategories = [
-      {
-        id: 'c1',
-        name: 'Serveurs',
-        count: 342,
-        color: '#4a90e2'
-      },
-      {
-        id: 'c2',
-        name: 'Applications Web',
-        count: 256,
-        color: '#50e3c2'
-      },
-      {
-        id: 'c3',
-        name: 'Endpoints',
-        count: 478,
-        color: '#f5a623'
-      },
-      {
-        id: 'c4',
-        name: 'Cloud',
-        count: 124,
-        color: '#9013fe'
-      },
-      {
-        id: 'c5',
-        name: 'IoT',
-        count: 47,
-        color: '#b8e986'
+        timestamp: new Date(Date.now() - 6 * 24 * 60 * 60000) // 6 days ago
       }
     ];
 
