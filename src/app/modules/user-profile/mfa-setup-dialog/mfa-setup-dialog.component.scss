@@ -1,0 +1,63 @@
+.setup-container {
+  padding: 16px 0;
+}
+
+.setup-step {
+  margin-bottom: 24px;
+  
+  h3 {
+    color: #64d9ff;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: #a0a8c0;
+    margin-bottom: 16px;
+  }
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.qr-code {
+  width: 200px;
+  height: 200px;
+  border: 8px solid white;
+  border-radius: 8px;
+}
+
+.secret-key {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  text-align: center;
+  
+  p {
+    margin-bottom: 8px;
+  }
+  
+  code {
+    font-family: monospace;
+    font-size: 16px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #ffffff;
+    letter-spacing: 2px;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error-message {
+  color: #ff4d4f;
+  margin-top: 8px;
+  font-size: 14px;
+}

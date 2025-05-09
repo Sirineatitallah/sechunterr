@@ -1,0 +1,18 @@
+<div class="ai-copilot-container" [class.open]="isOpen">
+  <button class="toggle-button" (click)="toggleOpen()">
+    @if (!isOpen) {
+      <span>💬</span>
+    } @else {
+      <span>✖</span>
+    }
+  </button>
+  @if (isOpen) {
+    <div class="chatbot-messages">
+      <ul>
+        @for (message of messages; track $index) {
+          <li>{{ message }}</li>
+        }
+      </ul>
+    </div>
+  }
+</div>

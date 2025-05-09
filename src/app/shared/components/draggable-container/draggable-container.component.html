@@ -1,0 +1,21 @@
+<div #container class="draggable-container" [class.collapsed]="isCollapsed" (mousedown)="bringToFront()">
+  <div class="container-header" (mousedown)="onDragStart($event)">
+    <div class="title">{{ title }}</div>
+    <div class="controls">
+      <button *ngIf="collapsible" class="control-button collapse-button" (click)="toggleCollapse()">
+        <i class="material-icons">{{ isCollapsed ? 'expand_more' : 'expand_less' }}</i>
+      </button>
+      <button *ngIf="closable" class="control-button close-button" (click)="close()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+  </div>
+  
+  <div class="container-content" [style.display]="isCollapsed ? 'none' : 'block'">
+    <ng-content></ng-content>
+  </div>
+  
+  <div *ngIf="resizable && !isCollapsed" class="resize-handle" (mousedown)="onResizeStart($event)">
+    <i class="material-icons">drag_handle</i>
+  </div>
+</div>

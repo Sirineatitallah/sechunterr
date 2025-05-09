@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule, Router } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { VisualizationSelectionService } from '../../../shared/services/visualization-selection.service';
 
 interface MenuItem {
@@ -37,7 +38,8 @@ interface ActionItem {
   imports: [
     CommonModule,
     MatIconModule,
-    RouterModule
+    RouterModule,
+    MatSnackBarModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
@@ -136,7 +138,8 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private visualizationSelectionService: VisualizationSelectionService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -184,6 +187,29 @@ export class SidebarComponent implements OnInit {
     return item.roles.includes(this.userRole);
   }
 
+  /**
+   * Handle click on disabled menu items for regular users
+   */
+  onDisabledMenuClick(menuTitle: string): void {
+    // Show message about creating an account
+    this.snackBar.open(
+      'Create an account and sign in for details',
+      'Sign In',
+      {
+        duration: 5000,
+        panelClass: ['premium-snackbar'],
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      }
+    ).onAction().subscribe(() => {
+      // Navigate to auth page when "Sign In" is clicked
+      this.router.navigate(['/auth']);
+    });
+
+    // Still emit the menu selection for the user dashboard to show the appropriate image
+    this.menuSelection.emit(menuTitle);
+  }
+
   signOut(): void {
     // Clear user data from localStorage
     localStorage.removeItem('user_token');
@@ -199,6 +225,20 @@ export class SidebarComponent implements OnInit {
     this.recentActions.unshift(signOutAction);
 
     // Navigate to auth component
+    this.router.navigate(['/auth']);
+  }
+
+  /**
+   * Navigate to sign up page
+   */
+  navigateToSignUp(): void {
+    this.router.navigate(['/signup']);
+  }
+
+  /**
+   * Navigate to sign in page
+   */
+  navigateToSignIn(): void {
     this.router.navigate(['/auth']);
   }
 }

@@ -29,10 +29,10 @@ export const RoleGuard: CanActivateFn = (route): Observable<boolean | UrlTree> =
     return of(true);
   }
 
-  // If user is client but trying to access admin route, redirect to client dashboard
+  // If user is client but trying to access admin route, redirect to user dashboard
   if (user.roles.includes(UserRole.CLIENT) &&
       (requiredRoles.includes(UserRole.ADMIN) || requiredRoles.includes(UserRole.SUPERUSER))) {
-    return of(router.createUrlTree(['/dashboard/client']));
+    return of(router.createUrlTree(['/dashboard/user']));
   }
 
   return hasRequiredRole ?

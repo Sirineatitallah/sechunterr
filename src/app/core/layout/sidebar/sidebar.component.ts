@@ -49,6 +49,14 @@ export class SidebarComponent implements OnInit {
       expanded: false
     },
     {
+      path: '/draggable-demo',
+      title: 'Widgets Draggables',
+      icon: 'assets/icons/dashboard-3d.svg',
+      mobileIcon: 'drag_indicator',
+      roles: ['admin', 'client'],
+      expanded: false
+    },
+    {
       path: '/asm',
       title: 'Attack Surface',
       icon: 'assets/icons/asm-3d.svg',

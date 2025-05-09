@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
+import { AuthService } from '../../services/auth.service';
 
 interface Instance {
   id: string;
@@ -29,7 +30,7 @@ export class HeaderComponent implements OnInit {
     { id: 'inst4', name: 'Client Instance 4', status: 'healthy' },
     { id: 'inst5', name: 'Client Instance 5', status: 'healthy' }
   ];
-  
+
   // Search
   searchQuery = '';
   showSearchPredictions = false;
@@ -40,57 +41,60 @@ export class HeaderComponent implements OnInit {
     cti: true,
     soar: true
   };
-  
+
   // Notifications
   showNotifications = false;
   alertCount = 5;
-  
+
   // User menu
   showUserMenu = false;
   userAvatar = 'assets/icons/user-avatar.svg';
-  
+
   // System status
   systemStatus = 85;
-  
+
   // UI effects
   hoverNewReport = false;
-  
+
   // Theme
   darkMode = false;
 
-  constructor(private themeService: ThemeService) {}
+  constructor(
+    private themeService: ThemeService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     // Subscribe to theme changes
     this.themeService.theme$.subscribe(theme => {
       this.darkMode = theme === 'dark';
     });
-    
+
     // Initialize with mock data
     this.selectedInstance = this.instances[0].id;
   }
-  
+
   get filteredInstances(): Instance[] {
     if (!this.instanceSearchTerm) {
       return this.instances;
     }
-    
+
     const searchTerm = this.instanceSearchTerm.toLowerCase();
-    return this.instances.filter(instance => 
+    return this.instances.filter(instance =>
       instance.name.toLowerCase().includes(searchTerm)
     );
   }
-  
+
   // Instance selector methods
   toggleInstanceDropdown(): void {
     this.showInstanceDropdown = !this.showInstanceDropdown;
   }
-  
+
   selectInstance(instanceId: string): void {
     this.selectedInstance = instanceId;
     this.showInstanceDropdown = false;
   }
-  
+
   // Search methods
   onSearchInput(): void {
     if (this.searchQuery.length > 2) {
@@ -104,24 +108,24 @@ export class HeaderComponent implements OnInit {
       this.searchPredictions = [];
     }
   }
-  
+
   onSearchBlur(): void {
     // Delay hiding predictions to allow for clicking on them
     setTimeout(() => {
       this.showSearchPredictions = false;
     }, 200);
   }
-  
+
   selectPrediction(prediction: string): void {
     this.searchQuery = prediction;
     this.showSearchPredictions = false;
     // Implement search functionality
   }
-  
+
   toggleFilter(filter: 'vi' | 'asm' | 'cti' | 'soar'): void {
     this.filters[filter] = !this.filters[filter];
   }
-  
+
   // Notification methods
   toggleNotifications(): void {
     this.showNotifications = !this.showNotifications;
@@ -129,7 +133,7 @@ export class HeaderComponent implements OnInit {
       this.showUserMenu = false;
     }
   }
-  
+
   // User menu methods
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
@@ -137,10 +141,15 @@ export class HeaderComponent implements OnInit {
       this.showNotifications = false;
     }
   }
-  
+
   toggleDarkMode(event: Event): void {
     event.stopPropagation();
     this.darkMode = !this.darkMode;
     this.themeService.setTheme(this.darkMode ? 'dark' : 'light');
+  }
+
+  logout(): void {
+    this.authService.logout();
+    // The router navigation is handled in the AuthService
   }
 }

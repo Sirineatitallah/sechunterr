@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthComponent } from './auth/auth.component';
 import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { AuthGuard } from './core/guards/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { AdminDashboardComponent } from './modules/admin/components/admin-dashboard/admin-dashboard.component';
 import { ClientDashboardComponent } from './modules/client/components/client-dashboard/client-dashboard.component';
 import { RoleGuard } from './core/guards/role.guard';
@@ -14,6 +14,8 @@ import { CtiComponent } from './modules/cti/components/cti-page/cti.component';
 import { AsmComponent } from './modules/asm/components/asm-page/asm.component';
 import { SoarComponent } from './modules/soar/components/soar-page/soar.component';
 import { ViComponent } from './modules/vi/components/vi-page/vi.component';
+import { UserDashboardComponent } from './dashboard/user-dashboard/user-dashboard.component';
+import { MainDashboardComponent } from './dashboard/main-dashboard/main-dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
@@ -22,9 +24,25 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
-      { path: '', redirectTo: 'client', pathMatch: 'full' },
+      {
+        path: '',
+        redirectTo: 'main',
+        pathMatch: 'full'
+      },
+      {
+        path: 'main',
+        component: MainDashboardComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.ADMIN] }
+      },
+      {
+        path: 'user',
+        component: UserDashboardComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.CLIENT] }
+      },
       {
         path: 'admin',
         component: AdminDashboardComponent,

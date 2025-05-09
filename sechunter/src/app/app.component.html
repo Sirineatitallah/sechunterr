@@ -8,3 +8,6 @@
 
   <div class="auth-overlay" *ngIf="!authService.isAuthenticated()"></div>
   <router-outlet *ngIf="!authService.isAuthenticated()"></router-outlet>
+
+  <!-- Global Chatbot - visible on all pages -->
+  <app-simple-chatbot></app-simple-chatbot>

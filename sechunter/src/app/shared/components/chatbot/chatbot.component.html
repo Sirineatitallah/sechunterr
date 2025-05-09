@@ -1,0 +1,121 @@
+<div class="chatbot-container" [class.open]="isOpen">
+  <!-- Chat toggle button -->
+  <button 
+    class="chat-toggle-button" 
+    matRipple 
+    [matRippleCentered]="true"
+    [matRippleUnbounded]="true"
+    (click)="toggleChat()"
+    matTooltip="{{ isOpen ? 'Fermer le chat' : 'Ouvrir l\'assistant' }}"
+    matTooltipPosition="left">
+    <mat-icon>{{ isOpen ? 'close' : 'chat' }}</mat-icon>
+  </button>
+
+  <!-- Chat window -->
+  <div class="chat-window">
+    <!-- Chat header -->
+    <div class="chat-header">
+      <div class="header-info">
+        <div class="bot-avatar">
+          <mat-icon>security</mat-icon>
+        </div>
+        <div class="bot-info">
+          <div class="bot-name">Assistant de Sécurité</div>
+          <div class="bot-status">
+            <span class="status-indicator online"></span>
+            <span class="status-text">En ligne</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-icon-button matTooltip="Effacer la conversation" (click)="clearChat()">
+          <mat-icon>delete_sweep</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Fermer" (click)="toggleChat()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat messages -->
+    <div class="chat-messages" #chatContainer>
+      <div *ngFor="let message of messages" 
+           class="message-container" 
+           [ngClass]="{'user-message': message.sender === 'user', 'bot-message': message.sender === 'bot'}">
+        
+        <!-- Bot avatar for bot messages -->
+        <div *ngIf="message.sender === 'bot'" class="message-avatar">
+          <div class="avatar-icon">
+            <mat-icon>security</mat-icon>
+          </div>
+        </div>
+        
+        <!-- Message content -->
+        <div class="message-content">
+          <!-- Loading indicator for bot typing -->
+          <div *ngIf="message.isLoading" class="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          
+          <!-- Actual message text -->
+          <div *ngIf="!message.isLoading" class="message-text">
+            {{ message.content }}
+          </div>
+          
+          <!-- Message timestamp -->
+          <div class="message-time">
+            {{ message.isLoading ? 'En train d\'écrire...' : (message.timestamp | date:'HH:mm') }}
+          </div>
+        </div>
+        
+        <!-- User avatar for user messages -->
+        <div *ngIf="message.sender === 'user'" class="message-avatar user">
+          <div class="avatar-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Typing indicator when bot is preparing a response -->
+      <div *ngIf="isTyping && !messages[messages.length-1]?.isLoading" class="message-container bot-message">
+        <div class="message-avatar">
+          <div class="avatar-icon">
+            <mat-icon>security</mat-icon>
+          </div>
+        </div>
+        <div class="message-content">
+          <div class="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="message-time">En train d'écrire...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat input -->
+    <div class="chat-input">
+      <mat-form-field appearance="outline" class="message-field">
+        <mat-label>Posez votre question...</mat-label>
+        <textarea 
+          matInput 
+          [(ngModel)]="newMessage" 
+          #messageInput
+          placeholder="Comment puis-je vous aider ?"
+          (keydown)="onKeydown($event)"
+          rows="1"></textarea>
+      </mat-form-field>
+      <button 
+        mat-mini-fab 
+        color="primary" 
+        class="send-button" 
+        [disabled]="!newMessage.trim()"
+        (click)="sendMessage()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

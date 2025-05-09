@@ -31,20 +31,20 @@ export class SignupComponent {
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]
-    }, { 
-      validators: this.passwordMatchValidator 
+    }, {
+      validators: this.passwordMatchValidator
     });
   }
 
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
-    
+
     if (password !== confirmPassword) {
       form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     }
-    
+
     return null;
   }
 
@@ -56,13 +56,27 @@ export class SignupComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Simulate signup process
-    setTimeout(() => {
-      // In a real application, you would call the auth service to register the user
-      // For now, we'll just navigate to the login page
+    const userData = {
+      fullName: this.signupForm.get('fullName')?.value,
+      email: this.signupForm.get('email')?.value,
+      username: this.signupForm.get('username')?.value,
+      password: this.signupForm.get('password')?.value
+    };
+
+    // Register the user
+    if (this.authService.register(userData)) {
+      // Show success message and navigate to login page
+      setTimeout(() => {
+        this.isLoading = false;
+        this.router.navigate(['/auth'], {
+          queryParams: { registered: 'success', username: userData.username }
+        });
+      }, 1500);
+    } else {
+      // Show error message
       this.isLoading = false;
-      this.router.navigate(['/auth']);
-    }, 1500);
+      this.errorMessage = 'Un compte avec cet email ou nom d\'utilisateur existe déjà.';
+    }
   }
 
   togglePasswordVisibility(): void {

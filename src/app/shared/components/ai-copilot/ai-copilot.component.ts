@@ -11,9 +11,9 @@ import { CommonModule } from '@angular/common';
 export class AiCopilotComponent {
   isOpen = false;
   messages: string[] = [
-    'Je peux gÈnÈrer un rapport ASM pour vous',
-    'Demandez-moi d\'exÈcuter une action rapide',
-    'Besoin d\'aide ? Je suis l‡ pour vous guider'
+    "Je peux g√©n√©rer un rapport ASM pour vous",
+    "Demandez-moi d'ex√©cuter une action rapide",
+    "Besoin d'aide ? Je suis l√† pour vous guider"
   ];
 
   toggleOpen() {

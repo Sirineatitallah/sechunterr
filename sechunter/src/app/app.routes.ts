@@ -26,6 +26,11 @@ export const routes: Routes = [
         title: 'Security Operations Dashboard'
       },
       {
+        path: 'user',
+        loadComponent: () => import('./dashboard/user-dashboard/user-dashboard.component').then(m => m.UserDashboardComponent),
+        title: 'User Dashboard'
+      },
+      {
         path: 'vi',
         loadComponent: () => import('./modules/vi/components/vi-page/vi.component').then(m => m.ViComponent),
         title: 'Threat Intelligence'

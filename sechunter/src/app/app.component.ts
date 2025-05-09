@@ -2,6 +2,7 @@ import { Component, Inject, PLATFORM_ID, TransferState, makeStateKey } from '@an
 import { isPlatformServer, CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { SimpleChatbotComponent } from './simple-chatbot/simple-chatbot.component';
 // These components are loaded via routing, not directly in the template
 
 const STATE_KEY = makeStateKey<string>('exampleState');
@@ -11,7 +12,8 @@ const STATE_KEY = makeStateKey<string>('exampleState');
   standalone: true,
   imports: [
     RouterOutlet,
-    CommonModule
+    CommonModule,
+    SimpleChatbotComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

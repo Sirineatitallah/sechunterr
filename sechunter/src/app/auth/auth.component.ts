@@ -118,12 +118,35 @@ export class AuthComponent implements OnInit {
 
     console.log('Attempting login with:', { id, password });
 
+    // Log exact values for debugging
+    console.log('ID length:', id.length, 'Password length:', password.length);
+    console.log('ID exact value:', JSON.stringify(id));
+    console.log('Password exact value:', JSON.stringify(password));
+
     // Special case for admin login
     if (id === 'admin' && password === 'Admin1!/') {
       console.log('Admin login detected');
       localStorage.setItem('access_token', 'admin-token');
       localStorage.setItem('user_role', 'admin');
-      window.location.href = '/dashboard/main';
+      window.location.href = '/dashboard/main'; // Admin dashboard
+      return;
+    }
+
+    // Special case for test user login - using trim to remove any accidental whitespace
+    if (id.trim() === 'test@gmail.com' && password.trim() === 'testTEST1!/') {
+      console.log('Test user login detected');
+      localStorage.setItem('access_token', 'user-token-test');
+      localStorage.setItem('user_role', 'client');
+      window.location.href = '/dashboard/user'; // User dashboard
+      return;
+    }
+
+    // Alternative check for test user with less strict comparison
+    if (id.includes('test@gmail.com') && password.includes('testTEST1!/')) {
+      console.log('Test user login detected (alternative check)');
+      localStorage.setItem('access_token', 'user-token-test');
+      localStorage.setItem('user_role', 'client');
+      window.location.href = '/dashboard/user'; // User dashboard
       return;
     }
 
@@ -132,7 +155,7 @@ export class AuthComponent implements OnInit {
       console.log('Regular login accepted');
       localStorage.setItem('access_token', 'user-token-' + Date.now());
       localStorage.setItem('user_role', 'client');
-      window.location.href = '/dashboard/main';
+      window.location.href = '/dashboard/user'; // User dashboard
       return;
     }
 

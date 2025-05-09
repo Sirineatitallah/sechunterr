@@ -1,0 +1,86 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="cyber-gradient"></div>
+    <div class="neon-grid"></div>
+
+    <div class="auth-content">
+      <header class="auth-header">
+        <h1 class="auth-title">Two-Factor Authentication</h1>
+        <p class="auth-subtitle">Enter the verification code from your authenticator app</p>
+      </header>
+
+      <form [formGroup]="mfaForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="input-field cyber-input">
+          <label for="code" class="hologram-label">Verification Code</label>
+          <input
+            type="text"
+            id="code"
+            formControlName="code"
+            autocomplete="off"
+            maxlength="6"
+            placeholder="000000"
+            required
+          >
+          <div class="cyber-border"></div>
+        </div>
+
+        <div class="timer-container">
+          <div class="timer-circle">
+            <svg viewBox="0 0 36 36" class="timer-svg">
+              <path class="timer-bg"
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path class="timer-progress"
+                [attr.stroke-dasharray]="(remainingTime / 30) * 100 + ', 100'"
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </svg>
+            <div class="timer-text">{{ remainingTime }}</div>
+          </div>
+        </div>
+
+        <!-- Error Messages -->
+        <div *ngIf="errorMessage" class="error-message">
+          <i class="icon icon-warning"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="auth-button cyber-button"
+          [disabled]="mfaForm.invalid || isLoading"
+        >
+          <span *ngIf="!isLoading">VERIFY</span>
+          <span *ngIf="isLoading" class="spinner"></span>
+        </button>
+
+        <!-- Cancel Button -->
+        <button
+          type="button"
+          class="cancel-button"
+          (click)="cancel()"
+        >
+          CANCEL
+        </button>
+      </form>
+
+      <footer class="auth-footer">
+        <div class="security-badges">
+          <div class="badge-item">
+            <i class="icon icon-lock-orb"></i>
+            <span>Enhanced Security</span>
+          </div>
+          <div class="badge-item">
+            <i class="icon icon-shield-check"></i>
+            <span>Two-Factor Protection</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>

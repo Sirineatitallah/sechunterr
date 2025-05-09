@@ -36,3 +36,13 @@ html, body {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// Custom snackbar styling
+.premium-snackbar {
+  background: linear-gradient(135deg, #1a1a2e, #0f3460) !important;
+  color: white !important;
+
+  .mat-simple-snackbar-action {
+    color: #e94560 !important;
+  }
+}

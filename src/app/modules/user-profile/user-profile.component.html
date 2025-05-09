@@ -1,0 +1,70 @@
+<div class="profile-container">
+  <mat-card class="profile-card">
+    <mat-card-header>
+      <div mat-card-avatar class="profile-avatar">
+        <mat-icon>account_circle</mat-icon>
+      </div>
+      <mat-card-title>{{ user?.name || 'User Profile' }}</mat-card-title>
+      <mat-card-subtitle>{{ user?.email || 'Loading...' }}</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="profile-section">
+        <h3>Account Information</h3>
+        <div class="info-row">
+          <span class="info-label">User ID:</span>
+          <span class="info-value">{{ user?.id || 'N/A' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Role:</span>
+          <span class="info-value">{{ user?.roles?.[0] || 'N/A' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Last Login:</span>
+          <span class="info-value">{{ user?.lastLogin | date:'medium' || 'N/A' }}</span>
+        </div>
+      </div>
+      
+      <div class="profile-section">
+        <h3>Security Settings</h3>
+        <div class="security-setting">
+          <div class="setting-info">
+            <mat-icon>security</mat-icon>
+            <div class="setting-text">
+              <h4>Two-Factor Authentication</h4>
+              <p>Add an extra layer of security to your account</p>
+            </div>
+          </div>
+          <mat-slide-toggle 
+            [checked]="user?.mfaEnabled" 
+            [disabled]="loading"
+            (change)="toggleMFA()"
+            color="primary">
+          </mat-slide-toggle>
+        </div>
+        
+        <div *ngIf="user?.mfaEnabled" class="mfa-status">
+          <mat-icon color="primary">verified_user</mat-icon>
+          <span>Two-factor authentication is enabled</span>
+        </div>
+      </div>
+      
+      <div class="profile-section">
+        <h3>Session Information</h3>
+        <div class="info-row">
+          <span class="info-label">Session Expires:</span>
+          <span class="info-value">
+            {{ (user?.exp ? (user.exp * 1000 | date:'medium') : 'N/A') }}
+          </span>
+        </div>
+      </div>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <button mat-button color="warn" (click)="authService.logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        LOGOUT
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

@@ -5,7 +5,7 @@
       <img src="assets/icons/shield-3d.svg" alt="VOC Shield" class="logo-icon" />
       <h1 class="logo-text">SecHunter <span class="accent">VOC</span></h1>
     </div>
-    
+
     <div class="instance-selector">
       <div class="selected-instance" (click)="toggleInstanceDropdown()">
         <span class="instance-label">Instance:</span>
@@ -14,16 +14,16 @@
           <i class="material-icons">{{ showInstanceDropdown ? 'arrow_drop_up' : 'arrow_drop_down' }}</i>
         </span>
       </div>
-      
+
       <div class="instance-dropdown" *ngIf="showInstanceDropdown">
         <div class="instance-search">
           <input type="text" placeholder="Rechercher une instance..." [(ngModel)]="instanceSearchTerm">
           <i class="material-icons">search</i>
         </div>
-        
+
         <div class="instance-list">
           <div class="instance-item" *ngFor="let instance of filteredInstances" (click)="selectInstance(instance.id)">
-            <span class="status-indicator" [class.status-healthy]="instance.status === 'healthy'" 
+            <span class="status-indicator" [class.status-healthy]="instance.status === 'healthy'"
                                           [class.status-warning]="instance.status === 'warning'"
                                           [class.status-critical]="instance.status === 'critical'"></span>
             <span class="instance-item-name">{{ instance.name }}</span>
@@ -32,16 +32,16 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Center section: Search -->
   <div class="header-center">
     <div class="search-container">
       <i class="material-icons search-icon">search</i>
-      <input type="text" placeholder="Rechercher des vulnérabilités, menaces, incidents..." 
-             [(ngModel)]="searchQuery" 
+      <input type="text" placeholder="Rechercher des vulnérabilités, menaces, incidents..."
+             [(ngModel)]="searchQuery"
              (focus)="showSearchPredictions = true"
              (blur)="onSearchBlur()">
-      
+
       <!-- Predictive search suggestions -->
       <div class="search-predictions" *ngIf="showSearchPredictions && searchPredictions.length > 0">
         <div class="prediction-item" *ngFor="let prediction of searchPredictions" (click)="selectPrediction(prediction)">
@@ -49,7 +49,7 @@
           <span>{{ prediction }}</span>
         </div>
       </div>
-      
+
       <!-- Search filters -->
       <div class="search-filters">
         <div class="filter-chip" [class.active]="filters.vi" (click)="toggleFilter('vi')">
@@ -71,7 +71,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Right section: User actions -->
   <div class="header-right">
     <!-- System status -->
@@ -81,30 +81,30 @@
       </div>
       <span class="status-text">Système {{ systemStatus }}%</span>
     </div>
-    
+
     <!-- New report button -->
-    <button class="new-report-btn" 
-            [class.hover-effect]="hoverNewReport" 
-            (mouseenter)="hoverNewReport = true" 
+    <button class="new-report-btn"
+            [class.hover-effect]="hoverNewReport"
+            (mouseenter)="hoverNewReport = true"
             (mouseleave)="hoverNewReport = false">
       <i class="material-icons">add</i>
       <span>Nouveau Rapport</span>
     </button>
-    
+
     <!-- Notifications -->
     <div class="notifications">
       <div class="notification-icon" (click)="toggleNotifications()">
         <i class="material-icons">notifications</i>
         <span class="notification-badge" *ngIf="alertCount > 0">{{ alertCount }}</span>
       </div>
-      
+
       <!-- Notification dropdown -->
       <div class="notification-dropdown" *ngIf="showNotifications">
         <div class="notification-header">
           <h3>Notifications</h3>
           <button class="mark-all-read">Tout marquer comme lu</button>
         </div>
-        
+
         <div class="notification-list">
           <div class="notification-item unread">
             <div class="notification-icon critical">
@@ -116,7 +116,7 @@
               <div class="notification-time">Il y a 10 minutes</div>
             </div>
           </div>
-          
+
           <div class="notification-item unread">
             <div class="notification-icon warning">
               <i class="material-icons">security</i>
@@ -127,7 +127,7 @@
               <div class="notification-time">Il y a 30 minutes</div>
             </div>
           </div>
-          
+
           <div class="notification-item">
             <div class="notification-icon info">
               <i class="material-icons">info</i>
@@ -139,19 +139,19 @@
             </div>
           </div>
         </div>
-        
+
         <div class="notification-footer">
           <a href="#">Voir toutes les notifications</a>
         </div>
       </div>
     </div>
-    
+
     <!-- User profile -->
     <div class="user-profile">
       <div class="user-avatar" (click)="toggleUserMenu()">
         <img [src]="userAvatar" alt="User Avatar">
       </div>
-      
+
       <!-- User menu dropdown -->
       <div class="user-menu" *ngIf="showUserMenu">
         <div class="user-info">
@@ -163,7 +163,7 @@
             <div class="user-role">Administrateur</div>
           </div>
         </div>
-        
+
         <div class="menu-items">
           <a class="menu-item" routerLink="/profile">
             <i class="material-icons">person</i>
@@ -181,7 +181,7 @@
             </div>
           </div>
           <div class="divider"></div>
-          <a class="menu-item logout" routerLink="/auth">
+          <a class="menu-item logout" (click)="logout()">
             <i class="material-icons">exit_to_app</i>
             <span>Déconnexion</span>
           </a>
