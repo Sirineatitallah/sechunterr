@@ -163,4 +163,26 @@ export class AuthComponent implements OnInit {
     this.error = 'Invalid credentials. Please check your email and password.';
     console.error('Login failed: Invalid credentials');
   }
+
+  /**
+   * Handle Google sign-in
+   * In a real application, this would integrate with Google OAuth
+   */
+  signInWithGoogle(): void {
+    console.log('Attempting to sign in with Google');
+    this.isLoading = true;
+
+    // Simulate Google authentication process
+    setTimeout(() => {
+      this.isLoading = false;
+      console.log('Google sign-in successful');
+
+      // Store mock token and redirect to dashboard
+      localStorage.setItem('access_token', 'google-user-token-' + Date.now());
+      localStorage.setItem('user_role', 'client');
+
+      // Redirect to user dashboard
+      window.location.href = '/dashboard/user';
+    }, 1000);
+  }
 }

@@ -124,4 +124,26 @@ export class SignupComponent {
     this.error = 'Registration failed. Please provide a valid email and password.';
     console.error('Registration failed: Invalid credentials');
   }
+
+  /**
+   * Handle Google sign-up
+   * In a real application, this would integrate with Google OAuth
+   */
+  signUpWithGoogle() {
+    console.log('Attempting to sign up with Google');
+    this.isLoading = true;
+
+    // Simulate Google authentication process
+    setTimeout(() => {
+      this.isLoading = false;
+      console.log('Google sign-up successful');
+
+      // Store mock token and redirect to dashboard
+      localStorage.setItem('access_token', 'google-user-token-' + Date.now());
+      localStorage.setItem('user_role', 'client');
+
+      // Redirect to user dashboard
+      window.location.href = '/dashboard/user';
+    }, 1000);
+  }
 }
