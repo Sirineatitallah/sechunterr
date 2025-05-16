@@ -1,0 +1,57 @@
+<h2 mat-dialog-title>Ajouter un nouvel utilisateur</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="userForm" class="user-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nom complet</mat-label>
+      <input matInput formControlName="name" placeholder="Entrez le nom complet">
+      <mat-error *ngIf="userForm.get('name')?.hasError('required')">
+        Le nom est requis
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" placeholder="Entrez l'adresse email" type="email">
+      <mat-error *ngIf="userForm.get('email')?.invalid">
+        {{ getEmailErrorMessage() }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Mot de passe</mat-label>
+      <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" placeholder="Entrez le mot de passe">
+      <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe'">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error *ngIf="userForm.get('password')?.invalid">
+        {{ getPasswordErrorMessage() }}
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Rôles</mat-label>
+      <mat-select formControlName="roles" multiple>
+        <mat-option *ngFor="let role of availableRoles" [value]="role.value">
+          {{ role.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="userForm.get('roles')?.hasError('required')">
+        Au moins un rôle est requis
+      </mat-error>
+    </mat-form-field>
+
+    <div class="mfa-toggle">
+      <mat-slide-toggle formControlName="mfaEnabled" color="primary">
+        Activer l'authentification à deux facteurs (MFA)
+      </mat-slide-toggle>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="userForm.invalid">
+    Ajouter l'utilisateur
+  </button>
+</mat-dialog-actions>

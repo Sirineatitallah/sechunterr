@@ -63,6 +63,7 @@ import { Vulnerability } from './models/vulnerability.model';
     CVSSLineChartComponent,
     HostBarChartComponent,
     RecentVulnsComponent,
+    // VulnerabilityDetailsDialogComponent is needed for the dialog opened in onViewVulnerabilityDetails method
     VulnerabilityDetailsDialogComponent
   ],
   templateUrl: './analyst-dashboard.component.html',

@@ -1,0 +1,128 @@
+<h2 mat-dialog-title>Gestion des rôles (RBAC)</h2>
+
+<mat-dialog-content class="role-management-content">
+  <div class="role-management-container">
+    <!-- Liste des rôles -->
+    <div class="roles-list">
+      <div class="roles-header">
+        <h3>Rôles disponibles</h3>
+        <button mat-mini-fab color="primary" (click)="createNewRole()" aria-label="Créer un nouveau rôle">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+
+      <table mat-table [dataSource]="roles" class="roles-table">
+        <!-- Nom du rôle -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nom</th>
+          <td mat-cell *matCellDef="let role">
+            <div class="role-name">
+              {{ role.name }}
+              <mat-icon *ngIf="role.isSystem" matTooltip="Rôle système" class="system-icon">shield</mat-icon>
+              <mat-icon *ngIf="role.isDefault" matTooltip="Rôle par défaut" class="default-icon">star</mat-icon>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Description du rôle -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
+          <td mat-cell *matCellDef="let role">{{ role.description }}</td>
+        </ng-container>
+
+        <!-- Nombre de permissions -->
+        <ng-container matColumnDef="permissionCount">
+          <th mat-header-cell *matHeaderCellDef>Permissions</th>
+          <td mat-cell *matCellDef="let role">
+            <div class="permission-count">
+              {{ getPermissionCount(role) }}
+              <span class="permission-total">/ {{ permissions.length }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let role">
+            <div class="role-actions">
+              <button mat-icon-button color="primary" (click)="selectRole(role)" aria-label="Modifier le rôle">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" [disabled]="role.isSystem" (click)="deleteRole(role)" aria-label="Supprimer le rôle">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.selected-row]="selectedRole && selectedRole.id === row.id"
+            (click)="selectRole(row)"></tr>
+      </table>
+    </div>
+
+    <!-- Formulaire d'édition de rôle -->
+    <div class="role-edit-form" *ngIf="selectedRole || !editMode">
+      <h3>{{ editMode ? 'Modifier le rôle' : 'Créer un nouveau rôle' }}</h3>
+
+      <form [formGroup]="roleForm" class="role-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nom du rôle</mat-label>
+          <input matInput formControlName="name" placeholder="Entrez le nom du rôle">
+          <mat-error *ngIf="roleForm.get('name')?.hasError('required')">
+            Le nom du rôle est requis
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" placeholder="Entrez une description du rôle" rows="2"></textarea>
+          <mat-error *ngIf="roleForm.get('description')?.hasError('required')">
+            La description est requise
+          </mat-error>
+        </mat-form-field>
+
+        <div class="permissions-section">
+          <h4>Permissions</h4>
+
+          <mat-accordion class="permissions-accordion">
+            <mat-expansion-panel *ngFor="let module of modules">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ module }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{ getPermissionsByModule(module).length }} permissions
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <div class="permission-list">
+                <div *ngFor="let permission of getPermissionsByModule(module); let i = index" class="permission-item">
+                  <mat-checkbox [formControl]="$any(permissionsFormArray.at(permissions.indexOf(permission)))">
+                    {{ permission.name }}
+                  </mat-checkbox>
+                  <div class="permission-description">
+                    {{ permission.description }}
+                  </div>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button (click)="cancelEdit()">Annuler</button>
+          <button mat-raised-button color="primary" (click)="saveRole()" [disabled]="roleForm.invalid">
+            {{ editMode ? 'Mettre à jour' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Fermer</button>
+</mat-dialog-actions>

@@ -1,0 +1,96 @@
+@use "sass:color";
+
+// Variables
+$primary-color: #00f3ff;
+$secondary-color: #bc13fe;
+$background-dark: #0a0e1f;
+$text-light: #ffffff;
+$text-muted: #a8a3a3;
+
+:host {
+  display: block;
+}
+
+h2 {
+  color: $primary-color;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 10px;
+  min-width: 400px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.mfa-toggle {
+  margin: 10px 0;
+}
+
+mat-dialog-actions {
+  padding: 16px 0;
+  margin-top: 20px;
+}
+
+// Style pour les champs de formulaire dans le thème sombre
+::ng-deep.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .mat-mdc-form-field-label {
+    color: $text-muted;
+  }
+
+  .mat-mdc-input-element {
+    color: $text-light;
+  }
+
+  .mat-mdc-select-value {
+    color: $text-light;
+  }
+}
+
+// Style pour les boutons
+button[mat-raised-button] {
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
+  color: $text-light;
+  transition: all 0.3s ease;
+
+  &:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    background: linear-gradient(135deg,
+      color.adjust($primary-color, $saturation: -50%),
+      color.adjust($secondary-color, $saturation: -50%)
+    );
+  }
+}
+
+button[mat-button] {
+  color: $text-muted;
+
+  &:hover {
+    color: $text-light;
+  }
+}
+
+// Animation d'entrée pour le dialogue
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+:host {
+  animation: fadeIn 0.3s ease-out;
+}

@@ -1,0 +1,168 @@
+// IE Compatibility Styles
+// This file contains CSS prefixes for Internet Explorer compatibility
+
+// Flexbox prefixes
+.dashboard-content {
+  display: -ms-flexbox;
+}
+
+.placeholder-content,
+.static-chart,
+.security-score,
+.score-circle,
+.score-details,
+.widget-header,
+.widget-controls,
+.section-header,
+.user-stats,
+.user-actions,
+.role-badges,
+.mfa-badge,
+.ms-header,
+.ms-trend,
+.metric-trend,
+.activity-heatmap,
+.heatmap-header,
+.heatmap-row,
+.heatmap-legend,
+.legend-item,
+.microservice-header,
+.microservice-metrics,
+.microservice-actions,
+.logs-filter,
+.threshold-slider {
+  display: -ms-flexbox;
+}
+
+// Flex direction
+.static-chart,
+.security-score,
+.score-circle,
+.score-details,
+.score-item,
+.metric,
+.activity-heatmap,
+.settings-content {
+  -ms-flex-direction: column;
+}
+
+// Flex wrap
+.role-badges {
+  -ms-flex-wrap: wrap;
+}
+
+// Align items
+.dashboard-content,
+.placeholder-content,
+.widget-header,
+.widget-controls,
+.section-header,
+.mfa-badge,
+.ms-header,
+.ms-trend,
+.metric-trend,
+.heatmap-row,
+.legend-item,
+.microservice-header,
+.threshold-slider {
+  -ms-flex-align: center;
+}
+
+// Justify content
+.placeholder-content,
+.score-circle,
+.widget-controls,
+.user-actions,
+.heatmap-legend,
+.microservice-actions {
+  -ms-flex-pack: center;
+}
+
+.widget-header,
+.section-header {
+  -ms-flex-pack: justify;
+}
+
+// Flex grow
+.section-header h2,
+.item-progress,
+.endpoint-path,
+.ms-name {
+  -ms-flex: 1;
+}
+
+// Grid prefixes
+.widget-grid {
+  display: -ms-grid;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr;
+}
+
+.stats-charts {
+  display: -ms-grid;
+  -ms-grid-columns: 1fr 1fr;
+}
+
+.microservice-metrics {
+  display: -ms-grid;
+  -ms-grid-columns: 1fr 1fr;
+}
+
+.settings-grid {
+  display: -ms-grid;
+  -ms-grid-columns: 1fr 1fr 1fr;
+}
+
+// User select
+.user-table th,
+.user-table td,
+.endpoint-method,
+.endpoint-path,
+.endpoint-status {
+  -ms-user-select: none;
+}
+
+// Touch action
+.mat-slider {
+  -ms-touch-action: none;
+}
+
+// Background clip
+.placeholder-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+// Position sticky
+.widget-header {
+  position: -ms-sticky;
+  position: sticky;
+}
+
+// Width fit-content
+.role-badge,
+.mfa-badge,
+.endpoint-method,
+.endpoint-status {
+  width: -ms-fit-content;
+  width: fit-content;
+}
+
+// Aspect ratio (no direct IE equivalent)
+.heatmap-cell {
+  width: 30px;
+  height: 30px;
+}
+
+// Backdrop filter (no IE support)
+// For glassmorphism effect, provide a fallback
+.admin-section,
+.admin-dashboard-header,
+.widget {
+  background-color: rgba(10, 14, 31, 0.8);
+}
+
+// Add IE-specific styles for progress bars
+.health-bar,
+.progress-container mat-progress-bar {
+  border: 1px solid rgba(0, 243, 255, 0.2);
+}

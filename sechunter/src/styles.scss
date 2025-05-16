@@ -54,6 +54,74 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: #e1e1e6;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    .mdc-dialog__surface {
+      background-color: #1a2634;
+      color: #e1e1e6;
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .mdc-dialog__title {
+      color: #00f3ff;
+    }
+
+    .mdc-dialog__content {
+      color: #e1e1e6;
+    }
+
+    .mdc-dialog__actions {
+      padding: 16px 24px;
+    }
+
+    .mat-mdc-form-field {
+      width: 100%;
+    }
+  }
+
+  // Animation d'entrée pour le dialogue
+  @keyframes dialogFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .mdc-dialog__container {
+    animation: dialogFadeIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+}
+
+/* Styles spécifiques pour le dialogue de gestion des rôles */
+.role-management-dialog {
+  .mat-mdc-dialog-container {
+    .mdc-dialog__surface {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mat-mdc-dialog-content {
+      max-height: 75vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 1200px) {
+      .mdc-dialog__surface {
+        width: 95vw;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mdc-dialog__surface {
+        width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+
+      .mat-mdc-dialog-content {
+        max-height: 85vh;
+      }
+    }
   }
 }
 

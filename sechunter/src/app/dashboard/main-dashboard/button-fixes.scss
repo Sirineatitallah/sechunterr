@@ -1,0 +1,106 @@
+/* Fixes for Material Button issues */
+
+/* Fix for mdc-button__label */
+.mat-mdc-button .mdc-button__label,
+.mat-mdc-unelevated-button .mdc-button__label,
+.mat-mdc-raised-button .mdc-button__label,
+.mat-mdc-outlined-button .mdc-button__label,
+.mat-mdc-icon-button .mdc-button__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Ensure clicks pass through to the button */
+}
+
+/* Fix for mat-mdc-button-touch-target */
+.mat-mdc-button-touch-target {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none; /* Ensure clicks pass through to the button */
+}
+
+/* Increase touch target size for better accessibility */
+.mat-mdc-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button {
+  min-width: 64px;
+  min-height: 36px;
+  padding: 0 16px !important;
+  position: relative;
+}
+
+.mat-mdc-icon-button {
+  min-width: 40px;
+  min-height: 40px;
+  position: relative;
+}
+
+/* Ensure proper alignment of icon and text in buttons */
+.mat-mdc-button .mat-icon,
+.mat-mdc-unelevated-button .mat-icon,
+.mat-mdc-raised-button .mat-icon,
+.mat-mdc-outlined-button .mat-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fix for button focus states */
+.mat-mdc-button:focus,
+.mat-mdc-unelevated-button:focus,
+.mat-mdc-raised-button:focus,
+.mat-mdc-outlined-button:focus,
+.mat-mdc-icon-button:focus {
+  outline: none;
+}
+
+.mat-mdc-button:focus-visible,
+.mat-mdc-unelevated-button:focus-visible,
+.mat-mdc-raised-button:focus-visible,
+.mat-mdc-outlined-button:focus-visible,
+.mat-mdc-icon-button:focus-visible {
+  outline: 2px solid rgba(0, 243, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Fix for button active states */
+.mat-mdc-button:active,
+.mat-mdc-unelevated-button:active,
+.mat-mdc-raised-button:active,
+.mat-mdc-outlined-button:active,
+.mat-mdc-icon-button:active {
+  transform: translateY(1px);
+}
+
+/* Fix for disabled buttons */
+.mat-mdc-button[disabled],
+.mat-mdc-unelevated-button[disabled],
+.mat-mdc-raised-button[disabled],
+.mat-mdc-outlined-button[disabled],
+.mat-mdc-icon-button[disabled] {
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
+/* Fix for button ripple effect */
+.mat-mdc-button .mat-ripple,
+.mat-mdc-unelevated-button .mat-ripple,
+.mat-mdc-raised-button .mat-ripple,
+.mat-mdc-outlined-button .mat-ripple,
+.mat-mdc-icon-button .mat-ripple {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

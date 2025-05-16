@@ -12,6 +12,7 @@ export interface AuditEntry {
     ipAddress?: string;
     userAgent?: string;
     error?: string;
+    details?: string; // Ajout de la propriété details pour les informations supplémentaires
   };
 }
 
@@ -22,7 +23,7 @@ export class AuditService {
 
   log(entry: AuditEntry): void {
     this.queue.push(this.sanitizeEntry(entry));
-    
+
     if (this.queue.length >= 5) {
       this.flush();
     }

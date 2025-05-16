@@ -14,77 +14,478 @@
       </a>
     </div>
 
-    <!-- Direct link to new analyst dashboard -->
-    <div class="direct-link-container">
-      <a routerLink="/dashboard/analyst-new" class="direct-link">
-        <mat-icon>dashboard</mat-icon>
-        <span>Go to New Analyst Dashboard</span>
-      </a>
+    <!-- Admin Dashboard Header -->
+    <div class="admin-dashboard-header">
+      <h1>Dashboard Principal de l'Admin</h1>
+      <p class="admin-subtitle">Vue centralisée de la plateforme et capacités de gestion</p>
     </div>
 
-    <!-- Instance Manager Section -->
-    <section class="instance-manager">
-      <h2>
-        <mat-icon>dns</mat-icon>
-        Instance Manager
-      </h2>
-      <div class="instance-list">
-        <div *ngFor="let instance of instances" class="instance-item">
-          <span class="status-indicator" [ngClass]="getStatusClass(instance.status)"></span>
-          <span class="instance-name">{{ instance.name }}</span>
-          <span class="instance-last-scan">Last scan: {{ formatDate(instance.lastScan) }}</span>
-          <div class="instance-actions">
-            <button mat-icon-button>
-              <mat-icon>more_vert</mat-icon>
+    <!-- User Management Section -->
+    <section class="admin-section user-management-section">
+      <div class="section-header">
+        <mat-icon class="section-icon">manage_accounts</mat-icon>
+        <h2>🔐 Gestion des utilisateurs</h2>
+        <button mat-icon-button class="refresh-btn" (click)="refreshUserData()" aria-label="Rafraîchir les données utilisateurs">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      <div class="section-content">
+        <div class="user-stats">
+          <div class="stat-card">
+            <div class="stat-value">{{ users.length }}</div>
+            <div class="stat-label">Nombre total d'utilisateurs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ getAnalystCount() }}</div>
+            <div class="stat-label">Analystes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">{{ getAdminCount() }}</div>
+            <div class="stat-label">Administrateurs</div>
+          </div>
+        </div>
+
+        <div class="user-list-container">
+          <h3>Liste des analystes</h3>
+          <div class="user-list">
+            <table mat-table [dataSource]="users" class="user-table">
+              <!-- Email Column -->
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Nom</th>
+                <td mat-cell *matCellDef="let user">{{ user.name }}</td>
+              </ng-container>
+
+              <!-- Role Column -->
+              <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef>Rôle</th>
+                <td mat-cell *matCellDef="let user">
+                  <div class="role-badges">
+                    <span *ngFor="let role of user.roles" class="role-badge" [ngClass]="'role-' + role">
+                      {{ role }}
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- MFA Column -->
+              <ng-container matColumnDef="mfa">
+                <th mat-header-cell *matHeaderCellDef>MFA</th>
+                <td mat-cell *matCellDef="let user">
+                  <span class="mfa-badge" [ngClass]="user.mfaEnabled ? 'mfa-enabled' : 'mfa-disabled'">
+                    <mat-icon>{{ user.mfaEnabled ? 'security' : 'no_encryption' }}</mat-icon>
+                    {{ user.mfaEnabled ? 'Activé' : 'Désactivé' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Last Login Column -->
+              <ng-container matColumnDef="lastLogin">
+                <th mat-header-cell *matHeaderCellDef>Dernière connexion</th>
+                <td mat-cell *matCellDef="let user">{{ user.lastLogin | date:'short' }}</td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let user">
+                  <button mat-icon-button matTooltip="Modifier l'utilisateur" (click)="editUser(user)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Supprimer l'utilisateur" (click)="deleteUser(user)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Gérer les permissions" (click)="manageUserPermissions(user)">
+                    <mat-icon>admin_panel_settings</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedUserColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedUserColumns;"></tr>
+            </table>
+          </div>
+
+          <div class="user-actions">
+            <button mat-raised-button color="primary" (click)="addUser()" aria-label="Ajouter un utilisateur">
+              <mat-icon aria-hidden="true">person_add</mat-icon>
+              <span>Ajouter un utilisateur</span>
+            </button>
+            <button mat-raised-button color="accent" (click)="manageRoles()" aria-label="Gérer les rôles">
+              <mat-icon aria-hidden="true">admin_panel_settings</mat-icon>
+              <span>Gérer les rôles (RBAC)</span>
             </button>
           </div>
         </div>
       </div>
-      <button class="add-instance-btn" (click)="addInstance()">
-        <mat-icon>add</mat-icon>
-        Ajouter une Instance
-      </button>
     </section>
 
-    <!-- Quick Widgets Section -->
-    <section class="favorites-widgets">
-      <h2>
-        <mat-icon>dashboard</mat-icon>
-        Favoris / Widgets Rapides
-      </h2>
-      <div class="widget-grid">
-        <div *ngFor="let widget of quickWidgets" class="quick-widget">
-          <h3>{{ widget.title }}</h3>
-          <div class="widget-value">{{ widget.value }}</div>
-          <div class="widget-trend" [ngClass]="widget.trendDirection">
-            <mat-icon>{{ widget.trendDirection === 'positive' ? 'trending_up' : 'trending_down' }}</mat-icon>
-            {{ widget.trend }}
+    <!-- Global Statistics Section -->
+    <section class="admin-section global-stats-section">
+      <div class="section-header">
+        <mat-icon class="section-icon">insights</mat-icon>
+        <h2>📈 Statistiques globales</h2>
+        <button mat-icon-button class="refresh-btn" (click)="refreshStatistics()" aria-label="Rafraîchir les statistiques">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      <div class="section-content">
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-value">{{ getTotalVulnerabilities() }}</div>
+            <div class="stat-label">Vulnérabilités détectées</div>
+            <div class="stat-breakdown">
+              <span class="severity-critical">{{ vulnerabilityStats.critical }} Critiques</span> |
+              <span class="severity-high">{{ vulnerabilityStats.high }} Hautes</span> |
+              <span class="severity-medium">{{ vulnerabilityStats.medium }} Moyennes</span> |
+              <span class="severity-low">{{ vulnerabilityStats.low }} Basses</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-value">{{ getActivityCount() }}</div>
+            <div class="stat-label">Activités récentes</div>
+            <div class="stat-breakdown">
+              <span>{{ getLastActivityTime() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-charts">
+          <div class="chart-container">
+            <h3>Répartition des vulnérabilités par microservice</h3>
+            <div class="chart-placeholder">
+              <!-- Placeholder for vulnerability distribution chart -->
+              <div class="microservice-stats">
+                <div class="microservice-stat" *ngFor="let ms of microserviceStats">
+                  <div class="ms-header">
+                    <div class="ms-name">{{ ms.name }}</div>
+                    <div class="ms-trend" [ngClass]="ms.status">
+                      <mat-icon>{{ ms.status === 'increasing' ? 'trending_up' : 'trending_down' }}</mat-icon>
+                      {{ ms.trend }}
+                    </div>
+                  </div>
+                  <div class="ms-value">{{ ms.vulnerabilities }} vulnérabilités</div>
+                  <div class="progress-container">
+                    <mat-progress-bar mode="determinate" [value]="ms.percentage" [color]="ms.color" [attr.aria-label]="'Pourcentage de vulnérabilités pour ' + ms.name + ': ' + ms.percentage + '%'"></mat-progress-bar>
+                    <span class="progress-value">{{ ms.percentage }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <h3>Activité par analyste</h3>
+            <div class="chart-placeholder">
+              <!-- Placeholder for activity heatmap -->
+              <div class="activity-heatmap">
+                <div class="heatmap-header">
+                  <div class="heatmap-corner"></div>
+                  <div class="heatmap-day" *ngFor="let day of weekdays">{{ day }}</div>
+                </div>
+                <div class="heatmap-row" *ngFor="let row of activityHeatmap; let i = index">
+                  <div class="heatmap-analyst">{{ analystNames[i] }}</div>
+                  <div class="heatmap-cell" *ngFor="let cell of row"
+                       [style.background-color]="getHeatmapColor(cell)"
+                       [matTooltip]="analystNames[i] + ' - ' + cell + ' activités'">
+                    {{ cell }}
+                  </div>
+                </div>
+                <div class="heatmap-legend">
+                  <div class="legend-item">
+                    <div class="legend-color" [style.background-color]="getHeatmapColor(1)"></div>
+                    <div class="legend-label">Faible</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" [style.background-color]="getHeatmapColor(5)"></div>
+                    <div class="legend-label">Moyen</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" [style.background-color]="getHeatmapColor(9)"></div>
+                    <div class="legend-label">Élevé</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Recent Activity Section -->
-    <section class="recent-activity">
-      <h2>
-        <mat-icon>history</mat-icon>
-        Historique des Actions
-      </h2>
-      <div class="activity-list">
-        <div *ngFor="let activity of recentActivities" class="activity-item">
-          <div class="activity-icon">
-            <mat-icon>{{ activity.icon }}</mat-icon>
-          </div>
-          <div class="activity-content">
-            <div class="activity-title">{{ activity.title }}</div>
-            <div class="activity-time">{{ activity.time }}</div>
+    <!-- Microservice Monitoring Section -->
+    <section class="admin-section microservice-section">
+      <div class="section-header">
+        <mat-icon class="section-icon">memory</mat-icon>
+        <h2>📊 Surveillance des Microservices</h2>
+        <button mat-icon-button class="refresh-btn" (click)="refreshMicroservices()" aria-label="Rafraîchir les microservices">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      <div class="section-content">
+        <div class="microservice-grid">
+          <div class="microservice-card" *ngFor="let service of microservices">
+            <div class="microservice-header">
+              <mat-icon [ngClass]="getServiceStatusClass(service)">{{ getServiceStatusIcon(service) }}</mat-icon>
+              <h3>{{ service.name }}</h3>
+              <span class="service-status" [ngClass]="getServiceStatusClass(service)">
+                {{ service.status }}
+              </span>
+            </div>
+
+            <div class="service-health-indicator">
+              <div class="health-bar" role="progressbar" [attr.aria-valuenow]="getServiceHealth(service)" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'Santé du service ' + service.name + ': ' + getServiceHealth(service) + '%'">
+                <div class="health-fill" [style.width.%]="getServiceHealth(service)"></div>
+              </div>
+              <span class="health-label">Santé: {{ getServiceHealth(service) }}%</span>
+            </div>
+
+            <div class="microservice-metrics">
+              <div class="metric">
+                <span class="metric-label">Temps de réponse</span>
+                <span class="metric-value">{{ service.responseTime }}ms</span>
+                <span class="metric-trend" [ngClass]="service.responseTime > 200 ? 'negative' : 'positive'">
+                  <mat-icon>{{ service.responseTime > 200 ? 'trending_up' : 'trending_down' }}</mat-icon>
+                </span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Dernière mise à jour</span>
+                <span class="metric-value">{{ service.lastUpdate | date:'short' }}</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Requêtes/min</span>
+                <span class="metric-value">{{ service.requestsPerMinute }}</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Erreurs</span>
+                <span class="metric-value" [ngClass]="service.errors > 0 ? 'error-value' : ''">
+                  {{ service.errors }}
+                </span>
+              </div>
+            </div>
+
+            <div class="service-endpoints">
+              <h4>Points d'accès API</h4>
+              <div class="endpoint" *ngFor="let i of [1, 2, 3]">
+                <span class="endpoint-method">GET</span>
+                <span class="endpoint-path">/api/{{ service.id.split('-')[0] }}/{{ i === 1 ? 'status' : i === 2 ? 'data' : 'metrics' }}</span>
+                <span class="endpoint-status" [ngClass]="i === 1 || service.status === 'Online' ? 'status-success' : 'status-error'">
+                  {{ i === 1 || service.status === 'Online' ? '200 OK' : '503 Error' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="microservice-actions">
+              <button mat-button [disabled]="service.status === 'Offline'" (click)="restartService(service)" matTooltip="Redémarrer le service">
+                <mat-icon>restart_alt</mat-icon> Redémarrer
+              </button>
+              <button mat-button (click)="toggleService(service)" matTooltip="{{ service.status === 'Online' ? 'Désactiver' : 'Activer' }} le service">
+                <mat-icon>{{ service.status === 'Online' ? 'pause' : 'play_arrow' }}</mat-icon>
+                {{ service.status === 'Online' ? 'Désactiver' : 'Activer' }}
+              </button>
+              <button mat-button (click)="viewServiceLogs(service)" matTooltip="Voir les logs du service">
+                <mat-icon>article</mat-icon> Logs
+              </button>
+              <button mat-button (click)="configureService(service)" matTooltip="Configurer le service">
+                <mat-icon>settings</mat-icon> Config
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Dashboard Filter -->
-    <app-dashboard-filter></app-dashboard-filter>
+    <!-- Audit & Logs Section -->
+    <section class="admin-section audit-logs-section">
+      <div class="section-header">
+        <mat-icon class="section-icon">fact_check</mat-icon>
+        <h2>🔍 Audit & Logs</h2>
+        <button mat-icon-button class="refresh-btn" (click)="refreshLogs()" aria-label="Rafraîchir les logs">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      <div class="section-content">
+        <div class="logs-filter">
+          <mat-form-field appearance="outline">
+            <mat-label>Filtrer par utilisateur</mat-label>
+            <mat-select [(ngModel)]="logFilters.user" (selectionChange)="applyLogFilters()">
+              <mat-option [value]="''">Tous</mat-option>
+              <mat-option *ngFor="let user of users" [value]="user.id">{{ user.email }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Filtrer par action</mat-label>
+            <mat-select [(ngModel)]="logFilters.action" (selectionChange)="applyLogFilters()">
+              <mat-option [value]="''">Toutes</mat-option>
+              <mat-option value="login">Connexion</mat-option>
+              <mat-option value="logout">Déconnexion</mat-option>
+              <mat-option value="create">Création</mat-option>
+              <mat-option value="update">Modification</mat-option>
+              <mat-option value="delete">Suppression</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Filtrer par date</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="logFilters.date" (dateChange)="applyLogFilters()">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="downloadLogs()">
+            <mat-icon>download</mat-icon> Télécharger les logs
+          </button>
+        </div>
+
+        <div class="logs-table-container">
+          <table mat-table [dataSource]="auditLogs" class="logs-table">
+            <!-- Timestamp Column -->
+            <ng-container matColumnDef="timestamp">
+              <th mat-header-cell *matHeaderCellDef>Date/Heure</th>
+              <td mat-cell *matCellDef="let log">{{ log.timestamp | date:'medium' }}</td>
+            </ng-container>
+
+            <!-- User Column -->
+            <ng-container matColumnDef="user">
+              <th mat-header-cell *matHeaderCellDef>Utilisateur</th>
+              <td mat-cell *matCellDef="let log">{{ log.user?.email || 'Système' }}</td>
+            </ng-container>
+
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Action</th>
+              <td mat-cell *matCellDef="let log">{{ log.method }}</td>
+            </ng-container>
+
+            <!-- Resource Column -->
+            <ng-container matColumnDef="resource">
+              <th mat-header-cell *matHeaderCellDef>Ressource</th>
+              <td mat-cell *matCellDef="let log">{{ log.endpoint }}</td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Statut</th>
+              <td mat-cell *matCellDef="let log">
+                <span class="status-badge" [ngClass]="log.status === 'success' ? 'status-success' : 'status-error'">
+                  {{ log.status }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Details Column -->
+            <ng-container matColumnDef="details">
+              <th mat-header-cell *matHeaderCellDef>Détails</th>
+              <td mat-cell *matCellDef="let log">
+                <button mat-icon-button (click)="viewLogDetails(log)" aria-label="Voir les détails du log">
+                  <mat-icon>info</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedLogColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedLogColumns;"></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advanced Settings Section -->
+    <section class="admin-section advanced-settings-section">
+      <div class="section-header">
+        <mat-icon class="section-icon">settings</mat-icon>
+        <h2>⚙️ Paramètres avancés</h2>
+      </div>
+
+      <div class="section-content">
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>
+              <mat-icon>api</mat-icon>
+              Configuration des accès API
+            </h3>
+            <div class="settings-content">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Clé API</mat-label>
+                <input matInput [type]="hideApiKey ? 'password' : 'text'" value="sk_live_51NxXXXXXXXXXXXXX" id="api-key" name="api-key">
+                <button mat-icon-button matSuffix (click)="hideApiKey = !hideApiKey" [attr.aria-label]="hideApiKey ? 'Afficher la clé API' : 'Masquer la clé API'">
+                  <mat-icon>{{ hideApiKey ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Limite de requêtes par minute</mat-label>
+                <input matInput type="number" value="100" id="rate-limit" name="rate-limit">
+              </mat-form-field>
+
+              <button mat-raised-button color="primary" aria-label="Régénérer la clé API">
+                <mat-icon aria-hidden="true">refresh</mat-icon>
+                <span>Régénérer la clé API</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>
+              <mat-icon>integration_instructions</mat-icon>
+              Intégration d'outils externes
+            </h3>
+            <div class="settings-content">
+              <mat-slide-toggle [checked]="integrations.siem">SIEM</mat-slide-toggle>
+              <mat-slide-toggle [checked]="integrations.ticketing">Système de tickets</mat-slide-toggle>
+              <mat-slide-toggle [checked]="integrations.email">Notifications par email</mat-slide-toggle>
+              <mat-slide-toggle [checked]="integrations.slack">Notifications Slack</mat-slide-toggle>
+
+              <button mat-raised-button color="primary" aria-label="Ajouter une intégration">
+                <mat-icon aria-hidden="true">add</mat-icon>
+                <span>Ajouter une intégration</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>
+              <mat-icon>notifications</mat-icon>
+              Configuration des notifications
+            </h3>
+            <div class="settings-content">
+              <h4>Seuils d'alerte</h4>
+
+              <div class="threshold-slider">
+                <span>Vulnérabilités critiques</span>
+                <mat-slider min="0" max="10" step="1" [discrete]="true" aria-label="Seuil de vulnérabilités critiques">
+                  <input matSliderThumb [(ngModel)]="notificationThresholds.critical" id="critical-threshold" name="critical-threshold">
+                </mat-slider>
+                <span>{{ notificationThresholds.critical }}</span>
+              </div>
+
+              <div class="threshold-slider">
+                <span>Vulnérabilités hautes</span>
+                <mat-slider min="0" max="20" step="1" [discrete]="true" aria-label="Seuil de vulnérabilités hautes">
+                  <input matSliderThumb [(ngModel)]="notificationThresholds.high" id="high-threshold" name="high-threshold">
+                </mat-slider>
+                <span>{{ notificationThresholds.high }}</span>
+              </div>
+
+              <button mat-raised-button color="primary" aria-label="Enregistrer les paramètres">
+                <mat-icon aria-hidden="true">save</mat-icon>
+                <span>Enregistrer les paramètres</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Drill Down View -->
     <app-drill-down-view *ngIf="isDrillDownActive"></app-drill-down-view>
@@ -96,11 +497,11 @@
         <div class="widget-header">
           <h3>Vulnerability Distribution</h3>
           <div class="widget-controls">
-            <button mat-icon-button (click)="refreshData()">
-              <mat-icon>refresh</mat-icon>
+            <button mat-icon-button (click)="refreshData()" aria-label="Rafraîchir les données">
+              <mat-icon aria-hidden="true">refresh</mat-icon>
             </button>
-            <button mat-icon-button>
-              <mat-icon>fullscreen</mat-icon>
+            <button mat-icon-button aria-label="Afficher en plein écran">
+              <mat-icon aria-hidden="true">fullscreen</mat-icon>
             </button>
           </div>
         </div>
@@ -130,11 +531,11 @@
         <div class="widget-header">
           <h3>Security Posture</h3>
           <div class="widget-controls">
-            <button mat-icon-button (click)="refreshData()">
-              <mat-icon>refresh</mat-icon>
+            <button mat-icon-button (click)="refreshData()" aria-label="Rafraîchir les données">
+              <mat-icon aria-hidden="true">refresh</mat-icon>
             </button>
-            <button mat-icon-button>
-              <mat-icon>fullscreen</mat-icon>
+            <button mat-icon-button aria-label="Afficher en plein écran">
+              <mat-icon aria-hidden="true">fullscreen</mat-icon>
             </button>
           </div>
         </div>
@@ -162,11 +563,11 @@
         <div class="widget-header">
           <h3>Global Threat Intelligence</h3>
           <div class="widget-controls">
-            <button mat-icon-button (click)="refreshData()">
-              <mat-icon>refresh</mat-icon>
+            <button mat-icon-button (click)="refreshData()" aria-label="Rafraîchir les données">
+              <mat-icon aria-hidden="true">refresh</mat-icon>
             </button>
-            <button mat-icon-button>
-              <mat-icon>fullscreen</mat-icon>
+            <button mat-icon-button aria-label="Afficher en plein écran">
+              <mat-icon aria-hidden="true">fullscreen</mat-icon>
             </button>
           </div>
         </div>
@@ -212,11 +613,11 @@
         <div class="widget-header">
           <h3>ASM Heatmap</h3>
           <div class="widget-controls">
-            <button mat-icon-button (click)="refreshData()">
-              <mat-icon>refresh</mat-icon>
+            <button mat-icon-button (click)="refreshData()" aria-label="Rafraîchir les données">
+              <mat-icon aria-hidden="true">refresh</mat-icon>
             </button>
-            <button mat-icon-button>
-              <mat-icon>fullscreen</mat-icon>
+            <button mat-icon-button aria-label="Afficher en plein écran">
+              <mat-icon aria-hidden="true">fullscreen</mat-icon>
             </button>
           </div>
         </div>
@@ -236,11 +637,11 @@
         <div class="widget-header">
           <h3>SOAR Workflow</h3>
           <div class="widget-controls">
-            <button mat-icon-button (click)="refreshData()">
-              <mat-icon>refresh</mat-icon>
+            <button mat-icon-button (click)="refreshData()" aria-label="Rafraîchir les données">
+              <mat-icon aria-hidden="true">refresh</mat-icon>
             </button>
-            <button mat-icon-button>
-              <mat-icon>fullscreen</mat-icon>
+            <button mat-icon-button aria-label="Afficher en plein écran">
+              <mat-icon aria-hidden="true">fullscreen</mat-icon>
             </button>
           </div>
         </div>
