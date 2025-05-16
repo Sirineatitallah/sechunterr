@@ -1,0 +1,296 @@
+<div class="notification-center-container">
+  <!-- Notification Button -->
+  <button
+    class="notification-button"
+    [matBadge]="unreadCount"
+    [matBadgeHidden]="unreadCount === 0"
+    matBadgeColor="warn"
+    [matTooltip]="currentLanguage === 'fr' ? 'Centre de notifications' : 'Notification center'"
+    [attr.aria-label]="currentLanguage === 'fr' ? 'Ouvrir le centre de notifications' : 'Open notification center'"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-haspopup]="true"
+    (click)="toggleNotificationCenter()">
+    <mat-icon aria-hidden="true">notifications</mat-icon>
+    <span class="sr-only">{{ currentLanguage === 'fr' ? 'Notifications' : 'Notifications' }}</span>
+  </button>
+
+  <!-- Notification Panel -->
+  <div
+    class="notification-panel"
+    [class.open]="isOpen"
+    role="dialog"
+    [attr.aria-label]="currentLanguage === 'fr' ? 'Centre de notifications' : 'Notification center'"
+    [attr.aria-hidden]="!isOpen"
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture>
+    <div class="notification-header">
+      <h2 id="notification-title">{{ currentLanguage === 'fr' ? 'Centre de notifications' : 'Notification center' }}</h2>
+      <div class="header-actions">
+        <button
+          mat-icon-button
+          [matTooltip]="currentLanguage === 'fr' ? 'Marquer tout comme lu' : 'Mark all as read'"
+          [attr.aria-label]="currentLanguage === 'fr' ? 'Marquer toutes les notifications comme lues' : 'Mark all notifications as read'"
+          (click)="markAllAsRead()">
+          <mat-icon aria-hidden="true">done_all</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          [matTooltip]="currentLanguage === 'fr' ? 'Paramètres' : 'Settings'"
+          [attr.aria-label]="currentLanguage === 'fr' ? 'Ouvrir les paramètres' : 'Open settings'"
+          [attr.aria-haspopup]="true"
+          [attr.aria-expanded]="isSettingsOpen"
+          [matMenuTriggerFor]="settingsMenu"
+          (menuOpened)="isSettingsOpen = true"
+          (menuClosed)="isSettingsOpen = false">
+          <mat-icon aria-hidden="true">settings</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          [matTooltip]="currentLanguage === 'fr' ? 'Fermer' : 'Close'"
+          [attr.aria-label]="currentLanguage === 'fr' ? 'Fermer le centre de notifications' : 'Close notification center'"
+          (click)="closeNotificationCenter()">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <mat-menu #settingsMenu="matMenu" class="settings-menu" aria-labelledby="settings-title">
+      <div class="settings-menu-content" (click)="$event.stopPropagation()" role="group">
+        <h3 id="settings-title">{{ currentLanguage === 'fr' ? 'Paramètres d\'affichage' : 'Display settings' }}</h3>
+
+        <!-- Time Format -->
+        <div class="settings-section" role="group" aria-labelledby="time-format-title">
+          <h4 id="time-format-title">{{ currentLanguage === 'fr' ? 'Format de temps' : 'Time format' }}</h4>
+          <div class="settings-option">
+            <button
+              mat-button
+              [class.active]="timeFormat === 'relative'"
+              (click)="toggleTimeFormat()"
+              [attr.aria-pressed]="timeFormat === 'relative'"
+              [attr.aria-label]="currentLanguage === 'fr' ? 'Format relatif' : 'Relative format'">
+              <mat-icon aria-hidden="true">update</mat-icon>
+              {{ currentLanguage === 'fr' ? 'Relatif' : 'Relative' }}
+            </button>
+            <button
+              mat-button
+              [class.active]="timeFormat === 'absolute'"
+              (click)="toggleTimeFormat()"
+              [attr.aria-pressed]="timeFormat === 'absolute'"
+              [attr.aria-label]="currentLanguage === 'fr' ? 'Format absolu' : 'Absolute format'">
+              <mat-icon aria-hidden="true">schedule</mat-icon>
+              {{ currentLanguage === 'fr' ? 'Absolu' : 'Absolute' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Show Seconds -->
+        <div class="settings-section" role="group" aria-labelledby="seconds-title">
+          <h4 id="seconds-title">{{ currentLanguage === 'fr' ? 'Afficher les secondes' : 'Show seconds' }}</h4>
+          <div class="settings-option">
+            <mat-slide-toggle
+              [checked]="showSeconds"
+              (change)="toggleSecondsDisplay()"
+              [attr.aria-label]="currentLanguage === 'fr' ? 'Afficher les secondes' : 'Show seconds'">
+              {{ currentLanguage === 'fr' ? (showSeconds ? 'Activé' : 'Désactivé') : (showSeconds ? 'Enabled' : 'Disabled') }}
+            </mat-slide-toggle>
+          </div>
+        </div>
+
+        <!-- Update Interval -->
+        <div class="settings-section" role="group" aria-labelledby="interval-title">
+          <h4 id="interval-title">{{ currentLanguage === 'fr' ? 'Intervalle de mise à jour (secondes)' : 'Update interval (seconds)' }}</h4>
+          <div class="settings-option">
+            <mat-slider
+              min="5"
+              max="120"
+              step="5"
+              [attr.aria-label]="currentLanguage === 'fr' ? 'Intervalle de mise à jour en secondes' : 'Update interval in seconds'">
+              <input matSliderThumb
+                [value]="updateIntervalSeconds"
+                (valueChange)="updateRefreshInterval($event)">
+            </mat-slider>
+            <span class="interval-value" aria-live="polite">{{ updateIntervalSeconds }}s</span>
+          </div>
+        </div>
+
+        <!-- Language -->
+        <div class="settings-section" role="group" aria-labelledby="language-title">
+          <h4 id="language-title">{{ currentLanguage === 'fr' ? 'Langue' : 'Language' }}</h4>
+          <div class="settings-option">
+            <button
+              mat-button
+              [class.active]="currentLanguage === 'fr'"
+              (click)="changeLanguage('fr')"
+              [attr.aria-pressed]="currentLanguage === 'fr'"
+              aria-label="Français">
+              Français
+            </button>
+            <button
+              mat-button
+              [class.active]="currentLanguage === 'en'"
+              (click)="changeLanguage('en')"
+              [attr.aria-pressed]="currentLanguage === 'en'"
+              aria-label="English">
+              English
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="settings-section">
+          <div class="settings-option">
+            <button
+              mat-button
+              color="warn"
+              (click)="resetPreferences()"
+              [attr.aria-label]="currentLanguage === 'fr' ? 'Réinitialiser tous les paramètres' : 'Reset all settings'">
+              <mat-icon aria-hidden="true">restore</mat-icon>
+              {{ currentLanguage === 'fr' ? 'Réinitialiser' : 'Reset' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-menu>
+
+    <!-- Notification Tabs -->
+    <div class="notification-tabs" role="tablist" [attr.aria-label]="currentLanguage === 'fr' ? 'Filtres de notifications' : 'Notification filters'">
+      <div
+        class="tab-item"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'all'"
+        [class.active]="activeTab === 'all'"
+        [attr.aria-label]="currentLanguage === 'fr' ? 'Toutes les notifications' : 'All notifications'"
+        tabindex="0"
+        (click)="setActiveTab('all')"
+        (keydown.enter)="setActiveTab('all')"
+        (keydown.space)="setActiveTab('all'); $event.preventDefault()">
+        <span>{{ currentLanguage === 'fr' ? 'Tous' : 'All' }}</span>
+        <span class="badge" *ngIf="unreadCount > 0" aria-hidden="true">{{ unreadCount }}</span>
+      </div>
+      <div
+        class="tab-item"
+        role="tab"
+        [attr.aria-selected]="activeTab === notificationTypes.ALERT"
+        [class.active]="activeTab === notificationTypes.ALERT"
+        [attr.aria-label]="currentLanguage === 'fr' ? 'Alertes' : 'Alerts'"
+        tabindex="0"
+        (click)="setActiveTab(notificationTypes.ALERT)"
+        (keydown.enter)="setActiveTab(notificationTypes.ALERT)"
+        (keydown.space)="setActiveTab(notificationTypes.ALERT); $event.preventDefault()">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <span>{{ currentLanguage === 'fr' ? 'Alertes' : 'Alerts' }}</span>
+        <span class="badge" *ngIf="getUnreadCountByType(notificationTypes.ALERT) > 0" aria-hidden="true">
+          {{ getUnreadCountByType(notificationTypes.ALERT) }}
+        </span>
+      </div>
+      <div
+        class="tab-item"
+        role="tab"
+        [attr.aria-selected]="activeTab === notificationTypes.TASK"
+        [class.active]="activeTab === notificationTypes.TASK"
+        [attr.aria-label]="currentLanguage === 'fr' ? 'Tâches' : 'Tasks'"
+        tabindex="0"
+        (click)="setActiveTab(notificationTypes.TASK)"
+        (keydown.enter)="setActiveTab(notificationTypes.TASK)"
+        (keydown.space)="setActiveTab(notificationTypes.TASK); $event.preventDefault()">
+        <mat-icon aria-hidden="true">assignment</mat-icon>
+        <span>{{ currentLanguage === 'fr' ? 'Tâches' : 'Tasks' }}</span>
+        <span class="badge" *ngIf="getUnreadCountByType(notificationTypes.TASK) > 0" aria-hidden="true">
+          {{ getUnreadCountByType(notificationTypes.TASK) }}
+        </span>
+      </div>
+      <div
+        class="tab-item"
+        role="tab"
+        [attr.aria-selected]="activeTab === notificationTypes.REPORT"
+        [class.active]="activeTab === notificationTypes.REPORT"
+        [attr.aria-label]="currentLanguage === 'fr' ? 'Rapports' : 'Reports'"
+        tabindex="0"
+        (click)="setActiveTab(notificationTypes.REPORT)"
+        (keydown.enter)="setActiveTab(notificationTypes.REPORT)"
+        (keydown.space)="setActiveTab(notificationTypes.REPORT); $event.preventDefault()">
+        <mat-icon aria-hidden="true">description</mat-icon>
+        <span>{{ currentLanguage === 'fr' ? 'Rapports' : 'Reports' }}</span>
+        <span class="badge" *ngIf="getUnreadCountByType(notificationTypes.REPORT) > 0" aria-hidden="true">
+          {{ getUnreadCountByType(notificationTypes.REPORT) }}
+        </span>
+      </div>
+      <div
+        class="tab-item"
+        role="tab"
+        [attr.aria-selected]="activeTab === notificationTypes.EVENT"
+        [class.active]="activeTab === notificationTypes.EVENT"
+        [attr.aria-label]="currentLanguage === 'fr' ? 'Événements' : 'Events'"
+        tabindex="0"
+        (click)="setActiveTab(notificationTypes.EVENT)"
+        (keydown.enter)="setActiveTab(notificationTypes.EVENT)"
+        (keydown.space)="setActiveTab(notificationTypes.EVENT); $event.preventDefault()">
+        <mat-icon aria-hidden="true">event</mat-icon>
+        <span>{{ currentLanguage === 'fr' ? 'Événements' : 'Events' }}</span>
+        <span class="badge" *ngIf="getUnreadCountByType(notificationTypes.EVENT) > 0" aria-hidden="true">
+          {{ getUnreadCountByType(notificationTypes.EVENT) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Notification List -->
+    <div
+      class="notification-list"
+      role="tabpanel"
+      [attr.aria-label]="currentLanguage === 'fr' ? 'Liste de notifications' : 'Notification list'">
+      <ng-container *ngIf="filteredNotifications.length > 0; else noNotifications">
+        <div
+          *ngFor="let notification of filteredNotifications; let i = index"
+          class="notification-item"
+          [class.unread]="!notification.read"
+          [attr.aria-label]="notification.title + (notification.read ? '' : (currentLanguage === 'fr' ? ' - Non lu' : ' - Unread'))"
+          [attr.tabindex]="0"
+          (click)="markAsRead(notification.id)"
+          (keydown.enter)="markAsRead(notification.id)"
+          (keydown.space)="markAsRead(notification.id); $event.preventDefault()">
+
+          <div class="notification-icon" [style.color]="getPriorityColor(notification.priority)" aria-hidden="true">
+            <mat-icon>{{ notification.icon || getTypeIcon(notification.type) }}</mat-icon>
+          </div>
+
+          <div class="notification-content">
+            <div class="notification-header">
+              <h3 class="notification-title" [id]="'notification-title-' + notification.id">{{ notification.title }}</h3>
+              <span class="notification-time" [attr.aria-label]="currentLanguage === 'fr' ? 'Reçu ' + getRelativeTime(notification.timestamp) : 'Received ' + getRelativeTime(notification.timestamp)">
+                {{ getRelativeTime(notification.timestamp) }}
+              </span>
+            </div>
+            <p class="notification-message">{{ notification.message }}</p>
+            <div class="notification-actions" *ngIf="notification.actionUrl">
+              <a
+                [routerLink]="notification.actionUrl"
+                class="action-button"
+                [attr.aria-label]="notification.actionLabel || (currentLanguage === 'fr' ? 'Voir' : 'View')"
+                (click)="$event.stopPropagation()">
+                {{ notification.actionLabel || (currentLanguage === 'fr' ? 'Voir' : 'View') }}
+              </a>
+            </div>
+          </div>
+
+          <button
+            class="delete-button"
+            [matTooltip]="currentLanguage === 'fr' ? 'Supprimer' : 'Delete'"
+            [attr.aria-label]="(currentLanguage === 'fr' ? 'Supprimer la notification: ' : 'Delete notification: ') + notification.title"
+            (click)="deleteNotification(notification.id, $event)">
+            <mat-icon aria-hidden="true">delete</mat-icon>
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-template #noNotifications>
+        <div class="no-notifications" role="status">
+          <mat-icon aria-hidden="true">notifications_off</mat-icon>
+          <p>{{ currentLanguage === 'fr'
+              ? ('Aucune notification' + (activeTab !== 'all' ? ' de ce type' : ''))
+              : ('No notifications' + (activeTab !== 'all' ? ' of this type' : '')) }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

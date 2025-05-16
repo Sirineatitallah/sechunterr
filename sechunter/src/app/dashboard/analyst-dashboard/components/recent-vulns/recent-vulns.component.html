@@ -1,0 +1,76 @@
+<mat-card class="recent-vulns-card">
+  <mat-card-header>
+    <mat-card-title>
+      <div class="widget-title">
+        <mat-icon>update</mat-icon>
+        <span>Recent Vulnerabilities</span>
+      </div>
+      <div class="widget-actions">
+        <button mat-icon-button [matMenuTriggerFor]="feedMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #feedMenu="matMenu">
+          <button mat-menu-item (click)="refreshFeed()">
+            <mat-icon>refresh</mat-icon>
+            <span>Refresh</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>fullscreen</mat-icon>
+            <span>Expand</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="feed-container" *ngIf="!loading; else loadingTemplate">
+      <div class="feed-info" *ngIf="recentVulnerabilities.length === 0">
+        <mat-icon>info</mat-icon>
+        <span>No recent vulnerabilities found</span>
+      </div>
+      
+      <div class="vuln-feed" *ngIf="recentVulnerabilities.length > 0">
+        <div class="vuln-item" *ngFor="let vuln of recentVulnerabilities">
+          <div class="vuln-header">
+            <div class="vuln-severity" [ngClass]="getSeverityClass(vuln.severity)">
+              {{ vuln.severity }}
+            </div>
+            <div class="vuln-time">{{ getTimeAgo(vuln.discoveredDate) }}</div>
+          </div>
+          
+          <div class="vuln-title">{{ vuln.vulnerabilityName }}</div>
+          
+          <div class="vuln-details">
+            <div class="vuln-detail">
+              <mat-icon>security</mat-icon>
+              <span>CVSS: {{ vuln.cvssScore.toFixed(1) }}</span>
+            </div>
+            <div class="vuln-detail">
+              <mat-icon>computer</mat-icon>
+              <span>Host: {{ vuln.host_ip }}</span>
+            </div>
+            <div class="vuln-detail" *ngIf="vuln.cve_ids.length > 0">
+              <mat-icon>bug_report</mat-icon>
+              <span>{{ vuln.cve_ids[0] }}</span>
+            </div>
+          </div>
+          
+          <div class="vuln-actions">
+            <button mat-button color="primary" (click)="onViewDetails(vuln)">
+              <mat-icon>visibility</mat-icon>
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading data...</p>
+  </div>
+</ng-template>

@@ -1,0 +1,102 @@
+<div class="dashboard-container">
+  <!-- Sidebar (Left) -->
+  <aside class="dashboard-sidebar">
+    <app-sidebar (menuSelection)="setActiveTab($event)"></app-sidebar>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-main" [ngClass]="activeTab + '-active'">
+    <!-- Header with analyst info and notifications -->
+    <header class="dashboard-header">
+      <div class="header-left">
+        <h1>Vulnerability Analysis Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <app-global-search (resultSelected)="onSearchResultSelected($event)"></app-global-search>
+        <div class="analyst-info">
+          <div class="analyst-avatar">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <span class="analyst-name">{{ analystName }}</span>
+        </div>
+        <app-notification-center></app-notification-center>
+      </div>
+    </header>
+
+    <!-- Real-time stats -->
+    <app-real-time-stats [stats]="realTimeStats"></app-real-time-stats>
+
+    <!-- Dashboard content -->
+    <div class="dashboard-content" [ngClass]="activeTab + '-content'">
+      <!-- Top row: Charts and summary -->
+      <div class="dashboard-row">
+        <!-- Severity Breakdown Chart -->
+        <div class="dashboard-card">
+          <app-severity-chart
+            [vulnerabilities]="vulnerabilities"
+            [loading]="loadingVulnerabilities">
+          </app-severity-chart>
+        </div>
+
+        <!-- CVSS Line Chart -->
+        <div class="dashboard-card">
+          <app-cvss-line-chart
+            [vulnerabilities]="vulnerabilities"
+            [loading]="loadingVulnerabilities">
+          </app-cvss-line-chart>
+        </div>
+
+        <!-- Host Bar Chart -->
+        <div class="dashboard-card">
+          <app-host-bar-chart
+            [vulnerabilities]="vulnerabilities"
+            [loading]="loadingVulnerabilities">
+          </app-host-bar-chart>
+        </div>
+      </div>
+
+      <!-- Middle row: Vulnerabilities table -->
+      <div class="dashboard-row">
+        <div class="dashboard-card full-width">
+          <app-vulnerabilities-table
+            [vulnerabilities]="vulnerabilities"
+            [loading]="loadingVulnerabilities"
+            (viewDetails)="onViewVulnerabilityDetails($event)"
+            (exportData)="onExportVulnerabilityData($event)">
+          </app-vulnerabilities-table>
+        </div>
+      </div>
+
+      <!-- Bottom row: Recent vulnerabilities and alerts -->
+      <div class="dashboard-row">
+        <div class="dashboard-card">
+          <app-recent-vulns
+            [vulnerabilities]="vulnerabilities"
+            [loading]="loadingVulnerabilities"
+            (viewDetails)="onViewVulnerabilityDetails($event)">
+          </app-recent-vulns>
+        </div>
+
+        <div class="dashboard-card">
+          <app-recent-alerts
+            [alerts]="recentAlerts"
+            [title]="'Recent Alerts'"
+            [viewAllLink]="'/dashboard/alerts'"
+            (alertAction)="onAlertAction($event)">
+          </app-recent-alerts>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Events -->
+    <app-security-events></app-security-events>
+  </main>
+</div>
+
+<!-- Loading template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading data...</p>
+  </div>
+</ng-template>

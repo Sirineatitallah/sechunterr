@@ -52,50 +52,51 @@ export class SidebarComponent implements OnInit {
       path: '/dashboard/main',
       title: 'Dashboard',
       icon: 'dashboard',
-      roles: ['admin', 'client']
+      roles: ['admin', 'client', 'analyst']
     },
     {
       path: '/dashboard/asm',
       title: 'Attack Surface',
       icon: 'security',
-      roles: ['admin', 'client']
+      roles: ['admin', 'client', 'analyst']
     },
     {
       path: '/dashboard/vi',
       title: 'Vulnerability Intel',
       icon: 'bug_report',
-      roles: ['admin', 'client']
+      roles: ['admin', 'client', 'analyst']
     },
     {
       path: '/dashboard/cti',
       title: 'Cyber Threat Intel',
       icon: 'gpp_maybe',
-      roles: ['admin', 'client'],
+      roles: ['admin', 'client', 'analyst'],
       notificationCount: 5
     },
-    {
-      path: '/dashboard/soar',
-      title: 'SOAR',
-      icon: 'healing',
-      roles: ['admin', 'client']
-    },
+
     {
       path: '/dashboard/visualizations',
       title: 'Security Visualizations',
       icon: 'insights',
-      roles: ['admin', 'client']
+      roles: ['admin', 'client', 'analyst']
     },
     {
       path: '/dashboard/charts',
       title: 'Analytics Charts',
       icon: 'bar_chart',
-      roles: ['admin', 'client']
+      roles: ['admin', 'client', 'analyst']
     },
     {
       path: '/dashboard/info',
       title: 'Information & Contact',
       icon: 'info',
-      roles: ['admin', 'client']
+      roles: ['admin', 'client', 'analyst']
+    },
+    {
+      path: '/dashboard/analyst',
+      title: 'Analyst Dashboard',
+      icon: 'analytics',
+      roles: ['analyst']
     }
   ];
 
@@ -151,6 +152,12 @@ export class SidebarComponent implements OnInit {
   }
 
   onMenuItemClick(title: string): void {
+    // Special handling for analyst clicking on Dashboard
+    if (this.userRole === 'analyst' && title === 'Dashboard') {
+      console.log('Analyst clicked on Dashboard, redirecting to analyst dashboard');
+      this.router.navigate(['/dashboard/analyst']);
+    }
+
     this.visualizationSelectionService.setSelectedTab(title);
   }
 
@@ -212,8 +219,8 @@ export class SidebarComponent implements OnInit {
 
   signOut(): void {
     // Clear user data from localStorage
-    localStorage.removeItem('user_token');
-    localStorage.removeItem('user_role');
+    localStorage.clear(); // Clear all localStorage items
+    console.log('Sidebar - Signed out, cleared all localStorage items');
 
     // Add a record to recent actions
     const signOutAction: ActionItem = {

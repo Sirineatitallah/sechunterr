@@ -109,7 +109,7 @@ export class MainDashboardComponent implements OnInit {
   // Flag to show back button
   showBackButton = false;
 
-  // Source module (asm, cti, soar, vi)
+  // Source module (asm, cti, vi)
   sourceModule = '';
 
   constructor(
@@ -200,7 +200,6 @@ export class MainDashboardComponent implements OnInit {
     const moduleNames: { [key: string]: string } = {
       'asm': 'ASM',
       'cti': 'CTI',
-      'soar': 'SOAR',
       'vi': 'VI'
     };
 

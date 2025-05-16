@@ -12,10 +12,10 @@ import { GlobalInfoComponent } from './shared/components/global-info/global-info
 import { VisualizationDashboardComponent } from './dashboard/visualization-dashboard/visualization-dashboard.component';
 import { CtiComponent } from './modules/cti/components/cti-page/cti.component';
 import { AsmComponent } from './modules/asm/components/asm-page/asm.component';
-import { SoarComponent } from './modules/soar/components/soar-page/soar.component';
 import { ViComponent } from './modules/vi/components/vi-page/vi.component';
 import { UserDashboardComponent } from './dashboard/user-dashboard/user-dashboard.component';
 import { MainDashboardComponent } from './dashboard/main-dashboard/main-dashboard.component';
+import { AnalystDashboardComponent } from './dashboard/analyst-dashboard/analyst-dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/auth', pathMatch: 'full' },
@@ -50,6 +50,13 @@ const routes: Routes = [
         data: { roles: [UserRole.ADMIN, UserRole.SUPERUSER] }
       },
       {
+        path: 'analyst',
+        component: AnalystDashboardComponent,
+        canActivate: [RoleGuard],
+        data: { roles: [UserRole.ANALYST] }
+      },
+
+      {
         path: 'client',
         component: ClientDashboardComponent,
         canActivate: [RoleGuard],
@@ -71,10 +78,7 @@ const routes: Routes = [
         path: 'asm',
         component: AsmComponent
       },
-      {
-        path: 'soar',
-        component: SoarComponent
-      },
+
       {
         path: 'vi',
         component: ViComponent

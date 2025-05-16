@@ -33,8 +33,8 @@ interface ChatMessage {
   template: `
     <div class="chatbot-widget" [class.open]="isOpen">
       <!-- Chat toggle button -->
-      <button 
-        class="chat-toggle-button" 
+      <button
+        class="chat-toggle-button"
         (click)="toggleChat()"
         matTooltip="{{ isOpen ? 'Fermer le chat' : 'Ouvrir l\\'assistant' }}">
         <mat-icon>{{ isOpen ? 'close' : 'chat' }}</mat-icon>
@@ -68,17 +68,17 @@ interface ChatMessage {
 
         <!-- Chat messages -->
         <div class="chat-messages" #chatContainer>
-          <div *ngFor="let message of messages" 
-               class="message-container" 
+          <div *ngFor="let message of messages"
+               class="message-container"
                [ngClass]="{'user-message': message.sender === 'user', 'bot-message': message.sender === 'bot'}">
-            
+
             <!-- Bot avatar for bot messages -->
             <div *ngIf="message.sender === 'bot'" class="message-avatar">
               <div class="avatar-icon">
                 <mat-icon>security</mat-icon>
               </div>
             </div>
-            
+
             <!-- Message content -->
             <div class="message-content">
               <!-- Loading indicator for bot typing -->
@@ -87,18 +87,18 @@ interface ChatMessage {
                 <div class="dot"></div>
                 <div class="dot"></div>
               </div>
-              
+
               <!-- Actual message text -->
               <div *ngIf="!message.isLoading" class="message-text">
                 {{ message.content }}
               </div>
-              
+
               <!-- Message timestamp -->
               <div class="message-time">
                 {{ message.isLoading ? 'En train d\\'écrire...' : (message.timestamp | date:'HH:mm') }}
               </div>
             </div>
-            
+
             <!-- User avatar for user messages -->
             <div *ngIf="message.sender === 'user'" class="message-avatar user">
               <div class="avatar-icon">
@@ -112,18 +112,18 @@ interface ChatMessage {
         <div class="chat-input">
           <mat-form-field appearance="outline" class="message-field">
             <mat-label>Posez votre question...</mat-label>
-            <textarea 
-              matInput 
-              [(ngModel)]="newMessage" 
+            <textarea
+              matInput
+              [(ngModel)]="newMessage"
               #messageInput
               placeholder="Comment puis-je vous aider ?"
               (keydown)="onKeydown($event)"
               rows="1"></textarea>
           </mat-form-field>
-          <button 
-            mat-mini-fab 
-            color="primary" 
-            class="send-button" 
+          <button
+            mat-mini-fab
+            color="primary"
+            class="send-button"
             [disabled]="!newMessage.trim()"
             (click)="sendMessage()">
             <mat-icon>send</mat-icon>
@@ -140,7 +140,7 @@ interface ChatMessage {
       z-index: 9999;
       font-family: 'Roboto', sans-serif;
     }
-    
+
     .chat-toggle-button {
       width: 70px;
       height: 70px;
@@ -157,13 +157,13 @@ interface ChatMessage {
       z-index: 2;
       animation: pulse 2s infinite;
     }
-    
+
     .chat-toggle-button mat-icon {
       font-size: 36px;
       width: 36px;
       height: 36px;
     }
-    
+
     .chat-window {
       position: absolute;
       bottom: 80px;
@@ -184,12 +184,12 @@ interface ChatMessage {
       background: rgba(10, 14, 31, 0.85);
       backdrop-filter: blur(10px);
     }
-    
+
     .open .chat-window {
       transform: scale(1);
       opacity: 1;
     }
-    
+
     .chat-header {
       padding: 12px 16px;
       display: flex;
@@ -198,13 +198,13 @@ interface ChatMessage {
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(0, 0, 0, 0.2);
     }
-    
+
     .header-info {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    
+
     .bot-avatar {
       width: 40px;
       height: 40px;
@@ -215,13 +215,13 @@ interface ChatMessage {
       align-items: center;
       color: #0a0e1f;
     }
-    
+
     .bot-name {
       font-size: 16px;
       font-weight: 500;
       color: white;
     }
-    
+
     .bot-status {
       display: flex;
       align-items: center;
@@ -229,18 +229,18 @@ interface ChatMessage {
       font-size: 12px;
       color: rgba(255, 255, 255, 0.7);
     }
-    
+
     .status-indicator {
       width: 8px;
       height: 8px;
       border-radius: 50%;
     }
-    
+
     .status-indicator.online {
       background-color: #4caf50;
       box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
     }
-    
+
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -249,29 +249,29 @@ interface ChatMessage {
       flex-direction: column;
       gap: 16px;
     }
-    
+
     .message-container {
       display: flex;
       gap: 12px;
       max-width: 100%;
     }
-    
+
     .message-container.user-message {
       flex-direction: row-reverse;
       align-self: flex-end;
     }
-    
+
     .message-container.bot-message {
       align-self: flex-start;
     }
-    
+
     .message-avatar {
       width: 32px;
       height: 32px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    
+
     .avatar-icon {
       width: 100%;
       height: 100%;
@@ -282,22 +282,22 @@ interface ChatMessage {
       background: #00f3ff;
       color: #0a0e1f;
     }
-    
+
     .avatar-icon mat-icon {
       font-size: 16px;
       width: 16px;
       height: 16px;
     }
-    
+
     .message-avatar.user .avatar-icon {
       background: #3f51b5;
       color: white;
     }
-    
+
     .message-content {
       max-width: 70%;
     }
-    
+
     .message-text {
       padding: 12px;
       border-radius: 12px;
@@ -306,24 +306,24 @@ interface ChatMessage {
       line-height: 1.4;
       word-break: break-word;
     }
-    
+
     .user-message .message-text {
       background-color: rgba(63, 81, 181, 0.2);
       border-top-right-radius: 0;
     }
-    
+
     .bot-message .message-text {
       background-color: rgba(0, 243, 255, 0.1);
       border-top-left-radius: 0;
     }
-    
+
     .message-time {
       font-size: 10px;
       color: rgba(255, 255, 255, 0.5);
       margin-top: 4px;
       padding: 0 4px;
     }
-    
+
     .typing-indicator {
       display: flex;
       align-items: center;
@@ -333,7 +333,7 @@ interface ChatMessage {
       background-color: rgba(0, 243, 255, 0.1);
       border-top-left-radius: 0;
     }
-    
+
     .dot {
       width: 8px;
       height: 8px;
@@ -342,19 +342,19 @@ interface ChatMessage {
       opacity: 0.7;
       animation: typing-animation 1.5s infinite ease-in-out;
     }
-    
+
     .dot:nth-child(1) {
       animation-delay: 0s;
     }
-    
+
     .dot:nth-child(2) {
       animation-delay: 0.2s;
     }
-    
+
     .dot:nth-child(3) {
       animation-delay: 0.4s;
     }
-    
+
     .chat-input {
       padding: 12px 16px;
       display: flex;
@@ -363,15 +363,15 @@ interface ChatMessage {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       background: rgba(0, 0, 0, 0.2);
     }
-    
+
     .message-field {
       flex: 1;
     }
-    
+
     .send-button {
       background: linear-gradient(135deg, #3f51b5, rgba(63, 81, 181, 0.7));
     }
-    
+
     @keyframes typing-animation {
       0%, 100% {
         transform: translateY(0);
@@ -380,7 +380,7 @@ interface ChatMessage {
         transform: translateY(-4px);
       }
     }
-    
+
     @keyframes pulse {
       0% {
         transform: scale(1);
@@ -428,13 +428,9 @@ export class ChatbotWidgetComponent implements OnInit, AfterViewChecked {
       'Les principaux points d\'exposition incluent des ports ouverts non nécessaires et des services mal configurés.',
       'Je recommande de réduire votre surface d\'attaque en désactivant les services non essentiels et en mettant à jour vos configurations.'
     ],
-    soar: [
-      'Nous avons 12 playbooks actifs pour automatiser la réponse aux incidents de sécurité.',
-      'Le temps moyen de réponse aux incidents a été réduit de 45% grâce à l\'automatisation.',
-      'Le playbook de réponse aux attaques de phishing a été déclenché 17 fois cette semaine.'
-    ],
+
     help: [
-      'Je peux vous aider avec des informations sur les vulnérabilités, les menaces, la surface d\'attaque, et l\'automatisation de la sécurité.',
+      'Je peux vous aider avec des informations sur les vulnérabilités, les menaces et la surface d\'attaque.',
       'Vous pouvez me demander des statistiques, des recommandations, ou des explications sur les alertes de sécurité.',
       'N\'hésitez pas à poser des questions spécifiques sur vos préoccupations en matière de sécurité.'
     ],
@@ -477,7 +473,7 @@ export class ChatbotWidgetComponent implements OnInit, AfterViewChecked {
 
     // Show typing indicator
     this.isTyping = true;
-    
+
     // Add a loading message from the bot
     const loadingMessage: ChatMessage = {
       content: '',
@@ -491,7 +487,7 @@ export class ChatbotWidgetComponent implements OnInit, AfterViewChecked {
     setTimeout(() => {
       // Remove the loading message
       this.messages = this.messages.filter(m => !m.isLoading);
-      
+
       // Add bot response
       this.addBotMessage(this.generateResponse(userQuestion));
       this.isTyping = false;
@@ -527,7 +523,7 @@ export class ChatbotWidgetComponent implements OnInit, AfterViewChecked {
   private generateResponse(question: string): string {
     // Convert question to lowercase for easier matching
     const lowerQuestion = question.toLowerCase();
-    
+
     // Check for different types of questions
     if (this.containsAny(lowerQuestion, ['bonjour', 'salut', 'hello', 'hi', 'hey'])) {
       return this.getRandomResponse('greeting');
@@ -537,8 +533,8 @@ export class ChatbotWidgetComponent implements OnInit, AfterViewChecked {
       return this.getRandomResponse('threat');
     } else if (this.containsAny(lowerQuestion, ['surface', 'asm', 'exposition', 'exposé', 'asset', 'actif'])) {
       return this.getRandomResponse('asm');
-    } else if (this.containsAny(lowerQuestion, ['soar', 'automatisation', 'playbook', 'workflow', 'incident', 'réponse'])) {
-      return this.getRandomResponse('soar');
+    } else if (this.containsAny(lowerQuestion, ['incident', 'réponse'])) {
+      return this.getRandomResponse('default');
     } else if (this.containsAny(lowerQuestion, ['aide', 'help', 'comment', 'quoi', 'que'])) {
       return this.getRandomResponse('help');
     } else {

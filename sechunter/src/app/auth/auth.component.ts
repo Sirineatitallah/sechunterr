@@ -110,25 +110,40 @@ export class AuthComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('Form submitted', this.loginForm.value);
-
     // Get form values even if form is technically invalid
     const id = this.loginForm.get('id')?.value || '';
     const password = this.loginForm.get('password')?.value || '';
 
-    console.log('Attempting login with:', { id, password });
-
-    // Log exact values for debugging
-    console.log('ID length:', id.length, 'Password length:', password.length);
-    console.log('ID exact value:', JSON.stringify(id));
-    console.log('Password exact value:', JSON.stringify(password));
-
     // Special case for admin login
     if (id === 'admin' && password === 'Admin1!/') {
-      console.log('Admin login detected');
       localStorage.setItem('access_token', 'admin-token');
       localStorage.setItem('user_role', 'admin');
       window.location.href = '/dashboard/main'; // Admin dashboard
+      return;
+    }
+
+    // Special case for analyst login
+    if ((id === 'analyst' && password === 'Analyst1!/') || (id === 'idanalyste' && password === 'Analyste1!/')) {
+      console.log('Analyst login detected');
+      localStorage.clear(); // Clear any existing tokens/roles
+      localStorage.setItem('access_token', 'analyst-token');
+      localStorage.setItem('user_role', 'analyst');
+      console.log('Stored token:', localStorage.getItem('access_token'));
+      console.log('Stored role:', localStorage.getItem('user_role'));
+      console.log('Redirecting to analyst dashboard...');
+
+      // Force redirect to analyst dashboard with a delay to ensure localStorage is updated
+      setTimeout(() => {
+        window.location.href = '/dashboard/analyst'; // Analyst dashboard
+      }, 100);
+      return;
+    }
+
+    // Special case for user login
+    if (id === 'user' && password === 'userA1!/') {
+      localStorage.setItem('access_token', 'user-token');
+      localStorage.setItem('user_role', 'user');
+      window.location.href = '/dashboard/user'; // User dashboard
       return;
     }
 

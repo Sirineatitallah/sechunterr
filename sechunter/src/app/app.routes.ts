@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
+import { UserRole } from './core/models/user.model';
 
 export const routes: Routes = [
   {
@@ -14,12 +15,25 @@ export const routes: Routes = [
     title: 'Security Registration'
   },
   {
+    path: 'user-dashboard',
+    loadComponent: () => import('./dashboard/user-dashboard/user-dashboard.component').then(m => m.UserDashboardComponent),
+    title: 'User Dashboard'
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard],
     data: { animation: 'dashboardFade' },
     children: [
-      { path: '', redirectTo: 'main', pathMatch: 'full' },
+      {
+        path: '',
+        canActivate: [RoleGuard],
+        data: {
+          roles: [UserRole.ADMIN, UserRole.CLIENT, UserRole.ANALYST],
+          redirect: '/dashboard/main'
+        },
+        loadComponent: () => import('./dashboard/dashboard-redirect/dashboard-redirect.component').then(m => m.DashboardRedirectComponent)
+      },
       {
         path: 'main',
         loadComponent: () => import('./dashboard/main-dashboard/main-dashboard.component').then(m => m.MainDashboardComponent),
@@ -45,11 +59,7 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/cti/components/cti-page/cti.component').then(m => m.CtiComponent),
         title: 'Threat Intelligence'
       },
-      {
-        path: 'soar',
-        loadComponent: () => import('./modules/soar/components/soar-page/soar.component').then(m => m.SoarComponent),
-        title: 'Incident Response'
-      },
+
       {
         path: 'visualizations',
         loadComponent: () => import('./dashboard/visualization-dashboard/visualization-dashboard.component').then(m => m.VisualizationDashboardComponent),
@@ -77,12 +87,23 @@ export const routes: Routes = [
         title: 'Administration Panel'
       },
       {
+        path: 'analyst',
+        loadComponent: () => import('./dashboard/analyst-dashboard/analyst-dashboard.component').then(m => m.AnalystDashboardComponent),
+        canActivate: [RoleGuard],
+        data: {
+          roles: [UserRole.ANALYST],
+          animation: 'analystSlide',
+          redirect: '/dashboard/analyst'
+        },
+        title: 'Analyst Dashboard'
+      },
+      {
         path: 'info',
         loadComponent: () => import('./shared/components/global-info/global-info.component').then(m => m.GlobalInfoComponent),
         title: 'Information & Contact'
       }
     ]
   },
-  { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  { path: '**', redirectTo: 'auth' }
+  { path: '', redirectTo: 'user-dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: 'user-dashboard' }
 ];

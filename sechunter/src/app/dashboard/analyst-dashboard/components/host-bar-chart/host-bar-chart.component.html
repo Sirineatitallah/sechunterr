@@ -1,0 +1,130 @@
+<mat-card class="host-chart-card">
+  <mat-card-header>
+    <mat-card-title>
+      <div class="widget-title">
+        <mat-icon>bar_chart</mat-icon>
+        <span>Top Affected Hosts</span>
+      </div>
+      <div class="widget-actions">
+        <button mat-icon-button [matMenuTriggerFor]="chartMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #chartMenu="matMenu">
+          <button mat-menu-item (click)="refreshChart()">
+            <mat-icon>refresh</mat-icon>
+            <span>Refresh</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>fullscreen</mat-icon>
+            <span>Expand</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="chart-container" *ngIf="!loading; else loadingTemplate">
+      <div class="chart-info" *ngIf="hostData.length === 0">
+        <mat-icon>info</mat-icon>
+        <span>No host vulnerability data available</span>
+      </div>
+      
+      <svg *ngIf="hostData.length > 0" [attr.width]="chartWidth" [attr.height]="chartHeight" class="bar-chart">
+        <!-- Y-axis (hosts) -->
+        <line 
+          [attr.x1]="paddingLeft" 
+          [attr.y1]="paddingTop" 
+          [attr.x2]="paddingLeft" 
+          [attr.y2]="chartHeight - paddingBottom" 
+          class="axis" />
+        
+        <!-- Host labels -->
+        <g *ngFor="let bar of bars">
+          <text 
+            [attr.x]="paddingLeft - 10" 
+            [attr.y]="bar.y + bar.height / 2 + 4" 
+            class="host-label">{{ bar.host }}</text>
+        </g>
+        
+        <!-- X-axis -->
+        <line 
+          [attr.x1]="paddingLeft" 
+          [attr.y1]="chartHeight - paddingBottom" 
+          [attr.x2]="chartWidth - paddingRight" 
+          [attr.y2]="chartHeight - paddingBottom" 
+          class="axis" />
+        
+        <!-- Bars -->
+        <g *ngFor="let bar of bars">
+          <!-- Stacked bar segments -->
+          <g [matTooltip]="'Host: ' + bar.host + '\nTotal: ' + bar.count + '\nCritical: ' + bar.critical + '\nHigh: ' + bar.high + '\nMedium: ' + bar.medium + '\nLow: ' + bar.low">
+            <!-- Critical -->
+            <rect *ngIf="bar.critical > 0"
+              [attr.x]="bar.x"
+              [attr.y]="bar.y"
+              [attr.width]="(bar.critical / bar.count) * bar.width"
+              [attr.height]="bar.height"
+              class="bar-segment critical" />
+            
+            <!-- High -->
+            <rect *ngIf="bar.high > 0"
+              [attr.x]="bar.x + (bar.critical / bar.count) * bar.width"
+              [attr.y]="bar.y"
+              [attr.width]="(bar.high / bar.count) * bar.width"
+              [attr.height]="bar.height"
+              class="bar-segment high" />
+            
+            <!-- Medium -->
+            <rect *ngIf="bar.medium > 0"
+              [attr.x]="bar.x + ((bar.critical + bar.high) / bar.count) * bar.width"
+              [attr.y]="bar.y"
+              [attr.width]="(bar.medium / bar.count) * bar.width"
+              [attr.height]="bar.height"
+              class="bar-segment medium" />
+            
+            <!-- Low -->
+            <rect *ngIf="bar.low > 0"
+              [attr.x]="bar.x + ((bar.critical + bar.high + bar.medium) / bar.count) * bar.width"
+              [attr.y]="bar.y"
+              [attr.width]="(bar.low / bar.count) * bar.width"
+              [attr.height]="bar.height"
+              class="bar-segment low" />
+          </g>
+          
+          <!-- Count label -->
+          <text 
+            [attr.x]="bar.x + bar.width + 5" 
+            [attr.y]="bar.y + bar.height / 2 + 4" 
+            class="count-label">{{ bar.count }}</text>
+        </g>
+      </svg>
+      
+      <div class="chart-legend" *ngIf="hostData.length > 0">
+        <div class="legend-item">
+          <div class="legend-color critical"></div>
+          <div class="legend-label">Critical</div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color high"></div>
+          <div class="legend-label">High</div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color medium"></div>
+          <div class="legend-label">Medium</div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color low"></div>
+          <div class="legend-label">Low</div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading data...</p>
+  </div>
+</ng-template>

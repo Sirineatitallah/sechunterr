@@ -1,0 +1,87 @@
+<div class="security-events-container">
+  <div class="events-header">
+    <h2>Événements de sécurité importants</h2>
+    <div class="filter-buttons">
+      <button 
+        [class.active]="activeFilter === 'all'"
+        (click)="filterEvents('all')">
+        Tous
+      </button>
+      <button 
+        [class.active]="activeFilter === 'upcoming'"
+        (click)="filterEvents('upcoming')">
+        À venir
+      </button>
+      <button 
+        [class.active]="activeFilter === 'in-progress'"
+        (click)="filterEvents('in-progress')">
+        En cours
+      </button>
+    </div>
+  </div>
+
+  <div class="events-list">
+    <ng-container *ngIf="filteredEvents.length > 0; else noEvents">
+      <div 
+        *ngFor="let event of filteredEvents" 
+        class="event-card"
+        [class.critical]="event.priority === 'critical'"
+        [class.high]="event.priority === 'high'"
+        [class.medium]="event.priority === 'medium'"
+        [class.low]="event.priority === 'low'">
+        
+        <div class="event-icon" [style.color]="getPriorityColor(event.priority)">
+          <mat-icon>{{ getEventIcon(event.type) }}</mat-icon>
+        </div>
+        
+        <div class="event-content">
+          <div class="event-header">
+            <h3 class="event-title">{{ event.title }}</h3>
+            <span class="event-status" [class]="event.status">
+              {{ event.status === 'upcoming' ? 'À venir' : 
+                 event.status === 'in-progress' ? 'En cours' : 
+                 event.status === 'completed' ? 'Terminé' : 'Annulé' }}
+            </span>
+          </div>
+          
+          <p class="event-description">{{ event.description }}</p>
+          
+          <div class="event-details">
+            <div class="event-date">
+              <mat-icon>event</mat-icon>
+              <span>{{ formatDate(event.date) }}</span>
+            </div>
+            
+            <div class="event-location" *ngIf="event.location">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ event.location }}</span>
+            </div>
+            
+            <div class="event-participants" *ngIf="event.participants && event.participants.length > 0">
+              <mat-icon>people</mat-icon>
+              <span>{{ event.participants.join(', ') }}</span>
+            </div>
+          </div>
+          
+          <div class="event-actions">
+            <button mat-button color="primary" *ngIf="event.link">
+              <mat-icon>open_in_new</mat-icon>
+              Détails
+            </button>
+            <button mat-button *ngIf="event.status === 'upcoming'">
+              <mat-icon>calendar_today</mat-icon>
+              Ajouter au calendrier
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    
+    <ng-template #noEvents>
+      <div class="no-events">
+        <mat-icon>event_busy</mat-icon>
+        <p>Aucun événement {{ activeFilter !== 'all' ? 'de ce type' : '' }} à afficher</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

@@ -24,6 +24,45 @@ $text-muted: #a8a3a3;
   background: linear-gradient(135deg, rgba($primary-color, 0.15) 0%, rgba($secondary-color, 0.15) 100%);
 }
 
+// Direct link to new analyst dashboard
+.direct-link-container {
+  margin: 1rem 0;
+  padding: 0.5rem;
+
+  .direct-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba($primary-color, 0.2) 0%, rgba($secondary-color, 0.2) 100%);
+    color: $text-light;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 1px solid rgba($primary-color, 0.3);
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($primary-color, 0.3) 0%, rgba($secondary-color, 0.3) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+      mat-icon {
+        transform: translateX(5px);
+      }
+    }
+
+    mat-icon {
+      color: $primary-color;
+      transition: transform 0.3s ease;
+    }
+
+    span {
+      font-size: 1.1rem;
+    }
+  }
+}
+
 // Additional styles specific to the main dashboard component
 .placeholder-content {
   display: flex;

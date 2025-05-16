@@ -4,14 +4,5 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
-  },
-  "/api/vi": {
-    "target": "http://localhost:5002",
-    "secure": false,
-    "changeOrigin": true,
-    "logLevel": "debug",
-    "pathRewrite": {
-      "^/api/vi": "/api/vi"
-    }
   }
 }

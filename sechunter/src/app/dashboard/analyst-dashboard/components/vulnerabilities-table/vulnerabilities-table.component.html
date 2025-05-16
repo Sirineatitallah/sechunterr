@@ -1,0 +1,181 @@
+<div class="vulnerabilities-table-container">
+  <div class="table-header">
+    <div class="search-filters">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search vulnerabilities</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
+        <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="searchTerm=''; onSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <button matSuffix mat-icon-button aria-label="Search" (click)="onSearch()">
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+      
+      <button mat-stroked-button [matMenuTriggerFor]="filterMenu" class="filter-button">
+        <mat-icon>filter_list</mat-icon>
+        Filters
+      </button>
+      
+      <mat-menu #filterMenu="matMenu" class="filter-menu">
+        <div class="filter-menu-content" (click)="$event.stopPropagation()">
+          <div class="filter-section">
+            <h4>Severity</h4>
+            <div class="severity-filters">
+              <mat-chip-listbox multiple [(ngModel)]="severityFilter">
+                <mat-chip-option value="critical" class="severity-critical">Critical</mat-chip-option>
+                <mat-chip-option value="high" class="severity-high">High</mat-chip-option>
+                <mat-chip-option value="medium" class="severity-medium">Medium</mat-chip-option>
+                <mat-chip-option value="low" class="severity-low">Low</mat-chip-option>
+              </mat-chip-listbox>
+            </div>
+          </div>
+          
+          <div class="filter-section">
+            <h4>CVSS Score Range</h4>
+            <div class="cvss-range">
+              <mat-form-field appearance="outline" class="cvss-min">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" min="0" max="10" [(ngModel)]="cvssMinFilter">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline" class="cvss-max">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" min="0" max="10" [(ngModel)]="cvssMaxFilter">
+              </mat-form-field>
+            </div>
+          </div>
+          
+          <div class="filter-section">
+            <h4>CVE ID</h4>
+            <mat-form-field appearance="outline" class="cve-filter">
+              <mat-label>CVE ID</mat-label>
+              <input matInput [(ngModel)]="cveFilter">
+            </mat-form-field>
+          </div>
+          
+          <div class="filter-actions">
+            <button mat-button (click)="clearFilters()">Clear All</button>
+            <button mat-raised-button color="primary" (click)="applyFilters()">Apply</button>
+          </div>
+        </div>
+      </mat-menu>
+      
+      <button mat-stroked-button [matMenuTriggerFor]="exportMenu" class="export-button">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+      
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="onExportData('csv')">
+          <mat-icon>description</mat-icon>
+          <span>Export as CSV</span>
+        </button>
+        <button mat-menu-item (click)="onExportData('pdf')">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>Export as PDF</span>
+        </button>
+      </mat-menu>
+    </div>
+    
+    <div class="table-info">
+      <span>{{ filteredData.length }} vulnerabilities found</span>
+    </div>
+  </div>
+  
+  <div class="table-container">
+    <table mat-table [dataSource]="filteredData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)" matSort (matSortChange)="onSortChange($event)" class="vuln-table">
+      <!-- Vulnerability Name Column -->
+      <ng-container matColumnDef="vulnerabilityName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Vulnerability</th>
+        <td mat-cell *matCellDef="let vuln">
+          <div class="vuln-name">{{ vuln.vulnerabilityName }}</div>
+        </td>
+      </ng-container>
+      
+      <!-- CVSS Score Column -->
+      <ng-container matColumnDef="cvssScore">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>CVSS</th>
+        <td mat-cell *matCellDef="let vuln">
+          <div class="cvss-score" [ngClass]="getSeverityClass(vuln.severity)">{{ vuln.cvssScore.toFixed(1) }}</div>
+        </td>
+      </ng-container>
+      
+      <!-- Severity Column -->
+      <ng-container matColumnDef="severity">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Severity</th>
+        <td mat-cell *matCellDef="let vuln">
+          <div class="severity-badge" [ngClass]="getSeverityClass(vuln.severity)">{{ vuln.severity }}</div>
+        </td>
+      </ng-container>
+      
+      <!-- Discovered Date Column -->
+      <ng-container matColumnDef="discoveredDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Discovered</th>
+        <td mat-cell *matCellDef="let vuln">{{ vuln.discoveredDate | date:'mediumDate' }}</td>
+      </ng-container>
+      
+      <!-- CVE IDs Column -->
+      <ng-container matColumnDef="cve_ids">
+        <th mat-header-cell *matHeaderCellDef>CVE IDs</th>
+        <td mat-cell *matCellDef="let vuln">
+          <div class="cve-list">
+            <span *ngFor="let cve of vuln.cve_ids" class="cve-chip">{{ cve }}</span>
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Remediation Column -->
+      <ng-container matColumnDef="remediation">
+        <th mat-header-cell *matHeaderCellDef>Remediation</th>
+        <td mat-cell *matCellDef="let vuln">
+          <div class="remediation-status" [ngClass]="vuln.remediation ? 'available' : 'unavailable'">
+            {{ vuln.remediation ? 'Available' : 'Not Available' }}
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Host IP Column -->
+      <ng-container matColumnDef="host_ip">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Host</th>
+        <td mat-cell *matCellDef="let vuln">{{ vuln.host_ip }}</td>
+      </ng-container>
+      
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let vuln">
+          <button mat-icon-button color="primary" matTooltip="View Details" (click)="onViewDetails(vuln)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      
+      <!-- No data row -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+          <div class="no-data-message" *ngIf="!loading">
+            <mat-icon>search_off</mat-icon>
+            <span>No vulnerabilities found</span>
+          </div>
+          <div class="loading-spinner" *ngIf="loading">
+            <mat-spinner diameter="40"></mat-spinner>
+            <span>Loading vulnerabilities...</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  
+  <mat-paginator 
+    [length]="filteredData.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+    [pageIndex]="pageIndex"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>

@@ -34,12 +34,7 @@ import { AttackSurfaceComponent } from '../../asm/components/attack-surface/atta
 import { ExternalRisksComponent } from '../../asm/components/external-risks/external-risks.component';
 import { RiskScoreComponent } from '../../asm/components/risk-score/risk-score.component';
 
-// SOAR Components
-import { IncidentTimelineComponent } from '../../soar/components/incident-timeline/incident-timeline.component';
-import { ResolutionRateComponent } from '../../soar/components/resolution-rate/resolution-rate.component';
-import { ActivePlaybooksComponent } from '../../soar/components/active-playbooks/active-playbooks.component';
-// This component will be implemented later
-// import { SoarWorkflowComponent } from '../../soar/components/soar-workflow/soar-workflow.component';
+
 
 import { VisualizationSelectionService } from '../../shared/services/visualization-selection.service';
 
@@ -70,11 +65,7 @@ import { VisualizationSelectionService } from '../../shared/services/visualizati
     ExternalRisksComponent,
     RiskScoreComponent,
 
-    // SOAR Components
-    IncidentTimelineComponent,
-    ResolutionRateComponent,
-    ActivePlaybooksComponent
-    // SoarWorkflowComponent // Will be implemented later
+    // SOAR Components have been removed
   ],
   templateUrl: 'visualization-dashboard.component.html',
   styleUrls: ['./visualization-dashboard.component.scss']
@@ -91,8 +82,6 @@ export class VisualizationDashboardComponent implements OnInit, OnDestroy {
         return 1;
       case "Surface d'Attaque":
         return 2;
-      case 'SOAR':
-        return 3;
       default:
         return 0;
     }

@@ -6,6 +6,11 @@ export const authGuard: CanActivateFn = (route, state): boolean | UrlTree => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  // Allow access to user dashboard without authentication
+  if (state.url.includes('/dashboard/user')) {
+    return true;
+  }
+
   if (authService.isAuthenticated()) {
     return true;
   }

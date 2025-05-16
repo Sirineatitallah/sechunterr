@@ -17,7 +17,7 @@ export enum WidgetType {
   ASM_HEATMAP = 'asm-heatmap',
   VI_RADAR = 'vi-radar',
   CTI_WORLD_MAP = 'cti-world-map',
-  SOAR_GANTT = 'soar-gantt',
+
   COMPLIANCE_DASHBOARD = 'compliance-dashboard',
   TOP_VULNERABILITIES = 'top-vulnerabilities',
   THREAT_INTEL_DIGEST = 'threat-intel-digest',

@@ -1,0 +1,290 @@
+.vulnerabilities-table-container {
+  width: 100%;
+  background-color: rgba(26, 38, 52, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    
+    .search-filters {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      
+      .search-field {
+        width: 300px;
+        margin-bottom: 0;
+        
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+      }
+      
+      .filter-button, .export-button {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #e1e1e6;
+        border-color: rgba(255, 255, 255, 0.1);
+        
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+      }
+    }
+    
+    .table-info {
+      color: #bdc3c7;
+      font-size: 0.875rem;
+    }
+  }
+  
+  .table-container {
+    max-height: 600px;
+    overflow: auto;
+    
+    .vuln-table {
+      width: 100%;
+      
+      .mat-mdc-header-cell {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: #191919;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      
+      .mat-mdc-cell {
+        color: #3d3d3d;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      
+      .mat-mdc-row {
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+      }
+      
+      .vuln-name {
+        font-weight: 500;
+        max-width: 300px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: rgb(50, 46, 46);
+      }
+      
+      .cvss-score {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+        text-align: center;
+        min-width: 40px;
+        
+        &.severity-critical {
+          background-color: rgba(231, 76, 60, 0.2);
+          color: #e74c3c;
+        }
+        
+        &.severity-high {
+          background-color: rgba(243, 156, 18, 0.2);
+          color: #f39c12;
+        }
+        
+        &.severity-medium {
+          background-color: rgba(52, 152, 219, 0.2);
+          color: #3498db;
+        }
+        
+        &.severity-low {
+          background-color: rgba(46, 204, 113, 0.2);
+          color: #2ecc71;
+        }
+      }
+      
+      .severity-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        text-align: center;
+        min-width: 70px;
+        
+        &.severity-critical {
+          background-color: rgba(231, 76, 60, 0.2);
+          color: #e74c3c;
+          border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        &.severity-high {
+          background-color: rgba(243, 156, 18, 0.2);
+          color: #f39c12;
+          border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        &.severity-medium {
+          background-color: rgba(52, 152, 219, 0.2);
+          color: #3498db;
+          border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        &.severity-low {
+          background-color: rgba(46, 204, 113, 0.2);
+          color: #2ecc71;
+          border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+      }
+      
+      .cve-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        max-width: 200px;
+        
+        .cve-chip {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          background-color: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          font-size: 0.75rem;
+          font-family: monospace;
+        }
+      }
+      
+      .remediation-status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        
+        &.available {
+          background-color: rgba(46, 204, 113, 0.2);
+          color: #2ecc71;
+        }
+        
+        &.unavailable {
+          background-color: rgba(231, 76, 60, 0.2);
+          color: #e74c3c;
+        }
+      }
+      
+      .no-data-cell {
+        padding: 2rem;
+        text-align: center;
+        
+        .no-data-message, .loading-spinner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 1rem;
+          color: #bdc3c7;
+          
+          mat-icon {
+            font-size: 2rem;
+            height: 2rem;
+            width: 2rem;
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Filter menu styles
+::ng-deep .filter-menu {
+  .filter-menu-content {
+    padding: 1rem;
+    min-width: 300px;
+    
+    .filter-section {
+      margin-bottom: 1rem;
+      
+      h4 {
+        margin: 0 0 0.5rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+      }
+      
+      .severity-filters {
+        .severity-critical {
+          background-color: rgba(231, 76, 60, 0.2);
+          color: #e74c3c;
+          
+          &.mdc-evolution-chip--selected {
+            background-color: rgba(231, 76, 60, 0.4);
+          }
+        }
+        
+        .severity-high {
+          background-color: rgba(243, 156, 18, 0.2);
+          color: #f39c12;
+          
+          &.mdc-evolution-chip--selected {
+            background-color: rgba(243, 156, 18, 0.4);
+          }
+        }
+        
+        .severity-medium {
+          background-color: rgba(52, 152, 219, 0.2);
+          color: #3498db;
+          
+          &.mdc-evolution-chip--selected {
+            background-color: rgba(52, 152, 219, 0.4);
+          }
+        }
+        
+        .severity-low {
+          background-color: rgba(46, 204, 113, 0.2);
+          color: #2ecc71;
+          
+          &.mdc-evolution-chip--selected {
+            background-color: rgba(46, 204, 113, 0.4);
+          }
+        }
+      }
+      
+      .cvss-range {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        .cvss-min, .cvss-max {
+          width: 80px;
+          margin-bottom: 0;
+          
+          ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+            display: none;
+          }
+        }
+      }
+      
+      .cve-filter {
+        width: 100%;
+        margin-bottom: 0;
+        
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+      }
+    }
+    
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+  }
+}

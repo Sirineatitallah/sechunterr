@@ -7,9 +7,7 @@ import { WidgetPosition } from '../models/widget-position.model';
 export enum MicroserviceType {
   THREAT_INTEL = 'threat-intel',
   VULNERABILITY_SCANNER = 'vuln-scanner',
-  INCIDENT_RESPONSE = 'incident-response',
-  NETWORK_SECURITY = 'network-security',
-  VULNERABILITY_INTELLIGENCE = 'vi' // Added for VI module
+  NETWORK_SECURITY = 'network-security'
 }
 
 export interface ServicePreferences {
@@ -67,16 +65,7 @@ export class MicroserviceConnectorService {
           lastUpdated: new Date().toISOString(),
           threatScore: 65
         };
-      case MicroserviceType.INCIDENT_RESPONSE:
-        return {
-          icon: 'emergency',
-          activeIncidents: 3,
-          resolvedToday: 5,
-          mttr: '2h 15m',
-          incidents: [
-            { id: 'INC-001', severity: 'high', status: 'active', created: new Date().toISOString() }
-          ]
-        };
+
       case MicroserviceType.NETWORK_SECURITY:
         return {
           icon: 'router',
@@ -114,76 +103,5 @@ export class MicroserviceConnectorService {
       });
     }
     return this.dataUpdateSubjects[serviceType].asObservable();
-  }
-
-  // Specific method to get VI (Vulnerability Intelligence) data
-  getVIData(): Observable<any> {
-    // In development mode, return mock data
-    if (isDevMode()) {
-      console.log('[DEV MODE] Returning mock VI data');
-      return of(this.getMockVIData());
-    }
-    // In production, fetch from the VI API
-    return this.http.get('/api/vi/vulnerabilities');
-  }
-
-  // Get real-time VI data with polling
-  getRealTimeVIData(intervalMs: number = 5000): Observable<any> {
-    const serviceType = 'vi-data';
-    if (!this.dataUpdateSubjects[serviceType]) {
-      this.dataUpdateSubjects[serviceType] = new Subject<any>();
-      timer(0, intervalMs).pipe(
-        switchMap(() => this.getVIData()),
-        retryWhen(errors => errors.pipe(delayWhen(() => timer(3000))))
-      ).subscribe(data => {
-        this.dataUpdateSubjects[serviceType].next(data);
-      });
-    }
-    return this.dataUpdateSubjects[serviceType].asObservable();
-  }
-
-  // Mock data for VI module
-  private getMockVIData(): any {
-    return {
-      topCVEs: [
-        { id: 'CVE-2023-1234', count: 156, severity: 'critical' },
-        { id: 'CVE-2023-5678', count: 142, severity: 'high' },
-        { id: 'CVE-2023-9012', count: 98, severity: 'critical' },
-        { id: 'CVE-2023-3456', count: 87, severity: 'high' },
-        { id: 'CVE-2023-7890', count: 76, severity: 'medium' }
-      ],
-      vulnerabilitiesBySeverity: [
-        { name: 'Critical', count: 124, color: '#d0021b' },
-        { name: 'High', count: 256, color: '#f5a623' },
-        { name: 'Medium', count: 432, color: '#f8e71c' },
-        { name: 'Low', count: 321, color: '#7ed321' }
-      ],
-      osintSources: [
-        {
-          name: 'NVD',
-          dailyVolume: [45, 38, 52, 63, 47, 55, 61],
-          totalVolume: 361
-        },
-        {
-          name: 'GitHub Security',
-          dailyVolume: [32, 28, 35, 42, 38, 45, 40],
-          totalVolume: 260
-        },
-        {
-          name: 'ExploitDB',
-          dailyVolume: [18, 15, 22, 19, 24, 20, 25],
-          totalVolume: 143
-        }
-      ],
-      dailyVulnerabilities: [
-        { date: '2023-05-01', count: 42 },
-        { date: '2023-05-02', count: 38 },
-        { date: '2023-05-03', count: 56 },
-        { date: '2023-05-04', count: 61 },
-        { date: '2023-05-05', count: 49 },
-        { date: '2023-05-06', count: 52 },
-        { date: '2023-05-07', count: 58 }
-      ]
-    };
   }
 }

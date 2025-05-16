@@ -21,6 +21,7 @@ html, body {
   background-color: var(--bg-default);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 body.dark-mode {

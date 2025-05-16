@@ -1,11 +1,13 @@
 // Enhanced dashboard styles
 .dashboard-container {
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: linear-gradient(135deg, #0a0e1f 0%, #1a1a2e 100%);
   color: #e1e1e6;
-  overflow: hidden;
+  overflow: auto; /* Changed from hidden to auto to enable scrolling */
   position: relative;
 }
 
@@ -16,6 +18,7 @@
   right: 20px;
   z-index: 1000;
   transition: all 0.3s ease;
+  display: none !important;
 
   &:hover {
     transform: scale(1.1);
@@ -69,7 +72,8 @@
 }
 
 .dashboard-sidebar {
-  width: 280px;
+  width: 60%;
+  max-width: 600px;
   background: rgba(16, 18, 27, 0.8);
   backdrop-filter: blur(10px);
   border-right: 1px solid rgba(0, 243, 255, 0.2);

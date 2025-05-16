@@ -1,0 +1,71 @@
+<mat-card class="severity-chart-card">
+  <mat-card-header>
+    <mat-card-title>
+      <div class="widget-title">
+        <mat-icon>pie_chart</mat-icon>
+        <span>Severity Breakdown</span>
+      </div>
+      <div class="widget-actions">
+        <button mat-icon-button [matMenuTriggerFor]="chartMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #chartMenu="matMenu">
+          <button mat-menu-item (click)="refreshChart()">
+            <mat-icon>refresh</mat-icon>
+            <span>Refresh</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>fullscreen</mat-icon>
+            <span>Expand</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="chart-container" *ngIf="!loading; else loadingTemplate">
+      <div class="donut-chart">
+        <svg [attr.width]="chartSize" [attr.height]="chartSize" viewBox="0 0 200 200">
+          <!-- Empty chart background -->
+          <circle *ngIf="donutSegments.length === 0"
+            cx="100" cy="100" r="80"
+            fill="none"
+            stroke="#2c3e50"
+            stroke-width="40" />
+          
+          <!-- Donut segments -->
+          <path *ngFor="let segment of donutSegments"
+            [attr.d]="segment.path"
+            [attr.fill]="segment.color"
+            class="donut-segment"
+            [matTooltip]="segment.severity + ': ' + segment.count + ' (' + getPercentage(segment.count) + ')'" />
+          
+          <!-- Center text -->
+          <text x="100" y="90" text-anchor="middle" class="total-count">{{ totalVulnerabilities }}</text>
+          <text x="100" y="110" text-anchor="middle" class="total-label">Total</text>
+        </svg>
+      </div>
+      
+      <div class="chart-legend">
+        <div class="legend-item" *ngFor="let item of chartData">
+          <div class="legend-color" [style.background-color]="item.color"></div>
+          <div class="legend-info">
+            <div class="legend-label">{{ item.severity }}</div>
+            <div class="legend-value">
+              <span class="count">{{ item.count }}</span>
+              <span class="percentage">({{ getPercentage(item.count) }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading data...</p>
+  </div>
+</ng-template>

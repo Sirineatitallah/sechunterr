@@ -1,13 +1,11 @@
 <div class="app-container">
   <!-- Header removed -->
-  <div class="main-container" [class.blurred]="!authService.isAuthenticated()">
+  <div class="main-container">
     <div class="content-container">
+
       <router-outlet></router-outlet>
     </div>
   </div>
-
-  <div class="auth-overlay" *ngIf="!authService.isAuthenticated()"></div>
-  <router-outlet *ngIf="!authService.isAuthenticated()"></router-outlet>
 
   <!-- Global Chatbot - visible on all pages -->
   <app-simple-chatbot></app-simple-chatbot>

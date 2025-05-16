@@ -1,11 +1,6 @@
-<div class="dashboard-content">
-  <!-- Sidebar (Left) -->
-  <aside class="dashboard-sidebar">
-    <app-sidebar (menuSelection)="handleMenuSelection($event)"></app-sidebar>
-  </aside>
-
-  <!-- Main Content (Right) -->
-  <main class="dashboard-main no-header">
+<div class="dashboard-content full-width">
+  <!-- Main Content (Full Width) -->
+  <main class="dashboard-main no-header full-width">
     <div class="user-dashboard-container">
       <!-- Welcome message when no module is selected -->
       @if (!activeModule) {
@@ -13,33 +8,45 @@
           <div class="welcome-badge">
             <span>VOC Security Platform</span>
           </div>
-          <h1>Welcome to VOC Ecosystem</h1>
-          <p>Explore our comprehensive security modules to protect your digital assets and infrastructure. Select a module below or from the sidebar to view details.</p>
+          <h1>Bienvenue sur la Page d'Accueil</h1>
+          <p>Explorez nos modules de sécurité complets pour protéger vos actifs numériques et votre infrastructure. Sélectionnez un module ci-dessous pour afficher les détails.</p>
+
+          <div class="account-buttons">
+            <button mat-raised-button color="primary" class="create-account-btn" (click)="navigateToSignup()" style="cursor: pointer;">
+              <mat-icon>person_add</mat-icon>
+              Créer un compte
+            </button>
+            <button mat-raised-button class="sign-in-btn" (click)="navigateToAuth()" style="cursor: pointer;">
+              <mat-icon>login</mat-icon>
+              Se connecter
+            </button>
+          </div>
 
           <div class="security-modules">
-            <div class="module-card" (click)="showModule('asm')">
+            <div class="module-card" (click)="showModule('asm')" style="cursor: pointer;">
               <div class="card-glow"></div>
               <mat-icon>security</mat-icon>
               <h3>Attack Surface Management</h3>
               <p class="card-description">Discover and monitor your external attack surface</p>
             </div>
-            <div class="module-card" (click)="showModule('vi')">
+            <div class="module-card" (click)="showModule('vi')" style="cursor: pointer;">
               <div class="card-glow"></div>
               <mat-icon>bug_report</mat-icon>
               <h3>Vulnerability Intelligence</h3>
               <p class="card-description">Track and prioritize vulnerabilities in real-time</p>
             </div>
-            <div class="module-card" (click)="showModule('cti')">
+            <div class="module-card" (click)="showModule('cti')" style="cursor: pointer;">
               <div class="card-glow"></div>
               <mat-icon>gpp_maybe</mat-icon>
               <h3>Cyber Threat Intelligence</h3>
               <p class="card-description">Stay ahead of emerging threats and actors</p>
             </div>
-            <div class="module-card" (click)="showModule('soar')">
+            <!-- SOAR module removed as it's not supported in the component -->
+            <div class="module-card" style="cursor: not-allowed; opacity: 0.7;">
               <div class="card-glow"></div>
               <mat-icon>healing</mat-icon>
               <h3>Security Orchestration</h3>
-              <p class="card-description">Automate incident response and remediation</p>
+              <p class="card-description">Coming soon - Automate incident response and remediation</p>
             </div>
           </div>
         </div>
@@ -48,7 +55,7 @@
       <!-- Module image display -->
       @if (activeModule) {
         <div class="module-display">
-          <div class="back-button" (click)="activeModule = null">
+          <div class="back-button" (click)="activeModule = null" style="cursor: pointer;">
             <mat-icon>arrow_back</mat-icon>
             <span>Back to Dashboard</span>
           </div>
@@ -56,13 +63,13 @@
           <h2>{{ moduleNames[activeModule] }}</h2>
           <div class="module-subtitle">Premium Security Module</div>
 
-          <div class="image-container" (click)="onImageClick()">
+          <div class="image-container" (click)="onImageClick()" style="cursor: pointer;">
             <img [src]="imagePaths[activeModule]" [alt]="moduleNames[activeModule]" class="module-image">
             <div class="image-overlay">
               <div class="overlay-content">
                 <mat-icon>lock</mat-icon>
                 <p>Premium Content</p>
-                <button mat-raised-button (click)="navigateToAuth()">Sign In for Details</button>
+                <button mat-raised-button (click)="navigateToAuth()" style="cursor: pointer;">Sign In for Details</button>
               </div>
             </div>
           </div>

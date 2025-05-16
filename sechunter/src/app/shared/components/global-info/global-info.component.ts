@@ -65,11 +65,7 @@ export class GlobalInfoComponent {
       icon: 'gpp_maybe',
       description: 'Real-time threat intelligence to stay ahead of emerging threats and vulnerabilities.'
     },
-    {
-      name: 'Security Orchestration & Response (SOAR)',
-      icon: 'healing',
-      description: 'Automated incident response workflows to quickly address and remediate security incidents.'
-    }
+
   ];
 
   // FAQ items
@@ -88,7 +84,7 @@ export class GlobalInfoComponent {
     },
     {
       question: 'How quickly can SecHunter respond to security incidents?',
-      answer: 'With our SOAR capabilities, SecHunter can automatically respond to many security incidents within minutes. For more complex incidents, our security experts are available 24/7 to provide guidance and support.'
+      answer: 'SecHunter can respond to security incidents quickly through our expert security team. For complex incidents, our security experts are available 24/7 to provide guidance and support.'
     },
     {
       question: 'How do I get started with SecHunter?',

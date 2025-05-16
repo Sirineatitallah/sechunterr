@@ -82,14 +82,7 @@ export class SidebarComponent {
       submenus: [],
       notificationCount: 5 // example badge count
     },
-    {
-      path: 'soar',
-      title: 'Incident Response',
-      icon: 'assets/icons/soar-3d.svg',
-      roles: ['admin'],
-      submenus: [],
-      notificationCount: 0
-    },
+
     {
       path: 'info',
       title: 'Information & Contact',

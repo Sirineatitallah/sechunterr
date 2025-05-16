@@ -1,0 +1,170 @@
+.cvss-chart-card {
+  background-color: rgba(26, 38, 52, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+  mat-card-header {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    
+    mat-card-title {
+      margin: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #e1e1e6;
+      
+      .widget-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        mat-icon {
+          color: #3498db;
+        }
+      }
+      
+      .widget-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        .time-range-select {
+          width: 120px;
+          font-size: 0.875rem;
+          
+          ::ng-deep .mat-mdc-select-trigger {
+            height: 36px;
+          }
+        }
+      }
+    }
+  }
+  
+  mat-card-content {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 1rem;
+      
+      .chart-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 1rem;
+        color: #bdc3c7;
+        text-align: center;
+        
+        mat-icon {
+          font-size: 2rem;
+          height: 2rem;
+          width: 2rem;
+          opacity: 0.5;
+        }
+      }
+      
+      .line-chart {
+        max-width: 100%;
+        height: auto;
+        
+        .axis {
+          stroke: rgba(255, 255, 255, 0.1);
+          stroke-width: 1;
+        }
+        
+        .grid-line {
+          stroke: rgba(255, 255, 255, 0.05);
+          stroke-width: 1;
+        }
+        
+        .axis-label {
+          fill: #bdc3c7;
+          font-size: 0.75rem;
+          text-anchor: middle;
+          
+          &.y-label {
+            text-anchor: end;
+          }
+        }
+        
+        .chart-line {
+          fill: none;
+          stroke: #3498db;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        
+        .data-point {
+          transition: all 0.2s ease;
+          
+          &:hover {
+            r: 7;
+            stroke: #fff;
+            stroke-width: 2;
+          }
+        }
+        
+        .chart-title {
+          fill: #e1e1e6;
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+      }
+      
+      .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.5rem;
+        
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          
+          .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+          }
+          
+          .legend-label {
+            font-size: 0.75rem;
+            color: #bdc3c7;
+          }
+        }
+      }
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  
+  p {
+    margin-top: 1rem;
+    color: #bdc3c7;
+  }
+}

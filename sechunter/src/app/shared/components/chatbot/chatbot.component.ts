@@ -64,13 +64,9 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
       'Les principaux points d\'exposition incluent des ports ouverts non nécessaires et des services mal configurés.',
       'Je recommande de réduire votre surface d\'attaque en désactivant les services non essentiels et en mettant à jour vos configurations.'
     ],
-    soar: [
-      'Nous avons 12 playbooks actifs pour automatiser la réponse aux incidents de sécurité.',
-      'Le temps moyen de réponse aux incidents a été réduit de 45% grâce à l\'automatisation.',
-      'Le playbook de réponse aux attaques de phishing a été déclenché 17 fois cette semaine.'
-    ],
+
     help: [
-      'Je peux vous aider avec des informations sur les vulnérabilités, les menaces, la surface d\'attaque, et l\'automatisation de la sécurité.',
+      'Je peux vous aider avec des informations sur les vulnérabilités, les menaces et la surface d\'attaque.',
       'Vous pouvez me demander des statistiques, des recommandations, ou des explications sur les alertes de sécurité.',
       'N\'hésitez pas à poser des questions spécifiques sur vos préoccupations en matière de sécurité.'
     ],
@@ -173,8 +169,8 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
       return this.getRandomResponse('threat');
     } else if (this.containsAny(lowerQuestion, ['surface', 'asm', 'exposition', 'exposé', 'asset', 'actif'])) {
       return this.getRandomResponse('asm');
-    } else if (this.containsAny(lowerQuestion, ['soar', 'automatisation', 'playbook', 'workflow', 'incident', 'réponse'])) {
-      return this.getRandomResponse('soar');
+    } else if (this.containsAny(lowerQuestion, ['incident', 'réponse'])) {
+      return this.getRandomResponse('default');
     } else if (this.containsAny(lowerQuestion, ['aide', 'help', 'comment', 'quoi', 'que'])) {
       return this.getRandomResponse('help');
     } else {

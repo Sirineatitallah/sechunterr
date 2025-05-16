@@ -39,37 +39,30 @@ export class AuthService {
   }
 
   login(credentials: { email: string; password: string }): Observable<any> {
-    console.log('Login attempt with:', credentials);
-
     // Special case for admin login
     if (credentials.email === 'admin' && credentials.password === 'Admin1!/') {
-      console.log('Admin login successful');
-      // Create a mock response with admin token
       const mockResponse = { token: 'admin-token' };
       this.handleAuthentication(mockResponse);
       return new BehaviorSubject(mockResponse).asObservable();
     }
 
-    // Special case for client login
-    if (credentials.email.startsWith('client') && credentials.password === 'Client1!/') {
-      console.log('Client login successful');
-      const clientId = credentials.email.replace('client', '') || '1';
-      const mockResponse = { token: `client-token-${clientId}` };
+    // Special case for analyst login
+    if ((credentials.email === 'analyst' && credentials.password === 'Analyst1!/') ||
+        (credentials.email === 'idanalyste' && credentials.password === 'Analyste1!/')) {
+      const mockResponse = { token: 'analyst-token' };
       this.handleAuthentication(mockResponse);
       return new BehaviorSubject(mockResponse).asObservable();
     }
 
-    // Special case for analyst login
-    if (credentials.email === 'analyst' && credentials.password === 'Analyst1!/') {
-      console.log('Analyst login successful');
-      const mockResponse = { token: 'analyst-token-' + Date.now() };
+    // Special case for user login
+    if (credentials.email === 'user' && credentials.password === 'userA1!/') {
+      const mockResponse = { token: 'user-token' };
       this.handleAuthentication(mockResponse);
       return new BehaviorSubject(mockResponse).asObservable();
     }
 
     // For demo purposes, accept any login with valid format
     if (credentials.email && credentials.password && credentials.password.length >= 6) {
-      console.log('Regular user login successful');
       const mockResponse = { token: 'client-token-1' };
       this.handleAuthentication(mockResponse);
       return new BehaviorSubject(mockResponse).asObservable();
@@ -77,7 +70,7 @@ export class AuthService {
 
     // Return error for invalid credentials
     console.log('Login failed: Invalid credentials');
-    return throwError(() => new Error('Invalid credentials. Please check your email and password.'));
+    return throwError(() => new Error('Login failed. Please provide a valid email and password.'));
   }
 
   private handleAuthentication(res: { token: string }): void {
@@ -92,6 +85,8 @@ export class AuthService {
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('access_token');
+      localStorage.removeItem('user_role');
+      console.log('Logged out, cleared tokens and roles');
     }
     this.authStatus.next(false);
     this.router.navigate(['/auth']);
@@ -104,6 +99,8 @@ export class AuthService {
 
     // Special case for admin token or client tokens
     if (token === 'admin-token' ||
+        token === 'analyst-token' ||
+        token === 'user-token' ||
         token.startsWith('client-token-') ||
         token.startsWith('analyst-token-') ||
         token.startsWith('user-token-')) {
@@ -127,7 +124,26 @@ export class AuthService {
 
   getDecodedToken(): any {
     const token = localStorage.getItem('access_token');
+    const userRole = localStorage.getItem('user_role');
+
     if (!token) return null;
+
+    console.log('Decoding token:', token);
+    console.log('User role from localStorage:', userRole);
+
+    // Check user_role in localStorage first
+    if (userRole === 'analyst') {
+      console.log('Using analyst role from localStorage');
+      return {
+        sub: 'analyst',
+        id: 'analyst-1',
+        email: 'analyst@example.com',
+        name: 'Security Analyst',
+        roles: ['analyst'],
+        mfaEnabled: false,
+        lastLogin: new Date()
+      };
+    }
 
     // Special case for admin token
     if (token === 'admin-token') {
@@ -159,13 +175,27 @@ export class AuthService {
     }
 
     // Special case for analyst tokens
-    if (token.startsWith('analyst-token-')) {
+    if (token === 'analyst-token' || token.startsWith('analyst-token-')) {
+      console.log('Using analyst role from token');
       return {
         sub: 'analyst',
         id: 'analyst-1',
         email: 'analyst@example.com',
         name: 'Security Analyst',
         roles: ['analyst'],
+        mfaEnabled: false,
+        lastLogin: new Date()
+      };
+    }
+
+    // Special case for user token
+    if (token === 'user-token' || token.startsWith('user-token-')) {
+      return {
+        sub: 'user',
+        id: 'user-1',
+        email: 'user@example.com',
+        name: 'Regular User',
+        roles: ['user'],
         mfaEnabled: false,
         lastLogin: new Date()
       };

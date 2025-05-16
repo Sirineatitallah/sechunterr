@@ -1,0 +1,417 @@
+// Variables
+$background-dark: #0a0e1f;
+$background-light: #1a2634;
+$primary-color: #00f3ff;
+$secondary-color: #bc13fe;
+$accent-color: #ff5e62;
+$text-light: #e1e1e6;
+$text-muted: #bdc3c7;
+$card-bg: rgba(26, 38, 52, 0.7);
+$border-color: rgba(255, 255, 255, 0.05);
+
+// Mixins
+@mixin glassmorphism {
+  background: rgba(26, 38, 52, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+@mixin card-hover {
+  transition: all 0.3s ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh; /* Changed from fixed height to min-height */
+  width: 100%;
+  overflow: auto; /* Changed from hidden to auto to enable scrolling */
+  background: linear-gradient(135deg, $background-dark 0%, $background-light 100%);
+  color: $text-light;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0, 243, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(188, 19, 254, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.dashboard-sidebar {
+  width: 250px;
+  @include glassmorphism;
+  border-right: 1px solid $border-color;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 1;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, $primary-color, $secondary-color);
+    border-radius: 3px;
+  }
+}
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.5rem;
+  z-index: 1;
+  min-height: 0; /* Ensure content can scroll within flex container */
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, $primary-color, $secondary-color);
+    border-radius: 3px;
+  }
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem 0 1.5rem;
+  border-bottom: 1px solid $border-color;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      $primary-color 30%,
+      $secondary-color 70%,
+      transparent 100%);
+    opacity: 0.5;
+  }
+
+  .header-left {
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: linear-gradient(45deg, $primary-color, $secondary-color);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.5px;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, $primary-color, $secondary-color);
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .analyst-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .analyst-name {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+
+      .analyst-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, $primary-color, $secondary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+
+        mat-icon {
+          color: #fff;
+          font-size: 20px;
+          height: 20px;
+          width: 20px;
+        }
+      }
+    }
+  }
+}
+
+.dashboard-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+  overflow: auto; /* Added to enable scrolling */
+  min-height: 0; /* Added to ensure flex child can scroll */
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(0, 243, 255, 0.03) 0%, transparent 30%),
+      radial-gradient(circle at 90% 90%, rgba(188, 19, 254, 0.03) 0%, transparent 30%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .dashboard-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    .dashboard-card {
+      flex: 1;
+      min-width: 0; // Prevent flex items from overflowing
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        height: 2px;
+        background: linear-gradient(90deg, $primary-color, $secondary-color);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 2px;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &.full-width {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 1400px) {
+      flex-direction: column;
+    }
+  }
+
+  // Add animation for dashboard cards
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .dashboard-card {
+    animation: fadeInUp 0.5s ease forwards;
+
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  width: 100%;
+
+  p {
+    margin-top: 1.5rem;
+    color: $text-muted;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: $primary-color !important;
+    }
+  }
+}
+
+// Add responsive styles
+@media (max-width: 1200px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .header-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal scrolling on mobile */
+  }
+
+  .dashboard-sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    overflow-y: auto; /* Ensure sidebar can scroll on mobile */
+  }
+
+  .dashboard-main {
+    padding: 1rem;
+    overflow-y: auto; /* Ensure main content can scroll on mobile */
+  }
+
+  .header-right {
+    flex-wrap: wrap;
+    gap: 0.75rem !important;
+  }
+
+  .dashboard-content {
+    gap: 1rem;
+    overflow-y: auto; /* Ensure content can scroll on mobile */
+
+    .dashboard-row {
+      gap: 1rem;
+    }
+  }
+}
+
+// Add styles for active tab content
+.vi-content, .cti-content, .asm-content, .soar-content {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  min-height: 0; /* Ensure content can scroll within flex container */
+  scroll-behavior: smooth;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  // Improve scrollbar appearance
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, $primary-color, $secondary-color);
+    border-radius: 3px;
+  }
+}
+
+// Tab changing animation
+.dashboard-content {
+  &.tab-changing {
+    animation: tabTransition 0.5s ease;
+  }
+}
+
+@keyframes tabTransition {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Add active tab indicator styles
+.dashboard-main {
+  &.vi-active, &.cti-active, &.asm-active, &.soar-active {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, $primary-color, $secondary-color);
+      z-index: 10;
+      opacity: 0.7;
+    }
+  }
+}

@@ -1,0 +1,42 @@
+# Node modules
+node_modules
+
+# Build output
+dist
+.angular
+
+# Git and version control
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+
+# Editor files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Virtual environment
+.venv
+
+# Documentation
+docs
+diagrams
+README.md

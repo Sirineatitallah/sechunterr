@@ -170,8 +170,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.createWidget('threat-feed', 2, 0, { cols: 1, rows: 1 }, 'feed1', { dataSource: 'threat-api' }),
       this.createWidget('asm-heatmap', 0, 1, { cols: 2, rows: 2 }, 'asm1', { title: 'ASM Heatmap' }),
       this.createWidget('vi-radar', 2, 1, { cols: 2, rows: 2 }, 'vi1', { title: 'Vulnerability Radar' }),
-      this.createWidget('cti-world-map', 0, 3, { cols: 3, rows: 2 }, 'cti1', { title: 'CTI World Threat Map' }),
-      this.createWidget('soar-gantt', 3, 3, { cols: 3, rows: 2 }, 'soar1', { title: 'SOAR Workflow' })
+      this.createWidget('cti-world-map', 0, 3, { cols: 3, rows: 2 }, 'cti1', { title: 'CTI World Threat Map' })
     ];
   }
 
