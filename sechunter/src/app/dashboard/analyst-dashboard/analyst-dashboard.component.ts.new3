@@ -1,0 +1,386 @@
+  /**
+   * Navigate to alerts page
+   */
+  navigateToAlerts(): void {
+    this.router.navigate(['/dashboard/alerts']);
+  }
+
+  /**
+   * Navigate to tasks page
+   */
+  navigateToTasks(): void {
+    this.router.navigate(['/dashboard/tasks']);
+  }
+
+  /**
+   * Navigate to reports page
+   */
+  navigateToReports(): void {
+    this.router.navigate(['/dashboard/reports']);
+  }
+
+  /**
+   * Toggle between dark and light theme
+   */
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    document.body.classList.toggle('dark-theme', this.isDarkTheme);
+    document.body.classList.toggle('light-theme', !this.isDarkTheme);
+
+    // Show notification
+    if (this.isDarkTheme) {
+      this.notificationService.showInfo('Thème sombre activé');
+    } else {
+      this.notificationService.showInfo('Thème clair activé');
+    }
+  }
+
+  /**
+   * Ouvre un aperçu d'action
+   */
+  openActionPreview(type: string, title: string): void {
+    this.notificationService.showInfo(`Aperçu "${title}" en cours de développement`);
+
+    // Afficher un message différent selon le type d'action
+    switch (type) {
+      case 'alert':
+        this.notificationService.showSuccess('Alerte créée avec succès');
+        break;
+      case 'scan':
+        this.notificationService.showSuccess('Scan lancé avec succès');
+        break;
+      case 'incident':
+        this.notificationService.showSuccess('Incident signalé avec succès');
+        break;
+      case 'report':
+        this.notificationService.showSuccess('Rapport généré avec succès');
+        break;
+    }
+  }
+
+  /**
+   * Ouvre l'aperçu pour créer une alerte
+   */
+  openCreateAlertPreview(): void {
+    this.openActionPreview('alert', 'Créer une alerte');
+  }
+
+  /**
+   * Ouvre l'aperçu pour lancer un scan
+   */
+  openLaunchScanPreview(): void {
+    this.openActionPreview('scan', 'Lancer un scan');
+  }
+
+  /**
+   * Ouvre l'aperçu pour signaler un incident
+   */
+  openReportIncidentPreview(): void {
+    this.openActionPreview('incident', 'Signaler un incident');
+  }
+
+  /**
+   * Ouvre l'aperçu pour générer un rapport
+   */
+  openGenerateReportPreview(): void {
+    this.openActionPreview('report', 'Générer un rapport');
+  }
+
+  /**
+   * Get tasks filtered by status
+   */
+  getTasksByStatus(status: string): Task[] {
+    if (status === 'all' || !status) {
+      return this.tasks;
+    }
+    return this.tasks.filter(task => task.status === status);
+  }
+
+  /**
+   * Get count of tasks by status
+   */
+  getTaskCountByStatus(status: string): number {
+    return this.getTasksByStatus(status).length;
+  }
+
+  /**
+   * Filter tasks based on selected status
+   */
+  filterTasks(): void {
+    // This method is called when the task filter dropdown changes
+    // The filtering is handled by getTasksByStatus
+  }
+
+  /**
+   * Update task status
+   */
+  updateTaskStatus(task: Task, newStatus: 'todo' | 'in-progress' | 'done'): void {
+    const taskIndex = this.tasks.findIndex(t => t.id === task.id);
+    if (taskIndex !== -1) {
+      this.tasks[taskIndex].status = newStatus;
+
+      // If task is marked as done, set completed date
+      if (newStatus === 'done') {
+        this.tasks[taskIndex].completedDate = new Date();
+      } else {
+        // Remove completed date if task is moved back to in-progress or todo
+        delete this.tasks[taskIndex].completedDate;
+      }
+
+      this.notificationService.showSuccess(`Statut de la tâche mis à jour: ${task.title}`);
+    }
+  }
+
+  /**
+   * Open task details dialog
+   */
+  openTaskDetails(task: Task): void {
+    this.selectedTask = { ...task };
+    this.dialog.open(this.taskDetailTemplate, {
+      width: '700px',
+      panelClass: 'dark-theme-dialog'
+    });
+  }
+
+  /**
+   * Add comment to selected task
+   */
+  addComment(): void {
+    if (!this.selectedTask || !this.newComment) {
+      return;
+    }
+
+    const comment: TaskComment = {
+      id: Date.now().toString(),
+      author: this.analystName,
+      content: this.newComment,
+      date: new Date()
+    };
+
+    // Add to selected task (dialog view)
+    this.selectedTask.comments.push(comment);
+
+    // Clear comment input
+    this.newComment = '';
+  }
+
+  /**
+   * Save task changes
+   */
+  saveTaskChanges(): void {
+    if (!this.selectedTask) {
+      return;
+    }
+
+    // Find and update the task in the main array
+    const taskIndex = this.tasks.findIndex(t => t.id === this.selectedTask!.id);
+    if (taskIndex !== -1) {
+      this.tasks[taskIndex] = { ...this.selectedTask };
+      this.notificationService.showSuccess('Tâche mise à jour avec succès');
+    }
+
+    // Close dialog
+    this.dialog.closeAll();
+  }
+
+  /**
+   * Create new task
+   */
+  createNewTask(): void {
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: 'Nouvelle tâche',
+      description: 'Description de la tâche',
+      status: 'todo',
+      priority: 'medium',
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      assignedBy: 'Admin',
+      comments: []
+    };
+
+    this.tasks.push(newTask);
+    this.openTaskDetails(newTask);
+  }
+
+  /**
+   * Get priority label
+   */
+  getPriorityLabel(priority: string | undefined): string {
+    if (!priority) return '';
+
+    switch (priority) {
+      case 'high': return 'Haute';
+      case 'medium': return 'Moyenne';
+      case 'low': return 'Faible';
+      default: return priority;
+    }
+  }
+
+  /**
+   * Get status label
+   */
+  getStatusLabel(status: string | undefined): string {
+    if (!status) return '';
+
+    switch (status) {
+      case 'todo': return 'À faire';
+      case 'in-progress': return 'En cours';
+      case 'done': return 'Fait';
+      default: return status;
+    }
+  }
+
+  /**
+   * Get report status label
+   */
+  getReportStatusLabel(status: string): string {
+    switch (status) {
+      case 'draft': return 'Brouillon';
+      case 'submitted': return 'Soumis';
+      case 'approved': return 'Approuvé';
+      case 'rejected': return 'Rejeté';
+      default: return status;
+    }
+  }
+
+  /**
+   * Launch integrated tool
+   */
+  launchTool(toolName: string): void {
+    this.notificationService.showInfo(`Lancement de l'outil: ${toolName}`);
+    // In a real application, this would launch the tool
+  }
+
+  /**
+   * Open resource
+   */
+  openResource(resourceType: string): void {
+    this.notificationService.showInfo(`Ouverture de la ressource: ${resourceType}`);
+    // In a real application, this would open the resource
+  }
+
+  /**
+   * Generate report
+   */
+  generateReport(): void {
+    this.notificationService.showInfo('Génération du rapport en cours...');
+
+    // In a real application, this would call a service to generate a report
+    setTimeout(() => {
+      const newReport: Report = {
+        id: Date.now().toString(),
+        title: `Rapport de vulnérabilités - ${new Date().toLocaleDateString()}`,
+        type: 'Automatique',
+        date: new Date(),
+        status: 'draft'
+      };
+
+      this.reportsHistory.unshift(newReport);
+      this.notificationService.showSuccess('Rapport généré avec succès');
+    }, 2000);
+  }
+
+  /**
+   * Report critical vulnerability
+   */
+  reportCriticalVulnerability(): void {
+    this.notificationService.showInfo('Préparation du formulaire de signalement...');
+
+    // In a real application, this would open a form to report a critical vulnerability
+    setTimeout(() => {
+      this.notificationService.showSuccess('Vulnérabilité critique signalée avec succès');
+    }, 1500);
+  }
+
+  /**
+   * View report
+   */
+  viewReport(report: Report): void {
+    this.notificationService.showInfo(`Affichage du rapport: ${report.title}`);
+    // In a real application, this would open the report
+  }
+
+  /**
+   * Download report
+   */
+  downloadReport(report: Report): void {
+    this.notificationService.showInfo(`Téléchargement du rapport: ${report.title}`);
+    // In a real application, this would download the report
+  }
+
+  /**
+   * Share report
+   */
+  shareReport(report: Report): void {
+    this.notificationService.showInfo(`Partage du rapport: ${report.title}`);
+    // In a real application, this would open a sharing dialog
+  }
+
+  /**
+   * Handle vulnerability details view
+   */
+  onViewVulnerabilityDetails(vulnerability: Vulnerability): void {
+    this.selectedVulnerability = vulnerability;
+    this.dialog.open(VulnerabilityDetailsDialogComponent, {
+      width: '800px',
+      data: vulnerability,
+      panelClass: 'dark-theme-dialog'
+    });
+  }
+
+  /**
+   * Export vulnerability data
+   */
+  onExportVulnerabilityData(format: string): void {
+    this.exportData(format);
+  }
+
+  /**
+   * Load mock data for a microservice tab
+   */
+  private loadMockData(tab: 'vi' | 'cti' | 'asm'): void {
+    // Mock data for each microservice
+    const mockData = {
+      vi: {
+        vulnerabilities: [
+          { id: 'CVE-2023-1234', severity: 'Critical', title: 'Remote Code Execution in Apache Log4j' },
+          { id: 'CVE-2023-5678', severity: 'High', title: 'SQL Injection in MySQL' },
+          { id: 'CVE-2023-9012', severity: 'Medium', title: 'Cross-Site Scripting in jQuery' }
+        ],
+        stats: {
+          critical: 12,
+          high: 34,
+          medium: 56,
+          low: 78
+        }
+      },
+      cti: {
+        threats: [
+          { id: 'APT-29', name: 'Cozy Bear', origin: 'Russia', activity: 'Active' },
+          { id: 'APT-41', name: 'Wicked Panda', origin: 'China', activity: 'Active' },
+          { id: 'Lazarus', name: 'Hidden Cobra', origin: 'North Korea', activity: 'Active' }
+        ],
+        stats: {
+          activeCampaigns: 8,
+          newIOCs: 156,
+          affectedSectors: ['Finance', 'Healthcare', 'Government']
+        }
+      },
+      asm: {
+        assets: [
+          { id: 'SRV-001', type: 'Server', vulnerabilities: 5, exposure: 'High' },
+          { id: 'APP-002', type: 'Web Application', vulnerabilities: 3, exposure: 'Medium' },
+          { id: 'NET-003', type: 'Network Device', vulnerabilities: 1, exposure: 'Low' }
+        ],
+        stats: {
+          totalAssets: 128,
+          exposedAssets: 23,
+          criticalAssets: 15
+        }
+      }
+    };
+
+    // Set the mock data for the specified tab
+    this.microserviceData[tab] = mockData[tab];
+  }
+}

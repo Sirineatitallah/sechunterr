@@ -9,7 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -26,14 +26,12 @@ import { MicroserviceConnectorService, MicroserviceType } from '../../core/servi
 import { NotificationService } from '../../core/services/notification.service';
 import { GlobalSearchComponent, SearchResult } from '../../shared/components/global-search/global-search.component';
 import { RealTimeStatsComponent, StatItem } from '../../shared/components/real-time-stats/real-time-stats.component';
-import { Alert } from '../../shared/components/recent-alerts/recent-alerts.component';
 
 // Vulnerability dashboard components
 import { VulnerabilitiesTableComponent } from './components/vulnerabilities-table/vulnerabilities-table.component';
 import { SeverityChartComponent } from './components/severity-chart/severity-chart.component';
 import { CVSSLineChartComponent } from './components/cvss-line-chart/cvss-line-chart.component';
 import { HostBarChartComponent } from './components/host-bar-chart/host-bar-chart.component';
-
 import { VulnerabilityDetailsDialogComponent } from './components/vulnerability-details-dialog/vulnerability-details-dialog.component';
 
 // CTI components
@@ -47,7 +45,8 @@ import { AttackSurfaceComponent } from '../../asm/components/attack-surface/atta
 import { VulnerabilityService } from './services/vulnerability.service';
 import { Vulnerability } from './models/vulnerability.model';
 
-// Interfaces for task management
+
+// Interfaces for new components
 interface Task {
   id: string;
   title: string;
@@ -67,7 +66,6 @@ interface TaskComment {
   date: Date;
 }
 
-// Interface for reports
 interface Report {
   id: string;
   title: string;
@@ -78,6 +76,19 @@ interface Report {
   fileUrl?: string;
 }
 
+interface Alert {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: Date;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  source: string;
+  status: 'new' | 'in-progress' | 'resolved' | 'dismissed';
+  type: 'incident' | 'vulnerability' | 'threat' | 'system';
+  actions?: { label: string; icon: string; action: string; }[];
+  message?: string;
+  read?: boolean;
+}
 
 @Component({
   selector: 'app-analyst-dashboard',
@@ -111,9 +122,6 @@ interface Report {
     SeverityChartComponent,
     CVSSLineChartComponent,
     HostBarChartComponent,
-    // VulnerabilityDetailsDialogComponent is needed for the dialog opened in onViewVulnerabilityDetails method
-    // It's not directly used in the template, but it's required for the dialog to work
-    VulnerabilityDetailsDialogComponent,
 
     // CTI components
     ThreatMapComponent,
@@ -161,6 +169,9 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
   // Microservice-specific vulnerability data
   viVulnerabilities: Vulnerability[] = [];
 
+  // Analyst info
+  analystName = 'John Doe';
+
   // Filter states
   selectedDateRange: string = 'month';
   selectedSeverity: string[] = ['critical', 'high', 'medium', 'low'];
@@ -175,9 +186,6 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
 
   // Reports
   reportsHistory: Report[] = [];
-
-  // Analyst info
-  analystName = 'John Doe';
 
   // Subscriptions
   private subscriptions: Subscription[] = [];
@@ -228,11 +236,13 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
       id: 'alert-001',
       title: 'Tentative d\'intrusion détectée',
       description: 'Multiples tentatives d\'authentification échouées sur le serveur principal',
+      message: 'Multiples tentatives d\'authentification échouées sur le serveur principal',
       timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
       severity: 'critical',
       source: 'Firewall',
       status: 'new',
       type: 'incident',
+      read: false,
       actions: [
         { label: 'Investiguer', icon: 'search', action: 'investigate' },
         { label: 'Bloquer IP', icon: 'block', action: 'block' }
@@ -242,11 +252,13 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
       id: 'alert-002',
       title: 'Nouvelle vulnérabilité critique',
       description: 'CVE-2023-1234 affecte 5 serveurs dans votre infrastructure',
+      message: 'CVE-2023-1234 affecte 5 serveurs dans votre infrastructure',
       timestamp: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
       severity: 'high',
       source: 'Scanner de vulnérabilités',
       status: 'new',
       type: 'vulnerability',
+      read: false,
       actions: [
         { label: 'Voir détails', icon: 'visibility', action: 'view' },
         { label: 'Corriger', icon: 'build', action: 'remediate' }
@@ -256,11 +268,13 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
       id: 'alert-003',
       title: 'Activité suspecte détectée',
       description: 'Comportement anormal observé sur le compte utilisateur admin',
+      message: 'Comportement anormal observé sur le compte utilisateur admin',
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
       severity: 'medium',
       source: 'SIEM',
       status: 'in-progress',
       type: 'threat',
+      read: false,
       actions: [
         { label: 'Analyser', icon: 'analytics', action: 'analyze' },
         { label: 'Isoler', icon: 'security', action: 'isolate' }
@@ -288,14 +302,124 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
 
     // Initialize mock reports
     this.initMockReports();
-
-    // Apply initial filters
-    this.applyFilters();
   }
 
   ngOnDestroy(): void {
     // Clean up subscriptions
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Initialize mock tasks for demonstration
+   */
+  private initMockTasks(): void {
+    this.tasks = [
+      {
+        id: '1',
+        title: 'Analyser la vulnérabilité CVE-2023-1234',
+        description: 'Évaluer l\'impact de la vulnérabilité Log4j sur nos systèmes et proposer des mesures de remédiation.',
+        status: 'todo',
+        priority: 'high',
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        assignedBy: 'Admin',
+        comments: []
+      },
+      {
+        id: '2',
+        title: 'Vérifier les alertes de sécurité du firewall',
+        description: 'Examiner les alertes récentes du firewall et déterminer s\'il y a des tentatives d\'intrusion légitimes.',
+        status: 'in-progress',
+        priority: 'medium',
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
+        assignedBy: 'Admin',
+        comments: [
+          {
+            id: '1',
+            author: 'John Doe',
+            content: 'J\'ai commencé à analyser les logs. Plusieurs tentatives suspectes détectées.',
+            date: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+          }
+        ]
+      },
+      {
+        id: '3',
+        title: 'Mettre à jour la base de signatures IDS',
+        description: 'Télécharger et installer les dernières signatures pour notre système de détection d\'intrusion.',
+        status: 'done',
+        priority: 'low',
+        dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        completedDate: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+        assignedBy: 'Admin',
+        comments: [
+          {
+            id: '1',
+            author: 'John Doe',
+            content: 'Mise à jour effectuée avec succès. 250 nouvelles signatures ajoutées.',
+            date: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 hours ago
+          }
+        ]
+      },
+      {
+        id: '4',
+        title: 'Analyser la campagne de phishing récente',
+        description: 'Examiner les emails de phishing récents et identifier les indicateurs de compromission (IOCs).',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+        assignedBy: 'Admin',
+        comments: []
+      },
+      {
+        id: '5',
+        title: 'Vérifier les correctifs de sécurité Windows',
+        description: 'S\'assurer que tous les serveurs Windows ont les derniers correctifs de sécurité installés.',
+        status: 'todo',
+        priority: 'medium',
+        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+        assignedBy: 'Admin',
+        comments: []
+      }
+    ];
+  }
+
+  /**
+   * Initialize mock reports for demonstration
+   */
+  private initMockReports(): void {
+    this.reportsHistory = [
+      {
+        id: '1',
+        title: 'Rapport mensuel de vulnérabilités - Janvier 2024',
+        type: 'Mensuel',
+        date: new Date(2024, 0, 31), // January 31, 2024
+        status: 'approved',
+        fileUrl: '/reports/monthly-2024-01.pdf'
+      },
+      {
+        id: '2',
+        title: 'Analyse de la campagne de phishing Q1 2024',
+        type: 'Analyse',
+        date: new Date(2024, 2, 15), // March 15, 2024
+        status: 'submitted',
+        fileUrl: '/reports/phishing-q1-2024.pdf'
+      },
+      {
+        id: '3',
+        title: 'Évaluation de sécurité - Infrastructure Cloud',
+        type: 'Évaluation',
+        date: new Date(2024, 1, 20), // February 20, 2024
+        status: 'approved',
+        fileUrl: '/reports/cloud-security-assessment.pdf'
+      },
+      {
+        id: '4',
+        title: 'Rapport d\'incident - Tentative d\'intrusion',
+        type: 'Incident',
+        date: new Date(2024, 2, 5), // March 5, 2024
+        status: 'draft',
+        fileUrl: '/reports/incident-report-draft.pdf'
+      }
+    ];
   }
 
   /**
@@ -364,11 +488,13 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
         id: vuln.id || `alert-${Math.random().toString(36).substring(2, 9)}`,
         title: `${vuln.severity} Vulnerability Detected`,
         description: `${vuln.vulnerabilityName} on host ${vuln.host_ip}`,
+        message: `${vuln.vulnerabilityName} on host ${vuln.host_ip}`,
         timestamp: new Date(vuln.discoveredDate),
         severity: alertSeverity,
         source: 'Vulnerability Scanner',
         status: 'new' as 'new' | 'in-progress' | 'resolved' | 'dismissed',
         type: 'vulnerability' as 'vulnerability' | 'threat' | 'incident' | 'system',
+        read: false,
         actions: [
           { label: 'View Details', icon: 'visibility', action: 'view' },
           { label: 'Remediate', icon: 'build', action: 'remediate' }
@@ -376,12 +502,12 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
       };
     });
 
-    // Update recent alerts
+    // Add new alerts to the beginning of the list
     if (newAlerts.length > 0) {
-      this.recentAlerts = [...newAlerts, ...this.recentAlerts].slice(0, 5);
+      this.recentAlerts = [...newAlerts, ...this.recentAlerts].slice(0, 10); // Keep only top 10
     }
   }
-
+}
   /**
    * Update real-time stats based on vulnerability data
    */
@@ -389,75 +515,43 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
     if (this.vulnerabilities.length === 0) return;
 
     // Count vulnerabilities by severity
-    const criticalCount = this.vulnerabilities.filter(v => v.severity.toLowerCase() === 'critical').length;
-    const highCount = this.vulnerabilities.filter(v => v.severity.toLowerCase() === 'high').length;
+    const severityCounts = {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0
+    };
 
-    // Update vulnerability count in real-time stats
+    this.vulnerabilities.forEach(vuln => {
+      const severity = vuln.severity.toLowerCase();
+      if (severity in severityCounts) {
+        severityCounts[severity as keyof typeof severityCounts]++;
+      }
+    });
+
+    // Update real-time stats
+    const totalVulnerabilities = Object.values(severityCounts).reduce((a, b) => a + b, 0);
+    
+    // Find the stat for vulnerabilities and update it
     const vulnStat = this.realTimeStats.find(stat => stat.id === 'vulnerabilities');
     if (vulnStat) {
-      const oldValue = vulnStat.value;
-      vulnStat.value = this.vulnerabilities.length;
-      vulnStat.trend = vulnStat.value > oldValue ? 'up' : vulnStat.value < oldValue ? 'down' : 'stable';
-      vulnStat.percentage = oldValue > 0 ? Math.round(((vulnStat.value - oldValue) / oldValue) * 100) : 0;
+      vulnStat.value = totalVulnerabilities;
+      
+      // Calculate trend (simplified)
+      const previousValue = totalVulnerabilities - severityCounts.critical - severityCounts.high;
+      const currentValue = severityCounts.critical + severityCounts.high;
+      
+      if (currentValue > previousValue) {
+        vulnStat.trend = 'up';
+        vulnStat.percentage = Math.round((currentValue - previousValue) / (previousValue || 1) * 100);
+      } else if (currentValue < previousValue) {
+        vulnStat.trend = 'down';
+        vulnStat.percentage = Math.round((previousValue - currentValue) / (previousValue || 1) * 100);
+      } else {
+        vulnStat.trend = 'stable';
+        vulnStat.percentage = 0;
+      }
     }
-
-    // Update threats stat based on critical and high vulnerabilities
-    const threatStat = this.realTimeStats.find(stat => stat.id === 'threats');
-    if (threatStat) {
-      const oldValue = threatStat.value;
-      threatStat.value = criticalCount + highCount;
-      threatStat.trend = threatStat.value > oldValue ? 'up' : threatStat.value < oldValue ? 'down' : 'stable';
-      threatStat.percentage = oldValue > 0 ? Math.round(((threatStat.value - oldValue) / oldValue) * 100) : 0;
-    }
-
-    // Update assets stat based on unique hosts
-    const assetStat = this.realTimeStats.find(stat => stat.id === 'assets');
-    if (assetStat) {
-      const uniqueHosts = new Set(this.vulnerabilities.map(v => v.host_ip)).size;
-      const oldValue = assetStat.value;
-      assetStat.value = uniqueHosts;
-      assetStat.trend = assetStat.value > oldValue ? 'up' : assetStat.value < oldValue ? 'down' : 'stable';
-      assetStat.percentage = oldValue > 0 ? Math.round(((assetStat.value - oldValue) / oldValue) * 100) : 0;
-    }
-
-    // Update incidents stat based on exploitable vulnerabilities
-    const incidentStat = this.realTimeStats.find(stat => stat.id === 'incidents');
-    if (incidentStat) {
-      const exploitableVulns = this.vulnerabilities.filter(v => v.exploitAvailable).length;
-      const oldValue = incidentStat.value;
-      incidentStat.value = exploitableVulns;
-      incidentStat.trend = incidentStat.value > oldValue ? 'up' : incidentStat.value < oldValue ? 'down' : 'stable';
-      incidentStat.percentage = oldValue > 0 ? Math.round(((incidentStat.value - oldValue) / oldValue) * 100) : 0;
-    }
-  }
-
-  /**
-   * Handle vulnerability details view
-   */
-  onViewVulnerabilityDetails(vulnerability: Vulnerability): void {
-    this.selectedVulnerability = vulnerability;
-    this.dialog.open(VulnerabilityDetailsDialogComponent, {
-      width: '800px',
-      data: vulnerability,
-      panelClass: 'dark-theme-dialog'
-    });
-  }
-
-  /**
-   * Export vulnerability data
-   */
-  onExportVulnerabilityData(format: string): void {
-    if (this.vulnerabilities.length === 0) {
-      this.notificationService.showWarning('No vulnerability data to export');
-      return;
-    }
-
-    this.notificationService.showInfo(`Exporting vulnerability data as ${format.toUpperCase()}...`);
-
-    // In a real application, this would call a service to export the data
-    setTimeout(() => {
-      this.notificationService.showSuccess(`Vulnerability data exported as ${format.toUpperCase()}`);
-    }, 1500);
   }
 
   /**
@@ -500,23 +594,13 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
    * Handle tab change from mat-tab-group
    */
   onTabChange(event: MatTabChangeEvent): void {
-    const tabs: ('vi' | 'cti' | 'asm')[] = ['vi', 'cti', 'asm'];
+    // Update selected tab index
     this.selectedTabIndex = event.index;
-    this.activeTab = tabs[event.index];
-    this.loadTabData(this.activeTab);
-
-    // Add animation effect when changing tabs
+    
+    // Scroll to top when changing tabs
     const contentElement = document.querySelector('.dashboard-content');
     if (contentElement) {
-      contentElement.classList.add('tab-changing');
-
-      // Scroll to top when changing tabs
       contentElement.scrollTop = 0;
-
-      // Remove animation class after animation completes
-      setTimeout(() => {
-        contentElement.classList.remove('tab-changing');
-      }, 500);
     }
   }
 
@@ -673,116 +757,146 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize mock tasks for demonstration
+   * Handle alert actions
    */
-  private initMockTasks(): void {
-    this.tasks = [
-      {
-        id: '1',
-        title: 'Analyser la vulnérabilité CVE-2023-1234',
-        description: 'Évaluer l\'impact de la vulnérabilité Log4j sur nos systèmes et proposer des mesures de remédiation.',
-        status: 'todo',
-        priority: 'high',
-        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-        assignedBy: 'Admin',
-        comments: []
-      },
-      {
-        id: '2',
-        title: 'Vérifier les alertes de sécurité du firewall',
-        description: 'Examiner les alertes récentes du firewall et déterminer s\'il y a des tentatives d\'intrusion légitimes.',
-        status: 'in-progress',
-        priority: 'medium',
-        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-        assignedBy: 'Admin',
-        comments: [
-          {
-            id: '1',
-            author: 'John Doe',
-            content: 'J\'ai commencé à analyser les logs. Plusieurs tentatives suspectes détectées.',
-            date: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+  onAlertAction(event: {alert: Alert, action: string}): void {
+    const { alert, action } = event;
+
+    // Handle different actions
+    switch (action) {
+      case 'view':
+        if (alert.type === 'vulnerability') {
+          // Find the corresponding vulnerability
+          const vuln = this.vulnerabilities.find(v =>
+            v.vulnerabilityName.includes(alert.description.split(' on host ')[0])
+          );
+
+          if (vuln) {
+            this.onViewVulnerabilityDetails(vuln);
+            return;
           }
-        ]
-      },
-      {
-        id: '3',
-        title: 'Mettre à jour la base de signatures IDS',
-        description: 'Télécharger et installer les dernières signatures pour notre système de détection d\'intrusion.',
-        status: 'done',
-        priority: 'low',
-        dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        completedDate: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-        assignedBy: 'Admin',
-        comments: [
-          {
-            id: '1',
-            author: 'John Doe',
-            content: 'Mise à jour effectuée avec succès. 250 nouvelles signatures ajoutées.',
-            date: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 hours ago
-          }
-        ]
-      },
-      {
-        id: '4',
-        title: 'Analyser la campagne de phishing récente',
-        description: 'Examiner les emails de phishing récents et identifier les indicateurs de compromission (IOCs).',
-        status: 'in-progress',
-        priority: 'high',
-        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-        assignedBy: 'Admin',
-        comments: []
-      },
-      {
-        id: '5',
-        title: 'Vérifier les correctifs de sécurité Windows',
-        description: 'S\'assurer que tous les serveurs Windows ont les derniers correctifs de sécurité installés.',
-        status: 'todo',
-        priority: 'medium',
-        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
-        assignedBy: 'Admin',
-        comments: []
-      }
-    ];
+        }
+        this.notificationService.showInfo(`Viewing details for alert: ${alert.title}`);
+        break;
+      case 'acknowledge':
+        this.notificationService.showSuccess(`Alert acknowledged: ${alert.title}`);
+        break;
+      case 'investigate':
+        this.notificationService.showInfo(`Investigating alert: ${alert.title}`);
+        break;
+      case 'resolve':
+        this.notificationService.showSuccess(`Alert resolved: ${alert.title}`);
+        break;
+      case 'dismiss':
+        this.notificationService.showWarning(`Alert dismissed: ${alert.title}`);
+        break;
+      case 'delete':
+        this.notificationService.showWarning(`Alert deleted: ${alert.title}`);
+        // Remove from the list
+        this.recentAlerts = this.recentAlerts.filter(a => a.id !== alert.id);
+        break;
+      case 'block':
+        this.notificationService.showSuccess(`IP blocked for alert: ${alert.title}`);
+        break;
+      case 'remediate':
+        this.notificationService.showInfo(`Remediation started for: ${alert.title}`);
+        break;
+      case 'analyze':
+        this.notificationService.showInfo(`Analysis started for: ${alert.title}`);
+        break;
+      case 'isolate':
+        this.notificationService.showSuccess(`System isolated for alert: ${alert.title}`);
+        break;
+      default:
+        this.notificationService.showInfo(`Action ${action} performed on alert: ${alert.title}`);
+    }
+  }
+  /**
+   * Navigate to alerts page
+   */
+  navigateToAlerts(): void {
+    this.router.navigate(['/dashboard/alerts']);
   }
 
   /**
-   * Initialize mock reports for demonstration
+   * Navigate to tasks page
    */
-  private initMockReports(): void {
-    this.reportsHistory = [
-      {
-        id: '1',
-        title: 'Rapport mensuel de vulnérabilités - Janvier 2024',
-        type: 'Mensuel',
-        date: new Date(2024, 0, 31), // January 31, 2024
-        status: 'approved',
-        fileUrl: '/reports/monthly-2024-01.pdf'
-      },
-      {
-        id: '2',
-        title: 'Analyse de la campagne de phishing Q1 2024',
-        type: 'Analyse',
-        date: new Date(2024, 2, 15), // March 15, 2024
-        status: 'submitted',
-        fileUrl: '/reports/phishing-q1-2024.pdf'
-      },
-      {
-        id: '3',
-        title: 'Évaluation de sécurité - Infrastructure Cloud',
-        type: 'Évaluation',
-        date: new Date(2024, 1, 20), // February 20, 2024
-        status: 'approved',
-        fileUrl: '/reports/cloud-security-assessment.pdf'
-      },
-      {
-        id: '4',
-        title: 'Rapport d\'incident - Tentative d\'intrusion',
-        type: 'Incident',
-        date: new Date(2024, 2, 5), // March 5, 2024
-        status: 'draft',
-        fileUrl: '/reports/incident-report-draft.pdf'
-      }
-    ];
+  navigateToTasks(): void {
+    this.router.navigate(['/dashboard/tasks']);
+  }
+
+  /**
+   * Navigate to reports page
+   */
+  navigateToReports(): void {
+    this.router.navigate(['/dashboard/reports']);
+  }
+
+  /**
+   * Toggle between dark and light theme
+   */
+  toggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    document.body.classList.toggle('dark-theme', this.isDarkTheme);
+    document.body.classList.toggle('light-theme', !this.isDarkTheme);
+
+    // Show notification
+    if (this.isDarkTheme) {
+      this.notificationService.showInfo('Thème sombre activé');
+    } else {
+      this.notificationService.showInfo('Thème clair activé');
+    }
+  }
+
+  /**
+   * Ouvre un aperçu d'action
+   */
+  openActionPreview(type: string, title: string): void {
+    this.notificationService.showInfo(`Aperçu "${title}" en cours de développement`);
+
+    // Afficher un message différent selon le type d'action
+    switch (type) {
+      case 'alert':
+        this.notificationService.showSuccess('Alerte créée avec succès');
+        break;
+      case 'scan':
+        this.notificationService.showSuccess('Scan lancé avec succès');
+        break;
+      case 'incident':
+        this.notificationService.showSuccess('Incident signalé avec succès');
+        break;
+      case 'report':
+        this.notificationService.showSuccess('Rapport généré avec succès');
+        break;
+    }
+  }
+
+  /**
+   * Ouvre l'aperçu pour créer une alerte
+   */
+  openCreateAlertPreview(): void {
+    this.openActionPreview('alert', 'Créer une alerte');
+  }
+
+  /**
+   * Ouvre l'aperçu pour lancer un scan
+   */
+  openLaunchScanPreview(): void {
+    this.openActionPreview('scan', 'Lancer un scan');
+  }
+
+  /**
+   * Ouvre l'aperçu pour signaler un incident
+   */
+  openReportIncidentPreview(): void {
+    this.openActionPreview('incident', 'Signaler un incident');
+  }
+
+  /**
+   * Ouvre l'aperçu pour générer un rapport
+   */
+  openGenerateReportPreview(): void {
+    this.openActionPreview('report', 'Générer un rapport');
   }
 
   /**
@@ -1016,149 +1130,27 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle alert actions
+   * Handle vulnerability details view
    */
-  onAlertAction(event: {alert: Alert, action: string}): void {
-    const { alert, action } = event;
-
-    // Handle different actions
-    switch (action) {
-      case 'view':
-        if (alert.type === 'vulnerability') {
-          // Find the corresponding vulnerability
-          const vuln = this.vulnerabilities.find(v =>
-            v.vulnerabilityName.includes(alert.description.split(' on host ')[0])
-          );
-
-          if (vuln) {
-            this.onViewVulnerabilityDetails(vuln);
-            return;
-          }
-        }
-        this.notificationService.showInfo(`Viewing details for alert: ${alert.title}`);
-        break;
-      case 'acknowledge':
-        this.notificationService.showSuccess(`Alert acknowledged: ${alert.title}`);
-        break;
-      case 'investigate':
-        this.notificationService.showInfo(`Investigating alert: ${alert.title}`);
-        break;
-      case 'resolve':
-        this.notificationService.showSuccess(`Alert resolved: ${alert.title}`);
-        break;
-      case 'dismiss':
-        this.notificationService.showWarning(`Alert dismissed: ${alert.title}`);
-        break;
-      case 'delete':
-        this.notificationService.showWarning(`Alert deleted: ${alert.title}`);
-        // Remove from the list
-        this.recentAlerts = this.recentAlerts.filter(a => a.id !== alert.id);
-        break;
-      case 'block':
-        this.notificationService.showSuccess(`IP blocked for alert: ${alert.title}`);
-        break;
-      case 'remediate':
-        this.notificationService.showInfo(`Remediation started for: ${alert.title}`);
-        break;
-      case 'analyze':
-        this.notificationService.showInfo(`Analysis started for: ${alert.title}`);
-        break;
-      case 'isolate':
-        this.notificationService.showSuccess(`System isolated for alert: ${alert.title}`);
-        break;
-      default:
-        this.notificationService.showInfo(`Action ${action} performed on alert: ${alert.title}`);
-    }
+  onViewVulnerabilityDetails(vulnerability: Vulnerability): void {
+    this.selectedVulnerability = vulnerability;
+    this.dialog.open(VulnerabilityDetailsDialogComponent, {
+      width: '800px',
+      data: vulnerability,
+      panelClass: 'dark-theme-dialog'
+    });
   }
 
   /**
-   * Navigate to alerts page
+   * Export vulnerability data
    */
-  navigateToAlerts(): void {
-    this.router.navigate(['/dashboard/alerts']);
+  onExportVulnerabilityData(format: string): void {
+    this.exportData(format);
   }
 
   /**
-   * Navigate to tasks page
+   * Load mock data for a microservice tab
    */
-  navigateToTasks(): void {
-    this.router.navigate(['/dashboard/tasks']);
-  }
-
-  /**
-   * Navigate to reports page
-   */
-  navigateToReports(): void {
-    this.router.navigate(['/dashboard/reports']);
-  }
-
-  /**
-   * Toggle between dark and light theme
-   */
-  toggleTheme(): void {
-    this.isDarkTheme = !this.isDarkTheme;
-    document.body.classList.toggle('dark-theme', this.isDarkTheme);
-    document.body.classList.toggle('light-theme', !this.isDarkTheme);
-
-    // Show notification
-    if (this.isDarkTheme) {
-      this.notificationService.showInfo('Thème sombre activé');
-    } else {
-      this.notificationService.showInfo('Thème clair activé');
-    }
-  }
-
-  /**
-   * Ouvre un aperçu d'action
-   */
-  openActionPreview(type: string, title: string): void {
-    this.notificationService.showInfo(`Aperçu "${title}" en cours de développement`);
-
-    // Afficher un message différent selon le type d'action
-    switch (type) {
-      case 'alert':
-        this.notificationService.showSuccess('Alerte créée avec succès');
-        break;
-      case 'scan':
-        this.notificationService.showSuccess('Scan lancé avec succès');
-        break;
-      case 'incident':
-        this.notificationService.showSuccess('Incident signalé avec succès');
-        break;
-      case 'report':
-        this.notificationService.showSuccess('Rapport généré avec succès');
-        break;
-    }
-  }
-
-  /**
-   * Ouvre l'aperçu pour créer une alerte
-   */
-  openCreateAlertPreview(): void {
-    this.openActionPreview('alert', 'Créer une alerte');
-  }
-
-  /**
-   * Ouvre l'aperçu pour lancer un scan
-   */
-  openLaunchScanPreview(): void {
-    this.openActionPreview('scan', 'Lancer un scan');
-  }
-
-  /**
-   * Ouvre l'aperçu pour signaler un incident
-   */
-  openReportIncidentPreview(): void {
-    this.openActionPreview('incident', 'Signaler un incident');
-  }
-
-  /**
-   * Ouvre l'aperçu pour générer un rapport
-   */
-  openGenerateReportPreview(): void {
-    this.openActionPreview('report', 'Générer un rapport');
-  }
-
   private loadMockData(tab: 'vi' | 'cti' | 'asm'): void {
     // Mock data for each microservice
     const mockData = {
@@ -1201,8 +1193,7 @@ export class AnalystDashboardComponent implements OnInit, OnDestroy {
       }
     };
 
-    // Utiliser une assertion de type pour indiquer à TypeScript que l'accès est sûr
+    // Set the mock data for the specified tab
     this.microserviceData[tab] = mockData[tab];
   }
 }
-

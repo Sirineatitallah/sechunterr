@@ -1,0 +1,510 @@
+import { Component, OnInit, OnDestroy, HostBinding, ViewChild, TemplateRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatTableModule } from '@angular/material/table';
+import { RouterModule, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+
+// Shared components
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
+import { NotificationCenterComponent } from '../../shared/components/notification-center/notification-center.component';
+import { SecurityEventsComponent } from '../../shared/components/security-events/security-events.component';
+import { MicroserviceConnectorService, MicroserviceType } from '../../core/services/microservice-connector.service';
+import { NotificationService } from '../../core/services/notification.service';
+import { GlobalSearchComponent, SearchResult } from '../../shared/components/global-search/global-search.component';
+import { RealTimeStatsComponent, StatItem } from '../../shared/components/real-time-stats/real-time-stats.component';
+
+// Vulnerability dashboard components
+import { VulnerabilitiesTableComponent } from './components/vulnerabilities-table/vulnerabilities-table.component';
+import { SeverityChartComponent } from './components/severity-chart/severity-chart.component';
+import { CVSSLineChartComponent } from './components/cvss-line-chart/cvss-line-chart.component';
+import { HostBarChartComponent } from './components/host-bar-chart/host-bar-chart.component';
+import { VulnerabilityDetailsDialogComponent } from './components/vulnerability-details-dialog/vulnerability-details-dialog.component';
+
+// CTI components
+import { ThreatMapComponent } from '../../cti/components/threat-map/threat-map.component';
+import { MitreHeatmapComponent } from '../../cti/components/mitre-heatmap/mitre-heatmap.component';
+
+// ASM components
+import { AttackSurfaceComponent } from '../../asm/components/attack-surface/attack-surface.component';
+
+// Services and models
+import { VulnerabilityService } from './services/vulnerability.service';
+import { Vulnerability } from './models/vulnerability.model';
+
+
+// Interfaces for new components
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'todo' | 'in-progress' | 'done';
+  priority: 'low' | 'medium' | 'high';
+  dueDate: Date;
+  completedDate?: Date;
+  assignedBy: string;
+  comments: TaskComment[];
+}
+
+interface TaskComment {
+  id: string;
+  author: string;
+  content: string;
+  date: Date;
+}
+
+interface Report {
+  id: string;
+  title: string;
+  type: string;
+  date: Date;
+  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+  content?: string;
+  fileUrl?: string;
+}
+
+interface Alert {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: Date;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  source: string;
+  status: 'new' | 'in-progress' | 'resolved' | 'dismissed';
+  type: 'incident' | 'vulnerability' | 'threat' | 'system';
+  actions?: { label: string; icon: string; action: string; }[];
+  message?: string;
+  read?: boolean;
+}
+
+@Component({
+  selector: 'app-analyst-dashboard',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatIconModule,
+    MatButtonModule,
+    MatCardModule,
+    MatTabsModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonToggleModule,
+    MatTableModule,
+    RouterModule,
+    SidebarComponent,
+    NotificationCenterComponent,
+    SecurityEventsComponent,
+    GlobalSearchComponent,
+    RealTimeStatsComponent,
+
+    // Vulnerability dashboard components
+    VulnerabilitiesTableComponent,
+    SeverityChartComponent,
+    CVSSLineChartComponent,
+    HostBarChartComponent,
+
+    // CTI components
+    ThreatMapComponent,
+    MitreHeatmapComponent,
+
+    // ASM components
+    AttackSurfaceComponent
+  ],
+  templateUrl: './analyst-dashboard.component.html',
+  styleUrls: ['./analyst-dashboard.component.scss'],
+  providers: [VulnerabilityService]
+})
+export class AnalystDashboardComponent implements OnInit, OnDestroy {
+  @HostBinding('class.dark-theme') isDarkTheme = true;
+  @ViewChild('taskDetailTemplate') taskDetailTemplate!: TemplateRef<any>;
+
+  // Active microservice tab
+  activeTab: 'vi' | 'cti' | 'asm' = 'vi';
+  selectedTabIndex = 0;
+
+  // Loading states
+  isLoading = {
+    vi: false,
+    cti: false,
+    asm: false
+  };
+
+  // Data for each microservice
+  microserviceData: {
+    vi: any;
+    cti: any;
+    asm: any;
+  } = {
+    vi: null,
+    cti: null,
+    asm: null
+  };
+
+  // Vulnerability data
+  vulnerabilities: Vulnerability[] = [];
+  filteredVulnerabilities: Vulnerability[] = [];
+  loadingVulnerabilities = false;
+  selectedVulnerability: Vulnerability | null = null;
+
+  // Microservice-specific vulnerability data
+  viVulnerabilities: Vulnerability[] = [];
+
+  // Analyst info
+  analystName = 'John Doe';
+
+  // Filter states
+  selectedDateRange: string = 'month';
+  selectedSeverity: string[] = ['critical', 'high', 'medium', 'low'];
+  selectedService: string = 'all';
+  selectedMicroservice: 'vi' | 'cti' | 'asm' = 'vi';
+
+  // Task management
+  tasks: Task[] = [];
+  selectedTaskStatus: string = 'all';
+  selectedTask: Task | null = null;
+  newComment: string = '';
+
+  // Reports
+  reportsHistory: Report[] = [];
+
+  // Subscriptions
+  private subscriptions: Subscription[] = [];
+
+  // Real-time stats
+  realTimeStats: StatItem[] = [
+    {
+      id: 'vulnerabilities',
+      label: 'Vulnérabilités',
+      value: 156,
+      icon: 'bug_report',
+      color: 'critical',
+      trend: 'up',
+      percentage: 12
+    },
+    {
+      id: 'threats',
+      label: 'Menaces Actives',
+      value: 23,
+      icon: 'gpp_maybe',
+      color: 'high',
+      trend: 'up',
+      percentage: 8
+    },
+    {
+      id: 'incidents',
+      label: 'Incidents',
+      value: 12,
+      icon: 'warning',
+      color: 'medium',
+      trend: 'down',
+      percentage: 5
+    },
+    {
+      id: 'assets',
+      label: 'Actifs Exposés',
+      value: 48,
+      icon: 'devices',
+      color: 'info',
+      trend: 'stable',
+      percentage: 0
+    }
+  ];
+
+  // Recent alerts
+  recentAlerts: Alert[] = [
+    {
+      id: 'alert-001',
+      title: 'Tentative d\'intrusion détectée',
+      description: 'Multiples tentatives d\'authentification échouées sur le serveur principal',
+      message: 'Multiples tentatives d\'authentification échouées sur le serveur principal',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+      severity: 'critical',
+      source: 'Firewall',
+      status: 'new',
+      type: 'incident',
+      read: false,
+      actions: [
+        { label: 'Investiguer', icon: 'search', action: 'investigate' },
+        { label: 'Bloquer IP', icon: 'block', action: 'block' }
+      ]
+    },
+    {
+      id: 'alert-002',
+      title: 'Nouvelle vulnérabilité critique',
+      description: 'CVE-2023-1234 affecte 5 serveurs dans votre infrastructure',
+      message: 'CVE-2023-1234 affecte 5 serveurs dans votre infrastructure',
+      timestamp: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
+      severity: 'high',
+      source: 'Scanner de vulnérabilités',
+      status: 'new',
+      type: 'vulnerability',
+      read: false,
+      actions: [
+        { label: 'Voir détails', icon: 'visibility', action: 'view' },
+        { label: 'Corriger', icon: 'build', action: 'remediate' }
+      ]
+    },
+    {
+      id: 'alert-003',
+      title: 'Activité suspecte détectée',
+      description: 'Comportement anormal observé sur le compte utilisateur admin',
+      message: 'Comportement anormal observé sur le compte utilisateur admin',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
+      severity: 'medium',
+      source: 'SIEM',
+      status: 'in-progress',
+      type: 'threat',
+      read: false,
+      actions: [
+        { label: 'Analyser', icon: 'analytics', action: 'analyze' },
+        { label: 'Isoler', icon: 'security', action: 'isolate' }
+      ]
+    }
+  ];
+
+  constructor(
+    private microserviceConnector: MicroserviceConnectorService,
+    private notificationService: NotificationService,
+    private router: Router,
+    private dialog: MatDialog,
+    private vulnerabilityService: VulnerabilityService
+  ) {}
+
+  ngOnInit(): void {
+    // Load initial data for the default tab
+    this.loadTabData(this.activeTab);
+
+    // Load vulnerability data
+    this.loadVulnerabilityData();
+
+    // Initialize mock tasks
+    this.initMockTasks();
+
+    // Initialize mock reports
+    this.initMockReports();
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Initialize mock tasks for demonstration
+   */
+  private initMockTasks(): void {
+    this.tasks = [
+      {
+        id: '1',
+        title: 'Analyser la vulnérabilité CVE-2023-1234',
+        description: 'Évaluer l\'impact de la vulnérabilité Log4j sur nos systèmes et proposer des mesures de remédiation.',
+        status: 'todo',
+        priority: 'high',
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+        assignedBy: 'Admin',
+        comments: []
+      },
+      {
+        id: '2',
+        title: 'Vérifier les alertes de sécurité du firewall',
+        description: 'Examiner les alertes récentes du firewall et déterminer s\'il y a des tentatives d\'intrusion légitimes.',
+        status: 'in-progress',
+        priority: 'medium',
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
+        assignedBy: 'Admin',
+        comments: [
+          {
+            id: '1',
+            author: 'John Doe',
+            content: 'J\'ai commencé à analyser les logs. Plusieurs tentatives suspectes détectées.',
+            date: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+          }
+        ]
+      },
+      {
+        id: '3',
+        title: 'Mettre à jour la base de signatures IDS',
+        description: 'Télécharger et installer les dernières signatures pour notre système de détection d\'intrusion.',
+        status: 'done',
+        priority: 'low',
+        dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        completedDate: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+        assignedBy: 'Admin',
+        comments: [
+          {
+            id: '1',
+            author: 'John Doe',
+            content: 'Mise à jour effectuée avec succès. 250 nouvelles signatures ajoutées.',
+            date: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 hours ago
+          }
+        ]
+      },
+      {
+        id: '4',
+        title: 'Analyser la campagne de phishing récente',
+        description: 'Examiner les emails de phishing récents et identifier les indicateurs de compromission (IOCs).',
+        status: 'in-progress',
+        priority: 'high',
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+        assignedBy: 'Admin',
+        comments: []
+      },
+      {
+        id: '5',
+        title: 'Vérifier les correctifs de sécurité Windows',
+        description: 'S\'assurer que tous les serveurs Windows ont les derniers correctifs de sécurité installés.',
+        status: 'todo',
+        priority: 'medium',
+        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+        assignedBy: 'Admin',
+        comments: []
+      }
+    ];
+  }
+
+  /**
+   * Initialize mock reports for demonstration
+   */
+  private initMockReports(): void {
+    this.reportsHistory = [
+      {
+        id: '1',
+        title: 'Rapport mensuel de vulnérabilités - Janvier 2024',
+        type: 'Mensuel',
+        date: new Date(2024, 0, 31), // January 31, 2024
+        status: 'approved',
+        fileUrl: '/reports/monthly-2024-01.pdf'
+      },
+      {
+        id: '2',
+        title: 'Analyse de la campagne de phishing Q1 2024',
+        type: 'Analyse',
+        date: new Date(2024, 2, 15), // March 15, 2024
+        status: 'submitted',
+        fileUrl: '/reports/phishing-q1-2024.pdf'
+      },
+      {
+        id: '3',
+        title: 'Évaluation de sécurité - Infrastructure Cloud',
+        type: 'Évaluation',
+        date: new Date(2024, 1, 20), // February 20, 2024
+        status: 'approved',
+        fileUrl: '/reports/cloud-security-assessment.pdf'
+      },
+      {
+        id: '4',
+        title: 'Rapport d\'incident - Tentative d\'intrusion',
+        type: 'Incident',
+        date: new Date(2024, 2, 5), // March 5, 2024
+        status: 'draft',
+        fileUrl: '/reports/incident-report-draft.pdf'
+      }
+    ];
+  }
+
+  /**
+   * Load vulnerability data from the API
+   */
+  private loadVulnerabilityData(): void {
+    this.loadingVulnerabilities = true;
+
+    const subscription = this.vulnerabilityService.loadVulnerabilities().subscribe({
+      next: (data) => {
+        this.vulnerabilities = data;
+        this.loadingVulnerabilities = false;
+
+        // Update real-time stats based on vulnerability data
+        this.updateRealTimeStats();
+
+        // Update recent alerts based on critical vulnerabilities
+        this.updateRecentAlerts();
+
+        // Log the loaded data
+        console.log('Loaded vulnerability data:', this.vulnerabilities.length, 'items');
+        if (this.vulnerabilities.length > 0) {
+          console.log('Sample vulnerability:', this.vulnerabilities[0]);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading vulnerability data:', error);
+        this.notificationService.showError('Failed to load vulnerability data');
+        this.loadingVulnerabilities = false;
+      }
+    });
+
+    this.subscriptions.push(subscription);
+  }
+
+  /**
+   * Update recent alerts based on critical vulnerabilities
+   */
+  private updateRecentAlerts(): void {
+    if (this.vulnerabilities.length === 0) return;
+
+    // Get critical and high vulnerabilities
+    const criticalVulns = this.vulnerabilities
+      .filter(v => v.severity.toLowerCase() === 'critical' || v.severity.toLowerCase() === 'high')
+      .slice(0, 3); // Take top 3
+
+    // Create alerts from vulnerabilities
+    const newAlerts = criticalVulns.map(vuln => {
+      // Map severity to the expected type
+      let alertSeverity: 'critical' | 'high' | 'medium' | 'low';
+      switch (vuln.severity.toLowerCase()) {
+        case 'critical':
+          alertSeverity = 'critical';
+          break;
+        case 'high':
+          alertSeverity = 'high';
+          break;
+        case 'medium':
+          alertSeverity = 'medium';
+          break;
+        default:
+          alertSeverity = 'low';
+      }
+
+      return {
+        id: vuln.id || `alert-${Math.random().toString(36).substring(2, 9)}`,
+        title: `${vuln.severity} Vulnerability Detected`,
+        description: `${vuln.vulnerabilityName} on host ${vuln.host_ip}`,
+        message: `${vuln.vulnerabilityName} on host ${vuln.host_ip}`,
+        timestamp: new Date(vuln.discoveredDate),
+        severity: alertSeverity,
+        source: 'Vulnerability Scanner',
+        status: 'new' as 'new' | 'in-progress' | 'resolved' | 'dismissed',
+        type: 'vulnerability' as 'vulnerability' | 'threat' | 'incident' | 'system',
+        read: false,
+        actions: [
+          { label: 'View Details', icon: 'visibility', action: 'view' },
+          { label: 'Remediate', icon: 'build', action: 'remediate' }
+        ]
+      };
+    });
+
+    // Add new alerts to the beginning of the list
+    if (newAlerts.length > 0) {
+      this.recentAlerts = [...newAlerts, ...this.recentAlerts].slice(0, 10); // Keep only top 10
+    }
+  }
+}

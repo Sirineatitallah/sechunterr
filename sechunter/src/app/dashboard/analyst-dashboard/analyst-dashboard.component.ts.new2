@@ -1,0 +1,303 @@
+  /**
+   * Update real-time stats based on vulnerability data
+   */
+  private updateRealTimeStats(): void {
+    if (this.vulnerabilities.length === 0) return;
+
+    // Count vulnerabilities by severity
+    const severityCounts = {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0
+    };
+
+    this.vulnerabilities.forEach(vuln => {
+      const severity = vuln.severity.toLowerCase();
+      if (severity in severityCounts) {
+        severityCounts[severity as keyof typeof severityCounts]++;
+      }
+    });
+
+    // Update real-time stats
+    const totalVulnerabilities = Object.values(severityCounts).reduce((a, b) => a + b, 0);
+    
+    // Find the stat for vulnerabilities and update it
+    const vulnStat = this.realTimeStats.find(stat => stat.id === 'vulnerabilities');
+    if (vulnStat) {
+      vulnStat.value = totalVulnerabilities;
+      
+      // Calculate trend (simplified)
+      const previousValue = totalVulnerabilities - severityCounts.critical - severityCounts.high;
+      const currentValue = severityCounts.critical + severityCounts.high;
+      
+      if (currentValue > previousValue) {
+        vulnStat.trend = 'up';
+        vulnStat.percentage = Math.round((currentValue - previousValue) / (previousValue || 1) * 100);
+      } else if (currentValue < previousValue) {
+        vulnStat.trend = 'down';
+        vulnStat.percentage = Math.round((previousValue - currentValue) / (previousValue || 1) * 100);
+      } else {
+        vulnStat.trend = 'stable';
+        vulnStat.percentage = 0;
+      }
+    }
+  }
+
+  /**
+   * Set the active tab and load its data
+   */
+  setActiveTab(tab: string): void {
+    // Convert menu title to tab name
+    let tabName: 'vi' | 'cti' | 'asm' = 'vi';
+
+    if (tab.toLowerCase().includes('vulnerability') || tab.toLowerCase().includes('vi')) {
+      tabName = 'vi';
+      this.selectedTabIndex = 0;
+    } else if (tab.toLowerCase().includes('cyber') || tab.toLowerCase().includes('threat') || tab.toLowerCase().includes('cti')) {
+      tabName = 'cti';
+      this.selectedTabIndex = 1;
+    } else if (tab.toLowerCase().includes('attack') || tab.toLowerCase().includes('surface') || tab.toLowerCase().includes('asm')) {
+      tabName = 'asm';
+      this.selectedTabIndex = 2;
+    }
+
+    this.activeTab = tabName;
+    this.loadTabData(tabName);
+
+    // Add animation effect when changing tabs
+    const contentElement = document.querySelector('.dashboard-content');
+    if (contentElement) {
+      contentElement.classList.add('tab-changing');
+
+      // Scroll to top when changing tabs
+      contentElement.scrollTop = 0;
+
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        contentElement.classList.remove('tab-changing');
+      }, 500);
+    }
+  }
+
+  /**
+   * Handle tab change from mat-tab-group
+   */
+  onTabChange(event: MatTabChangeEvent): void {
+    // Update selected tab index
+    this.selectedTabIndex = event.index;
+    
+    // Scroll to top when changing tabs
+    const contentElement = document.querySelector('.dashboard-content');
+    if (contentElement) {
+      contentElement.scrollTop = 0;
+    }
+  }
+
+  /**
+   * Apply filters to vulnerability data
+   */
+  applyFilters(): void {
+    if (!this.vulnerabilities || this.vulnerabilities.length === 0) {
+      this.filteredVulnerabilities = [];
+      return;
+    }
+
+    // Start with all vulnerabilities
+    let filtered = [...this.vulnerabilities];
+
+    // Filter by date range
+    if (this.selectedDateRange) {
+      const now = new Date();
+      let startDate: Date;
+
+      switch (this.selectedDateRange) {
+        case 'today':
+          startDate = new Date(now.setHours(0, 0, 0, 0));
+          break;
+        case 'week':
+          startDate = new Date(now);
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case 'month':
+          startDate = new Date(now);
+          startDate.setMonth(startDate.getMonth() - 1);
+          break;
+        case 'quarter':
+          startDate = new Date(now);
+          startDate.setMonth(startDate.getMonth() - 3);
+          break;
+        default:
+          startDate = new Date(0); // Beginning of time
+      }
+
+      filtered = filtered.filter(v => new Date(v.discoveredDate) >= startDate);
+    }
+
+    // Filter by severity
+    if (this.selectedSeverity && this.selectedSeverity.length > 0) {
+      filtered = filtered.filter(v =>
+        this.selectedSeverity.includes(v.severity.toLowerCase())
+      );
+    }
+
+    // Filter by service (microservice)
+    if (this.selectedService && this.selectedService !== 'all') {
+      // In a real application, this would filter based on the source microservice
+      // For now, we'll just simulate it with a random subset
+      if (this.selectedService === 'vi') {
+        filtered = filtered.filter(v => v.cve_ids && v.cve_ids.length > 0);
+      } else if (this.selectedService === 'cti') {
+        filtered = filtered.filter(v => v.exploitAvailable);
+      } else if (this.selectedService === 'asm') {
+        filtered = filtered.filter(v => v.host_ip.startsWith('192.168'));
+      }
+    }
+
+    this.filteredVulnerabilities = filtered;
+  }
+
+  /**
+   * Export data in specified format
+   */
+  exportData(format: string): void {
+    if (this.filteredVulnerabilities.length === 0) {
+      this.notificationService.showWarning('Aucune donnée à exporter');
+      return;
+    }
+
+    this.notificationService.showInfo(`Exportation des données au format ${format.toUpperCase()}...`);
+
+    // In a real application, this would call a service to export the data
+    setTimeout(() => {
+      this.notificationService.showSuccess(`Données exportées au format ${format.toUpperCase()}`);
+    }, 1500);
+  }
+
+  /**
+   * Handle microservice change in the second tab
+   */
+  onMicroserviceChange(_event: any): void {
+    // Load data for the selected microservice
+    this.loadTabData(this.selectedMicroservice);
+
+    // In a real application, this would load specific data for the selected microservice
+    if (this.selectedMicroservice === 'vi') {
+      this.viVulnerabilities = this.vulnerabilities.filter(v => v.cve_ids && v.cve_ids.length > 0);
+    }
+  }
+
+  /**
+   * Load data for the specified microservice tab
+   */
+  loadTabData(tab: 'vi' | 'cti' | 'asm'): void {
+
+    // Skip if data is already loaded
+    if (this.microserviceData[tab]) {
+      return;
+    }
+
+    // Set loading state
+    this.isLoading[tab] = true;
+
+    // Map tab to microservice type
+    const microserviceType = this.getMicroserviceType(tab);
+
+    // Load data from microservice
+    this.microserviceConnector.getServiceData(microserviceType).subscribe({
+      next: (data: any) => {
+        this.microserviceData[tab] = data;
+        this.isLoading[tab] = false;
+      },
+      error: (error) => {
+        console.error(`Error loading ${tab} data:`, error);
+        this.isLoading[tab] = false;
+        // Load mock data as fallback
+        this.loadMockData(tab);
+      }
+    });
+  }
+
+  /**
+   * Map tab name to microservice type
+   */
+  private getMicroserviceType(tab: string): MicroserviceType {
+    switch (tab) {
+      case 'vi':
+        return MicroserviceType.VULNERABILITY_SCANNER; // Utiliser VULNERABILITY_SCANNER pour VI
+      case 'cti':
+        return MicroserviceType.THREAT_INTEL;
+      case 'asm':
+        return MicroserviceType.VULNERABILITY_SCANNER;
+
+      default:
+        return MicroserviceType.VULNERABILITY_SCANNER; // Valeur par défaut
+    }
+  }
+
+  /**
+   * Handle search result selection
+   */
+  onSearchResultSelected(result: SearchResult): void {
+    // Navigate to the appropriate page based on the result type
+    this.router.navigate([result.link]);
+
+    // Show notification
+    this.notificationService.showSuccess(`Navigating to ${result.title}`);
+  }
+
+  /**
+   * Handle alert actions
+   */
+  onAlertAction(event: {alert: Alert, action: string}): void {
+    const { alert, action } = event;
+
+    // Handle different actions
+    switch (action) {
+      case 'view':
+        if (alert.type === 'vulnerability') {
+          // Find the corresponding vulnerability
+          const vuln = this.vulnerabilities.find(v =>
+            v.vulnerabilityName.includes(alert.description.split(' on host ')[0])
+          );
+
+          if (vuln) {
+            this.onViewVulnerabilityDetails(vuln);
+            return;
+          }
+        }
+        this.notificationService.showInfo(`Viewing details for alert: ${alert.title}`);
+        break;
+      case 'acknowledge':
+        this.notificationService.showSuccess(`Alert acknowledged: ${alert.title}`);
+        break;
+      case 'investigate':
+        this.notificationService.showInfo(`Investigating alert: ${alert.title}`);
+        break;
+      case 'resolve':
+        this.notificationService.showSuccess(`Alert resolved: ${alert.title}`);
+        break;
+      case 'dismiss':
+        this.notificationService.showWarning(`Alert dismissed: ${alert.title}`);
+        break;
+      case 'delete':
+        this.notificationService.showWarning(`Alert deleted: ${alert.title}`);
+        // Remove from the list
+        this.recentAlerts = this.recentAlerts.filter(a => a.id !== alert.id);
+        break;
+      case 'block':
+        this.notificationService.showSuccess(`IP blocked for alert: ${alert.title}`);
+        break;
+      case 'remediate':
+        this.notificationService.showInfo(`Remediation started for: ${alert.title}`);
+        break;
+      case 'analyze':
+        this.notificationService.showInfo(`Analysis started for: ${alert.title}`);
+        break;
+      case 'isolate':
+        this.notificationService.showSuccess(`System isolated for alert: ${alert.title}`);
+        break;
+      default:
+        this.notificationService.showInfo(`Action ${action} performed on alert: ${alert.title}`);
+    }
+  }

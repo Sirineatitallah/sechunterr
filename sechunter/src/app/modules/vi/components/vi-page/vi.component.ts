@@ -1,10 +1,13 @@
 //vi.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { VulnerabilityService, Vulnerability as ApiVulnerability } from '../../services/vulnerability.service';
 
 // Interfaces
 interface TimeRange {
@@ -133,12 +136,20 @@ interface BotStatusInfo {
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    RouterModule
+    RouterModule,
+    HttpClientModule
   ],
   templateUrl: './vi.component.html',
   styleUrls: ['./vi.component.scss']
 })
-export class ViComponent implements OnInit {
+export class ViComponent implements OnInit, OnDestroy {
+  // Subscription to manage API calls
+  private subscriptions: Subscription[] = [];
+
+  // API data
+  apiVulnerabilities: ApiVulnerability[] = [];
+  isLoading = false;
+  apiError: string | null = null;
   // Time ranges
   timeRanges: TimeRange[] = [
     { id: '7d', label: '7 jours' },
@@ -205,11 +216,85 @@ export class ViComponent implements OnInit {
   // 10. État des bots
   botStatus: BotStatusInfo[] = [];
 
-  constructor() { }
+  constructor(private vulnerabilityService: VulnerabilityService) { }
 
   ngOnInit(): void {
     // Initialize mock data
     this.initMockData();
+
+    // Load data from API
+    this.loadVulnerabilityData();
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  /**
+   * Load vulnerability data from the API
+   */
+  loadVulnerabilityData(): void {
+    this.isLoading = true;
+    this.apiError = null;
+
+    const subscription = this.vulnerabilityService.getVulnerabilities().subscribe({
+      next: (data) => {
+        this.apiVulnerabilities = data;
+        this.isLoading = false;
+
+        // Update UI with API data if available
+        if (data.length > 0) {
+          this.updateUIWithAPIData();
+        }
+
+        console.log('Loaded vulnerability data from API:', data.length, 'items');
+      },
+      error: (error) => {
+        console.error('Error loading vulnerability data from API:', error);
+        this.apiError = 'Failed to load vulnerability data from API';
+        this.isLoading = false;
+      }
+    });
+
+    this.subscriptions.push(subscription);
+  }
+
+  /**
+   * Update UI components with API data
+   */
+  private updateUIWithAPIData(): void {
+    if (this.apiVulnerabilities.length === 0) return;
+
+    // Update vulnerability summary
+    const criticalCount = this.apiVulnerabilities.filter(v => v.severity.toLowerCase() === 'critical').length;
+    const highCount = this.apiVulnerabilities.filter(v => v.severity.toLowerCase() === 'high').length;
+    const patchedCount = this.apiVulnerabilities.filter(v => v.patchAvailable).length;
+
+    this.vulnerabilitySummary = {
+      totalVulnerabilities: this.apiVulnerabilities.length,
+      criticalVulnerabilities: criticalCount,
+      highVulnerabilities: highCount,
+      patchedVulnerabilities: patchedCount,
+      trend: -5 // Mock trend for now
+    };
+
+    // Update top vulnerabilities
+    this.topVulnerabilities = this.apiVulnerabilities
+      .filter(v => v.severity.toLowerCase() === 'critical' || v.severity.toLowerCase() === 'high')
+      .slice(0, 5)
+      .map(v => ({
+        id: v.id,
+        cve: v.cve_ids[0] || 'Unknown',
+        title: v.vulnerabilityName,
+        severity: v.severity.toLowerCase(),
+        cvss: v.cvssScore,
+        status: v.status,
+        affectedSystems: Math.floor(Math.random() * 50) + 1 // Mock affected systems count
+      }));
+
+    // Update other UI components as needed
+    console.log('UI updated with API data');
   }
 
   // Set time range
@@ -221,9 +306,40 @@ export class ViComponent implements OnInit {
 
   // Refresh all data
   refreshAll(): void {
-    // In a real application, this would call APIs to refresh data
     console.log('Refreshing all data for time range:', this.selectedTimeRange);
-    this.initMockData(); // For demo, just reinitialize mock data
+
+    // Show loading state
+    this.isLoading = true;
+
+    // Load data from API
+    this.loadVulnerabilityData();
+
+    // Also refresh mock data for components not yet connected to API
+    this.initMockData();
+
+    // Show notification to user
+    this.showNotification('Données rafraîchies depuis l\'API');
+  }
+
+  /**
+   * Show a notification to the user
+   */
+  private showNotification(message: string): void {
+    // Create a notification element
+    const notification = document.createElement('div');
+    notification.className = 'api-notification';
+    notification.textContent = message;
+
+    // Add it to the document
+    document.body.appendChild(notification);
+
+    // Remove it after a delay
+    setTimeout(() => {
+      notification.classList.add('fade-out');
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 500);
+    }, 3000);
   }
 
   // Get CVSS class based on score

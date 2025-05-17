@@ -26,6 +26,19 @@
     </div>
   </div>
 
+  <!-- Loading Indicator -->
+  <div class="loading-indicator" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement des données depuis l'API...</p>
+  </div>
+
+  <!-- API Error Message -->
+  <div class="api-error" *ngIf="apiError">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ apiError }}</p>
+    <button (click)="loadVulnerabilityData()">Réessayer</button>
+  </div>
+
   <!-- Vulnerability Summary Section -->
   <div class="vulnerability-summary-section">
     <h3>Résumé des Vulnérabilités</h3>

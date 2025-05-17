@@ -9,7 +9,7 @@
     <!-- Header with analyst info and notifications -->
     <header class="dashboard-header">
       <div class="header-left">
-        <h1>Vulnerability Analysis Dashboard</h1>
+        <h1>Dashboard Principal de l'Analyste</h1>
       </div>
       <div class="header-right">
         <app-global-search (resultSelected)="onSearchResultSelected($event)"></app-global-search>
@@ -28,64 +28,438 @@
 
     <!-- Dashboard content -->
     <div class="dashboard-content" [ngClass]="activeTab + '-content'">
-      <!-- Top row: Charts and summary -->
-      <div class="dashboard-row">
-        <!-- Severity Breakdown Chart -->
-        <div class="dashboard-card">
-          <app-severity-chart
-            [vulnerabilities]="vulnerabilities"
-            [loading]="loadingVulnerabilities">
-          </app-severity-chart>
-        </div>
+      <!-- Section tabs -->
+      <mat-tab-group (selectedTabChange)="onTabChange($event)" animationDuration="300ms">
+        <!-- Vue globale des vulnérabilités -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>dashboard</mat-icon>
+            <span>Vue globale des vulnérabilités</span>
+          </ng-template>
 
-        <!-- CVSS Line Chart -->
-        <div class="dashboard-card">
-          <app-cvss-line-chart
-            [vulnerabilities]="vulnerabilities"
-            [loading]="loadingVulnerabilities">
-          </app-cvss-line-chart>
-        </div>
+          <div class="section-container">
+            <div class="section-header">
+              <h2>Vue globale des vulnérabilités</h2>
+              <div class="filter-controls">
+                <mat-form-field appearance="outline" class="date-filter">
+                  <mat-label>Période</mat-label>
+                  <mat-select [(value)]="selectedDateRange" (selectionChange)="applyFilters()">
+                    <mat-option value="today">Aujourd'hui</mat-option>
+                    <mat-option value="week">7 derniers jours</mat-option>
+                    <mat-option value="month">30 derniers jours</mat-option>
+                    <mat-option value="quarter">90 derniers jours</mat-option>
+                  </mat-select>
+                </mat-form-field>
 
-        <!-- Host Bar Chart -->
-        <div class="dashboard-card">
-          <app-host-bar-chart
-            [vulnerabilities]="vulnerabilities"
-            [loading]="loadingVulnerabilities">
-          </app-host-bar-chart>
-        </div>
-      </div>
+                <mat-form-field appearance="outline" class="severity-filter">
+                  <mat-label>Criticité</mat-label>
+                  <mat-select [(value)]="selectedSeverity" multiple (selectionChange)="applyFilters()">
+                    <mat-option value="critical">Critique</mat-option>
+                    <mat-option value="high">Élevée</mat-option>
+                    <mat-option value="medium">Moyenne</mat-option>
+                    <mat-option value="low">Faible</mat-option>
+                  </mat-select>
+                </mat-form-field>
 
-      <!-- Middle row: Vulnerabilities table -->
-      <div class="dashboard-row">
-        <div class="dashboard-card full-width">
-          <app-vulnerabilities-table
-            [vulnerabilities]="vulnerabilities"
-            [loading]="loadingVulnerabilities"
-            (viewDetails)="onViewVulnerabilityDetails($event)"
-            (exportData)="onExportVulnerabilityData($event)">
-          </app-vulnerabilities-table>
-        </div>
-      </div>
+                <mat-form-field appearance="outline" class="service-filter">
+                  <mat-label>Microservice</mat-label>
+                  <mat-select [(value)]="selectedService" (selectionChange)="applyFilters()">
+                    <mat-option value="all">Tous</mat-option>
+                    <mat-option value="vi">VI</mat-option>
+                    <mat-option value="cti">CTI</mat-option>
+                    <mat-option value="asm">ASM</mat-option>
+                  </mat-select>
+                </mat-form-field>
 
-      <!-- Bottom row: Recent vulnerabilities and alerts -->
-      <div class="dashboard-row">
-        <div class="dashboard-card">
-          <app-recent-vulns
-            [vulnerabilities]="vulnerabilities"
-            [loading]="loadingVulnerabilities"
-            (viewDetails)="onViewVulnerabilityDetails($event)">
-          </app-recent-vulns>
-        </div>
+                <button mat-raised-button color="primary" class="export-button" (click)="exportData('csv')">
+                  <mat-icon>file_download</mat-icon>
+                  Export CSV
+                </button>
 
-        <div class="dashboard-card">
-          <app-recent-alerts
-            [alerts]="recentAlerts"
-            [title]="'Recent Alerts'"
-            [viewAllLink]="'/dashboard/alerts'"
-            (alertAction)="onAlertAction($event)">
-          </app-recent-alerts>
-        </div>
-      </div>
+                <button mat-raised-button color="accent" class="export-button" (click)="exportData('pdf')">
+                  <mat-icon>picture_as_pdf</mat-icon>
+                  Export PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="charts-container">
+              <!-- Severity Breakdown Chart -->
+              <div class="dashboard-card">
+                <app-severity-chart
+                  [vulnerabilities]="filteredVulnerabilities"
+                  [loading]="loadingVulnerabilities">
+                </app-severity-chart>
+              </div>
+
+              <!-- CVSS Line Chart -->
+              <div class="dashboard-card">
+                <app-cvss-line-chart
+                  [vulnerabilities]="filteredVulnerabilities"
+                  [loading]="loadingVulnerabilities">
+                </app-cvss-line-chart>
+              </div>
+
+              <!-- Host Bar Chart -->
+              <div class="dashboard-card">
+                <app-host-bar-chart
+                  [vulnerabilities]="filteredVulnerabilities"
+                  [loading]="loadingVulnerabilities">
+                </app-host-bar-chart>
+              </div>
+            </div>
+
+            <!-- Vulnerabilities Table -->
+            <div class="vulnerabilities-table-container">
+              <app-vulnerabilities-table
+                [vulnerabilities]="filteredVulnerabilities"
+                [loading]="loadingVulnerabilities"
+                (viewDetails)="onViewVulnerabilityDetails($event)"
+                (exportData)="onExportVulnerabilityData($event)">
+              </app-vulnerabilities-table>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Analyse par microservice -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>analytics</mat-icon>
+            <span>Analyse par microservice</span>
+          </ng-template>
+
+          <div class="section-container">
+            <div class="section-header">
+              <h2>Analyse par microservice</h2>
+              <mat-button-toggle-group [(value)]="selectedMicroservice" (change)="onMicroserviceChange($event)">
+                <mat-button-toggle value="vi">
+                  <mat-icon>bug_report</mat-icon>
+                  VI
+                </mat-button-toggle>
+                <mat-button-toggle value="cti">
+                  <mat-icon>gpp_maybe</mat-icon>
+                  CTI
+                </mat-button-toggle>
+                <mat-button-toggle value="asm">
+                  <mat-icon>security</mat-icon>
+                  ASM
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+
+            <!-- Microservice content container -->
+            <div class="microservice-content" [ngSwitch]="selectedMicroservice">
+              <!-- VI Content -->
+              <div *ngSwitchCase="'vi'" class="microservice-panel">
+                <h3>Vulnerability Intelligence</h3>
+                <p class="microservice-description">Liste des vulnérabilités identifiées avec détails</p>
+
+                <div class="vi-content">
+                  <!-- VI specific components will be loaded here -->
+                  <app-vulnerabilities-table
+                    [vulnerabilities]="viVulnerabilities"
+                    [loading]="loadingVulnerabilities"
+                    (viewDetails)="onViewVulnerabilityDetails($event)">
+                  </app-vulnerabilities-table>
+                </div>
+              </div>
+
+              <!-- CTI Content -->
+              <div *ngSwitchCase="'cti'" class="microservice-panel">
+                <h3>Cyber Threat Intelligence</h3>
+                <p class="microservice-description">Menaces associées, IOC, TTPs</p>
+
+                <div class="cti-content">
+                  <!-- CTI specific components will be loaded here -->
+                  <div class="cti-visualizations">
+                    <app-threat-map></app-threat-map>
+                    <app-mitre-heatmap></app-mitre-heatmap>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ASM Content -->
+              <div *ngSwitchCase="'asm'" class="microservice-panel">
+                <h3>Attack Surface Monitoring</h3>
+                <p class="microservice-description">Vue des surfaces d'attaque exposées (IPs, domaines, ports ouverts…)</p>
+
+                <div class="asm-content">
+                  <!-- ASM specific components will be loaded here -->
+                  <app-attack-surface></app-attack-surface>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tâches assignées -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>assignment</mat-icon>
+            <span>Tâches assignées</span>
+          </ng-template>
+
+          <div class="section-container">
+            <div class="section-header">
+              <h2>Tâches assignées</h2>
+              <div class="task-controls">
+                <mat-form-field appearance="outline" class="task-filter">
+                  <mat-label>Statut</mat-label>
+                  <mat-select [(value)]="selectedTaskStatus" (selectionChange)="filterTasks()">
+                    <mat-option value="all">Tous</mat-option>
+                    <mat-option value="todo">À faire</mat-option>
+                    <mat-option value="in-progress">En cours</mat-option>
+                    <mat-option value="done">Fait</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" (click)="createNewTask()">
+                  <mat-icon>add</mat-icon>
+                  Nouvelle tâche
+                </button>
+              </div>
+            </div>
+
+            <div class="tasks-container">
+              <div class="task-columns">
+                <!-- To Do Column -->
+                <div class="task-column todo-column">
+                  <div class="column-header">
+                    <h3>À faire</h3>
+                    <span class="task-count">{{ getTaskCountByStatus('todo') }}</span>
+                  </div>
+
+                  <div class="task-list">
+                    <div *ngFor="let task of getTasksByStatus('todo')" class="task-card"
+                         [class.high-priority]="task.priority === 'high'"
+                         [class.medium-priority]="task.priority === 'medium'"
+                         [class.low-priority]="task.priority === 'low'"
+                         (click)="openTaskDetails(task)">
+                      <div class="task-header">
+                        <span class="task-title">{{ task.title }}</span>
+                        <span class="task-priority">{{ getPriorityLabel(task.priority) }}</span>
+                      </div>
+                      <div class="task-description">{{ task.description }}</div>
+                      <div class="task-footer">
+                        <span class="task-date">{{ task.dueDate | date:'dd/MM/yyyy' }}</span>
+                        <button mat-icon-button (click)="updateTaskStatus(task, 'in-progress'); $event.stopPropagation()">
+                          <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- In Progress Column -->
+                <div class="task-column in-progress-column">
+                  <div class="column-header">
+                    <h3>En cours</h3>
+                    <span class="task-count">{{ getTaskCountByStatus('in-progress') }}</span>
+                  </div>
+
+                  <div class="task-list">
+                    <div *ngFor="let task of getTasksByStatus('in-progress')" class="task-card"
+                         [class.high-priority]="task.priority === 'high'"
+                         [class.medium-priority]="task.priority === 'medium'"
+                         [class.low-priority]="task.priority === 'low'"
+                         (click)="openTaskDetails(task)">
+                      <div class="task-header">
+                        <span class="task-title">{{ task.title }}</span>
+                        <span class="task-priority">{{ getPriorityLabel(task.priority) }}</span>
+                      </div>
+                      <div class="task-description">{{ task.description }}</div>
+                      <div class="task-footer">
+                        <button mat-icon-button (click)="updateTaskStatus(task, 'todo'); $event.stopPropagation()">
+                          <mat-icon>arrow_back</mat-icon>
+                        </button>
+                        <span class="task-date">{{ task.dueDate | date:'dd/MM/yyyy' }}</span>
+                        <button mat-icon-button (click)="updateTaskStatus(task, 'done'); $event.stopPropagation()">
+                          <mat-icon>arrow_forward</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Done Column -->
+                <div class="task-column done-column">
+                  <div class="column-header">
+                    <h3>Fait</h3>
+                    <span class="task-count">{{ getTaskCountByStatus('done') }}</span>
+                  </div>
+
+                  <div class="task-list">
+                    <div *ngFor="let task of getTasksByStatus('done')" class="task-card"
+                         [class.high-priority]="task.priority === 'high'"
+                         [class.medium-priority]="task.priority === 'medium'"
+                         [class.low-priority]="task.priority === 'low'"
+                         (click)="openTaskDetails(task)">
+                      <div class="task-header">
+                        <span class="task-title">{{ task.title }}</span>
+                        <span class="task-priority">{{ getPriorityLabel(task.priority) }}</span>
+                      </div>
+                      <div class="task-description">{{ task.description }}</div>
+                      <div class="task-footer">
+                        <button mat-icon-button (click)="updateTaskStatus(task, 'in-progress'); $event.stopPropagation()">
+                          <mat-icon>arrow_back</mat-icon>
+                        </button>
+                        <span class="task-date">{{ task.completedDate | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Outils -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>build</mat-icon>
+            <span>Outils</span>
+          </ng-template>
+
+          <div class="section-container">
+            <div class="section-header">
+              <h2>Outils</h2>
+            </div>
+
+            <div class="tools-grid">
+              <!-- Integrated Tools -->
+              <div class="tools-section">
+                <h3>Outils intégrés</h3>
+                <div class="tools-cards">
+                  <div class="tool-card" (click)="launchTool('port-scanner')">
+                    <mat-icon>wifi_tethering</mat-icon>
+                    <h4>Scanner de port</h4>
+                    <p>Analyser les ports ouverts sur une cible</p>
+                  </div>
+
+                  <div class="tool-card" (click)="launchTool('whois')">
+                    <mat-icon>search</mat-icon>
+                    <h4>Whois</h4>
+                    <p>Informations sur les domaines</p>
+                  </div>
+
+                  <div class="tool-card" (click)="launchTool('reverse-dns')">
+                    <mat-icon>swap_horiz</mat-icon>
+                    <h4>Reverse DNS</h4>
+                    <p>Résolution inverse de noms de domaine</p>
+                  </div>
+
+                  <div class="tool-card" (click)="launchTool('sandbox')">
+                    <mat-icon>science</mat-icon>
+                    <h4>Sandbox</h4>
+                    <p>Analyse de fichiers suspects</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Resources -->
+              <div class="resources-section">
+                <h3>Ressources</h3>
+                <div class="resources-list">
+                  <a href="#" class="resource-link" (click)="openResource('wiki')">
+                    <mat-icon>menu_book</mat-icon>
+                    <span>Wiki interne</span>
+                  </a>
+
+                  <a href="#" class="resource-link" (click)="openResource('guides')">
+                    <mat-icon>description</mat-icon>
+                    <span>Guides d'analyse</span>
+                  </a>
+
+                  <a href="#" class="resource-link" (click)="openResource('sop')">
+                    <mat-icon>assignment</mat-icon>
+                    <span>Procédures opérationnelles (SOP)</span>
+                  </a>
+
+                  <a href="#" class="resource-link" (click)="openResource('training')">
+                    <mat-icon>school</mat-icon>
+                    <span>Formations</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Rapports & Export -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>summarize</mat-icon>
+            <span>Rapports & Export</span>
+          </ng-template>
+
+          <div class="section-container">
+            <div class="section-header">
+              <h2>Rapports & Export</h2>
+              <div class="report-actions">
+                <button mat-raised-button color="primary" (click)="generateReport()">
+                  <mat-icon>auto_awesome</mat-icon>
+                  Générer un rapport automatisé
+                </button>
+
+                <button mat-raised-button color="warn" (click)="reportCriticalVulnerability()">
+                  <mat-icon>warning</mat-icon>
+                  Signaler une vulnérabilité critique
+                </button>
+              </div>
+            </div>
+
+            <div class="reports-history">
+              <h3>Historique des rapports</h3>
+              <table mat-table [dataSource]="reportsHistory" class="reports-table">
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                  <th mat-header-cell *matHeaderCellDef>Date</th>
+                  <td mat-cell *matCellDef="let report">{{ report.date | date:'dd/MM/yyyy HH:mm' }}</td>
+                </ng-container>
+
+                <!-- Title Column -->
+                <ng-container matColumnDef="title">
+                  <th mat-header-cell *matHeaderCellDef>Titre</th>
+                  <td mat-cell *matCellDef="let report">{{ report.title }}</td>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="type">
+                  <th mat-header-cell *matHeaderCellDef>Type</th>
+                  <td mat-cell *matCellDef="let report">{{ report.type }}</td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Statut</th>
+                  <td mat-cell *matCellDef="let report">
+                    <span [class]="'status-badge ' + report.status">{{ getReportStatusLabel(report.status) }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let report">
+                    <button mat-icon-button matTooltip="Voir le rapport" (click)="viewReport(report)">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltip="Télécharger" (click)="downloadReport(report)">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                    <button mat-icon-button matTooltip="Partager" (click)="shareReport(report)">
+                      <mat-icon>share</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['date', 'title', 'type', 'status', 'actions']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['date', 'title', 'type', 'status', 'actions'];"></tr>
+              </table>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </div>
 
     <!-- Security Events -->
@@ -100,3 +474,73 @@
     <p>Loading data...</p>
   </div>
 </ng-template>
+
+<!-- Task Detail Dialog Template -->
+<ng-template #taskDetailTemplate>
+  <div class="task-detail-dialog">
+    <h2 mat-dialog-title>{{ selectedTask?.title }}</h2>
+    <mat-dialog-content>
+      <div class="task-detail-content">
+        <div class="task-detail-row">
+          <span class="detail-label">Priorité:</span>
+          <span class="detail-value" [class]="selectedTask?.priority + '-priority'">
+            {{ getPriorityLabel(selectedTask?.priority) }}
+          </span>
+        </div>
+
+        <div class="task-detail-row">
+          <span class="detail-label">Statut:</span>
+          <span class="detail-value">{{ getStatusLabel(selectedTask?.status) }}</span>
+        </div>
+
+        <div class="task-detail-row">
+          <span class="detail-label">Date d'échéance:</span>
+          <span class="detail-value">{{ selectedTask?.dueDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+
+        <div class="task-detail-row">
+          <span class="detail-label">Assigné par:</span>
+          <span class="detail-value">{{ selectedTask?.assignedBy }}</span>
+        </div>
+
+        <div class="task-detail-description">
+          <h3>Description</h3>
+          <p>{{ selectedTask?.description }}</p>
+        </div>
+
+        <div class="task-detail-comments">
+          <h3>Commentaires</h3>
+          <div class="comments-list">
+            <div *ngFor="let comment of selectedTask?.comments" class="comment-item">
+              <div class="comment-header">
+                <span class="comment-author">{{ comment.author }}</span>
+                <span class="comment-date">{{ comment.date | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="comment-content">{{ comment.content }}</div>
+            </div>
+          </div>
+
+          <div class="add-comment">
+            <mat-form-field appearance="outline" class="comment-input">
+              <mat-label>Ajouter un commentaire</mat-label>
+              <textarea matInput [(ngModel)]="newComment" rows="3"></textarea>
+            </mat-form-field>
+            <button mat-raised-button color="primary" [disabled]="!newComment" (click)="addComment()">
+              <mat-icon>send</mat-icon>
+              Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Fermer</button>
+      <button mat-raised-button color="primary" (click)="saveTaskChanges()">Enregistrer</button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<!-- Hidden component reference to satisfy Angular compiler -->
+<ng-container *ngIf="false">
+  <app-vulnerability-details-dialog></app-vulnerability-details-dialog>
+</ng-container>
