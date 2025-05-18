@@ -1,0 +1,7 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4300:80"  # hôte:conteneur
